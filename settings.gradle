@@ -1,0 +1,3 @@
+rootProject.name = 'tiny-types'
+
+include('core', 'format-gson', 'format-jackson')

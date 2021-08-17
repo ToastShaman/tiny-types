@@ -1,0 +1,11 @@
+//file:noinspection GroovyAssignabilityCheck
+
+plugins {
+    id 'tiny.types.java-common-conventions'
+}
+
+dependencies {
+    constraints {
+        implementation 'io.vavr:vavr:0.10.4'
+    }
+}
