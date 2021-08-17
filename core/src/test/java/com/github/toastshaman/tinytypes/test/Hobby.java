@@ -1,0 +1,9 @@
+package com.github.toastshaman.tinytypes.test;
+
+import com.github.toastshaman.tinytypes.values.NonBlankStringValue;
+
+public class Hobby extends NonBlankStringValue {
+    public Hobby(String value) {
+        super(value);
+    }
+}

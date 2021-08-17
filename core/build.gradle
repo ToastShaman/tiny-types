@@ -1,7 +1,3 @@
-plugins {
-    id 'tiny.types.java-core-conventions'
-}
-
 dependencies {
-    implementation 'io.vavr:vavr'
+    implementation(Libs.vavr)
 }

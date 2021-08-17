@@ -1,12 +1,9 @@
-plugins {
-    id 'tiny.types.java-format-jackson-conventions'
-}
-
 dependencies {
-    implementation project(':core')
+    api project(':core')
 
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    implementation(platform(Libs.jackson_bom))
+    implementation(Libs.jackson_databind)
+    implementation(Libs.jackson_module_parameter_names)
+
+    testImplementation project(path: ":core", configuration: 'testArtifacts')
 }

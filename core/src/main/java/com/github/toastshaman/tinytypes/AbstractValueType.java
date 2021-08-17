@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public class AbstractValueType<T> {
-    public final T value;
+    protected final T value;
     private final Function<T, String> showFn;
 
     public AbstractValueType(T value) {
@@ -29,6 +29,14 @@ public class AbstractValueType<T> {
         this.value = value;
     }
 
+    public String show() {
+        return showFn.apply(value);
+    }
+
+    public T unwrap() {
+        return value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -44,6 +52,6 @@ public class AbstractValueType<T> {
 
     @Override
     public String toString() {
-        return showFn.apply(value);
+        return show();
     }
 }

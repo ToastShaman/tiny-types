@@ -5,7 +5,7 @@ import com.github.toastshaman.tinytypes.validation.Validator;
 
 import java.util.function.Function;
 
-public class IntValue extends AbstractValueType<Integer> {
+public class IntValue extends AbstractValueType<Integer> implements Comparable<IntValue> {
     public static IntValue ZERO = new IntValue(0);
     public static IntValue ONE = new IntValue(1);
     public static IntValue TWO = new IntValue(2);
@@ -20,5 +20,10 @@ public class IntValue extends AbstractValueType<Integer> {
 
     public IntValue(Integer value, Validator<? super Integer> validator, Function<Integer, String> showFn) {
         super(value, validator, showFn);
+    }
+
+    @Override
+    public int compareTo(IntValue o) {
+        return value.compareTo(o.value);
     }
 }

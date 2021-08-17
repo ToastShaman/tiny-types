@@ -1,0 +1,57 @@
+//file:noinspection GroovyAssignabilityCheck
+//file:noinspection GroovyAccessibility
+//file:noinspection GradlePackageUpdate
+
+plugins {
+    id 'java-library'
+}
+
+allprojects {
+    apply plugin: 'java-library'
+
+    group 'com.github.toastshaman.tinytypes'
+    version = '0.0.1-SNAPSHOT'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+        withSourcesJar()
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType(JavaCompile) {
+        options.release = 11
+        options.compilerArgs += ['-parameters']
+    }
+
+    tasks.withType(Test) {
+        useJUnitPlatform()
+    }
+
+    configurations {
+        testArtifacts.extendsFrom testApi
+    }
+
+    task testJar(type: Jar) {
+        classifier "test"
+        from sourceSets.test.output
+    }
+
+    artifacts {
+        testArtifacts testJar
+    }
+
+    dependencies {
+        testImplementation(platform(Libs.junit_bom))
+        testImplementation(Libs.junit_jupiter_api)
+        testImplementation(Libs.junit_jupiter_params)
+        testImplementation(Libs.junit_jupiter_engine)
+
+        testImplementation(Libs.assertj_core)
+        testImplementation(Libs.jsonassert)
+        testImplementation(Libs.approvaltests)
+    }
+}

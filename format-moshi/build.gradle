@@ -1,7 +1,7 @@
 dependencies {
     api project(':core')
 
-    implementation(Libs.gson)
+    implementation(Libs.moshi)
 
     testImplementation project(path: ":core", configuration: 'testArtifacts')
 }

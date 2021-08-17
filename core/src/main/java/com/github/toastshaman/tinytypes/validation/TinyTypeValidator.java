@@ -31,7 +31,7 @@ public class TinyTypeValidator<T> implements Validator<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TinyTypeValidator<?> that = (TinyTypeValidator<?>) o;
-        return Objects.equals(predicate, that.predicate) && Objects.equals(message, that.message);
+        return predicate.equals(that.predicate) && message.equals(that.message);
     }
 
     @Override
