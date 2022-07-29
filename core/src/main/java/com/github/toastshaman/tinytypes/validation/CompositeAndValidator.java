@@ -1,6 +1,6 @@
 package com.github.toastshaman.tinytypes.validation;
 
-import io.vavr.control.Either;
+import com.github.toastshaman.tinytypes.either.Either;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +22,7 @@ public class CompositeAndValidator<T> implements Validator<T> {
     public Either<List<String>, T> isValid(T t) {
         List<String> errors = Stream.of(first, second)
                 .map(it -> it.isValid(t))
-                .map(it -> it.swap().getOrElse(List.of()))
+                .map(it -> it.swap().getOrElseGet((l) -> List.of()))
                 .flatMap(Collection::stream)
                 .collect(toList());
 

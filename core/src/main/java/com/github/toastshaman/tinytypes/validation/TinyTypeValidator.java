@@ -1,6 +1,6 @@
 package com.github.toastshaman.tinytypes.validation;
 
-import io.vavr.control.Either;
+import com.github.toastshaman.tinytypes.either.Either;
 
 import java.util.List;
 import java.util.Objects;

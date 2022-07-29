@@ -3,7 +3,6 @@ package com.github.toastshaman.tinytypes.values;
 import com.github.toastshaman.tinytypes.AbstractValueType;
 import com.github.toastshaman.tinytypes.validation.Validator;
 
-import java.awt.image.Kernel;
 import java.util.function.Function;
 
 public class LongValue extends AbstractValueType<Long> implements Comparable<LongValue> {

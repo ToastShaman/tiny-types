@@ -1,13 +1,11 @@
 package com.github.toastshaman.tinytypes.validation;
 
-import com.github.toastshaman.tinytypes.values.UUIDValue;
 import io.vavr.Tuple3;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,25 +20,25 @@ public class ValidatorTest {
     class Numbers {
         @Test
         void can_validate() {
-            assertThat(Validator.Min(1).isValid(1).getOrNull()).isEqualTo(1);
-            assertThat(Validator.Min(1L).isValid(1L).getOrNull()).isEqualTo(1L);
-            assertThat(Validator.Min(1F).isValid(1F).getOrNull()).isEqualTo(1F);
-            assertThat(Validator.Min(1D).isValid(1D).getOrNull()).isEqualTo(1D);
+            assertThat(Validator.Min(1).isValid(1).get()).isEqualTo(1);
+            assertThat(Validator.Min(1L).isValid(1L).get()).isEqualTo(1L);
+            assertThat(Validator.Min(1F).isValid(1F).get()).isEqualTo(1F);
+            assertThat(Validator.Min(1D).isValid(1D).get()).isEqualTo(1D);
 
-            assertThat(Validator.Min(1).isValid(0).swap().getOrNull()).containsExactly("must be greater than or equal to 1");
-            assertThat(Validator.Min(1L).isValid(0L).swap().getOrNull()).containsExactly("must be greater than or equal to 1");
-            assertThat(Validator.Min(1F).isValid(0F).swap().getOrNull()).containsExactly("must be greater than or equal to 1.000000");
-            assertThat(Validator.Min(1D).isValid(0D).swap().getOrNull()).containsExactly("must be greater than or equal to 1.000000");
+            assertThat(Validator.Min(1).isValid(0).swap().get()).containsExactly("must be greater than or equal to 1");
+            assertThat(Validator.Min(1L).isValid(0L).swap().get()).containsExactly("must be greater than or equal to 1");
+            assertThat(Validator.Min(1F).isValid(0F).swap().get()).containsExactly("must be greater than or equal to 1.000000");
+            assertThat(Validator.Min(1D).isValid(0D).swap().get()).containsExactly("must be greater than or equal to 1.000000");
 
-            assertThat(Validator.Max(1).isValid(1).getOrNull()).isEqualTo(1);
-            assertThat(Validator.Max(1L).isValid(1L).getOrNull()).isEqualTo(1L);
-            assertThat(Validator.Max(1F).isValid(1F).getOrNull()).isEqualTo(1F);
-            assertThat(Validator.Max(1D).isValid(1D).getOrNull()).isEqualTo(1D);
+            assertThat(Validator.Max(1).isValid(1).get()).isEqualTo(1);
+            assertThat(Validator.Max(1L).isValid(1L).get()).isEqualTo(1L);
+            assertThat(Validator.Max(1F).isValid(1F).get()).isEqualTo(1F);
+            assertThat(Validator.Max(1D).isValid(1D).get()).isEqualTo(1D);
 
-            assertThat(Validator.Max(1).isValid(2).swap().getOrNull()).containsExactly("must be less than or equal to 1");
-            assertThat(Validator.Max(1L).isValid(2L).swap().getOrNull()).containsExactly("must be less than or equal to 1");
-            assertThat(Validator.Max(1F).isValid(2F).swap().getOrNull()).containsExactly("must be less than or equal to 1.000000");
-            assertThat(Validator.Max(1D).isValid(2D).swap().getOrNull()).containsExactly("must be less than or equal to 1.000000");
+            assertThat(Validator.Max(1).isValid(2).swap().get()).containsExactly("must be less than or equal to 1");
+            assertThat(Validator.Max(1L).isValid(2L).swap().get()).containsExactly("must be less than or equal to 1");
+            assertThat(Validator.Max(1F).isValid(2F).swap().get()).containsExactly("must be less than or equal to 1.000000");
+            assertThat(Validator.Max(1D).isValid(2D).swap().get()).containsExactly("must be less than or equal to 1.000000");
         }
     }
 
@@ -49,17 +47,17 @@ public class ValidatorTest {
     class Strings {
         @Test
         public void can_validate() {
-            assertThat(Validator.MinLength(1).isValid("a").getOrNull()).isEqualTo("a");
-            assertThat(Validator.MaxLength(1).isValid("a").getOrNull()).isEqualTo("a");
+            assertThat(Validator.MinLength(1).isValid("a").get()).isEqualTo("a");
+            assertThat(Validator.MaxLength(1).isValid("a").get()).isEqualTo("a");
 
-            assertThat(Validator.MinLength(2).isValid("a").swap().getOrNull()).containsExactly("must be greater than or equal to 2");
-            assertThat(Validator.MaxLength(2).isValid("aaa").swap().getOrNull()).containsExactly("must be less than or equal to 2");
+            assertThat(Validator.MinLength(2).isValid("a").swap().get()).containsExactly("must be greater than or equal to 2");
+            assertThat(Validator.MaxLength(2).isValid("aaa").swap().get()).containsExactly("must be less than or equal to 2");
 
-            assertThat(Validator.Matches("\\d{2}\\w{2}").isValid("00aa").getOrNull()).isEqualTo("00aa");
-            assertThat(Validator.Matches("\\d{2}\\w{2}").isValid("foobar").swap().getOrNull()).containsExactly("must match \\d{2}\\w{2}");
+            assertThat(Validator.Matches("\\d{2}\\w{2}").isValid("00aa").get()).isEqualTo("00aa");
+            assertThat(Validator.Matches("\\d{2}\\w{2}").isValid("foobar").swap().get()).containsExactly("must match \\d{2}\\w{2}");
 
-            assertThat(Validator.Matches(Pattern.compile("\\d{2}\\w{2}")).isValid("00aa").getOrNull()).isEqualTo("00aa");
-            assertThat(Validator.Matches(Pattern.compile("\\d{2}\\w{2}")).isValid("foobar").swap().getOrNull()).containsExactly("must match \\d{2}\\w{2}");
+            assertThat(Validator.Matches(Pattern.compile("\\d{2}\\w{2}")).isValid("00aa").get()).isEqualTo("00aa");
+            assertThat(Validator.Matches(Pattern.compile("\\d{2}\\w{2}")).isValid("foobar").swap().get()).containsExactly("must match \\d{2}\\w{2}");
         }
     }
 
