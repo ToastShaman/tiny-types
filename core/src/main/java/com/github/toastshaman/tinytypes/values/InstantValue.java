@@ -17,6 +17,10 @@ public class InstantValue extends AbstractValueType<Instant> {
         super(value, validator);
     }
 
+    public InstantValue(Instant value, Function<Instant, String> showFn) {
+        super(value, showFn);
+    }
+
     public InstantValue(Instant value, Validator<? super Instant> validator, Function<Instant, String> showFn) {
         super(value, validator, showFn);
     }

@@ -19,6 +19,10 @@ public class FloatValue extends AbstractValueType<Float> {
         super(value, validator);
     }
 
+    public FloatValue(Float value, Function<Float, String> showFn) {
+        super(value, showFn);
+    }
+
     public FloatValue(Float value, Validator<? super Float> validator, Function<Float, String> showFn) {
         super(value, validator, showFn);
     }

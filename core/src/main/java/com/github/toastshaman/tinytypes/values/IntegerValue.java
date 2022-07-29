@@ -19,6 +19,10 @@ public class IntegerValue extends AbstractValueType<Integer> {
         super(value, validator);
     }
 
+    public IntegerValue(Integer value, Function<Integer, String> showFn) {
+        super(value, showFn);
+    }
+
     public IntegerValue(Integer value, Validator<? super Integer> validator, Function<Integer, String> showFn) {
         super(value, validator, showFn);
     }

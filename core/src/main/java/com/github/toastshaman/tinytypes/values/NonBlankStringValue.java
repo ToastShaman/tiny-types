@@ -10,6 +10,10 @@ public class NonBlankStringValue extends StringValue {
         super(value, Validator.NonBlank());
     }
 
+    public NonBlankStringValue(String value, Function<String, String> showFn) {
+        super(value, Validator.NonBlank(), showFn);
+    }
+
     public NonBlankStringValue(String value, Validator<String> validator) {
         super(value, Validator.NonBlank().and(validator));
     }

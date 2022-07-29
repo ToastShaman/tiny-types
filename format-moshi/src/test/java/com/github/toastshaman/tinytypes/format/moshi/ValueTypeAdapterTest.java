@@ -42,10 +42,12 @@ class ValueTypeAdapterTest {
         Age age = new Age(42);
         Hobby hobby = new Hobby("Playing Guitar");
         Timestamp timestamp = new Timestamp(BigInteger.ONE);
-        Person person = new Person(firstname, lastname, age, List.of(hobby), timestamp);
+        Pin pin = new Pin("1234567890");
+
+        Person person = new Person(firstname, lastname, age, List.of(hobby), timestamp, pin);
         String json = moshi.adapter(Person.class).toJson(person);
 
-        JSONAssert.assertEquals("{\"firstname\":\"Mete\",\"lastname\":\"Dietfried\",\"age\":42,\"hobbies\":[\"Playing Guitar\"],\"timestamp\":\"1\"}", json, STRICT);
+        JSONAssert.assertEquals("{\"firstname\":\"Mete\",\"lastname\":\"Dietfried\",\"age\":42,\"hobbies\":[\"Playing Guitar\"],\"timestamp\":\"1\",\"pin\":\"1234567890\"}", json, STRICT);
 
         Person personFromWire = moshi.adapter(Person.class).fromJson(json);
 

@@ -20,6 +20,10 @@ public class BigIntegerValue extends AbstractValueType<BigInteger> {
         super(value, validator);
     }
 
+    public BigIntegerValue(BigInteger value, Function<BigInteger, String> showFn) {
+        super(value, showFn);
+    }
+
     public BigIntegerValue(BigInteger value, Validator<? super BigInteger> validator, Function<BigInteger, String> showFn) {
         super(value, validator, showFn);
     }

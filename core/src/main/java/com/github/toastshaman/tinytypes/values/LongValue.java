@@ -19,6 +19,10 @@ public class LongValue extends AbstractValueType<Long> {
         super(value, validator);
     }
 
+    public LongValue(Long value, Function<Long, String> showFn) {
+        super(value, showFn);
+    }
+
     public LongValue(Long value, Validator<? super Long> validator, Function<Long, String> showFn) {
         super(value, validator, showFn);
     }

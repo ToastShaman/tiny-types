@@ -19,6 +19,10 @@ public class AbstractValueType<T extends Comparable<? super T>> implements Compa
         this(value, validator, Object::toString);
     }
 
+    public AbstractValueType(T value, Function<T, String> showFn) {
+        this(value, Validator.AlwaysValid(), showFn);
+    }
+
     public AbstractValueType(T value, Validator<? super T> validator, Function<T, String> showFn) {
         Objects.requireNonNull(value);
         Objects.requireNonNull(showFn);

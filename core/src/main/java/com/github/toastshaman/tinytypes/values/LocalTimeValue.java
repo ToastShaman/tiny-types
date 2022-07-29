@@ -17,6 +17,10 @@ public class LocalTimeValue extends AbstractValueType<LocalTime> {
         super(value, validator);
     }
 
+    public LocalTimeValue(LocalTime value, Function<LocalTime, String> showFn) {
+        super(value, showFn);
+    }
+
     public LocalTimeValue(LocalTime value, Validator<? super LocalTime> validator, Function<LocalTime, String> showFn) {
         super(value, validator, showFn);
     }

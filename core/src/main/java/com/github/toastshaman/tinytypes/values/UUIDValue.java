@@ -16,6 +16,10 @@ public class UUIDValue extends AbstractValueType<UUID> {
         super(value, validator);
     }
 
+    public UUIDValue(UUID value, Function<UUID, String> showFn) {
+        super(value, showFn);
+    }
+
     public UUIDValue(UUID value, Validator<? super UUID> validator, Function<UUID, String> showFn) {
         super(value, validator, showFn);
     }

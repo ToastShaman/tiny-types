@@ -21,6 +21,10 @@ public class BigDecimalValue extends AbstractValueType<BigDecimal> {
         super(value, validator);
     }
 
+    public BigDecimalValue(BigDecimal value, Function<BigDecimal, String> showFn) {
+        super(value, showFn);
+    }
+
     public BigDecimalValue(BigDecimal value, Validator<? super BigDecimal> validator, Function<BigDecimal, String> showFn) {
         super(value, validator, showFn);
     }

@@ -10,6 +10,10 @@ public class NonEmptyStringValue extends StringValue {
         super(value, Validator.NonEmpty());
     }
 
+    public NonEmptyStringValue(String value, Function<String, String> showFn) {
+        super(value, Validator.NonEmpty(), showFn);
+    }
+
     public NonEmptyStringValue(String value, Validator<String> validator) {
         super(value, Validator.NonEmpty().and(validator));
     }

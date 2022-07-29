@@ -19,6 +19,10 @@ public class DoubleValue extends AbstractValueType<Double> {
         super(value, validator);
     }
 
+    public DoubleValue(Double value, Function<Double, String> showFn) {
+        super(value, showFn);
+    }
+
     public DoubleValue(Double value, Validator<? super Double> validator, Function<Double, String> showFn) {
         super(value, validator, showFn);
     }
