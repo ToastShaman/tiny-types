@@ -6,7 +6,7 @@ import com.github.toastshaman.tinytypes.validation.Validator;
 import java.util.UUID;
 import java.util.function.Function;
 
-public class UUIDValue extends AbstractValueType<UUID> implements Comparable<UUIDValue> {
+public class UUIDValue extends AbstractValueType<UUID> {
 
     public UUIDValue(UUID value) {
         super(value);
@@ -22,10 +22,5 @@ public class UUIDValue extends AbstractValueType<UUID> implements Comparable<UUI
 
     public static UUIDValue random() {
         return new UUIDValue(UUID.randomUUID());
-    }
-
-    @Override
-    public int compareTo(UUIDValue o) {
-        return value.compareTo(o.value);
     }
 }

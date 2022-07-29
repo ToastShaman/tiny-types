@@ -6,7 +6,8 @@ import com.github.toastshaman.tinytypes.validation.Validator;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class AbstractValueType<T> {
+public class AbstractValueType<T extends Comparable<? super T>> implements Comparable<AbstractValueType<T>> {
+
     protected final T value;
     private final Function<T, String> showFn;
 
@@ -53,5 +54,10 @@ public class AbstractValueType<T> {
     @Override
     public String toString() {
         return show();
+    }
+
+    @Override
+    public int compareTo(AbstractValueType<T> other) {
+        return value.compareTo(other.value);
     }
 }

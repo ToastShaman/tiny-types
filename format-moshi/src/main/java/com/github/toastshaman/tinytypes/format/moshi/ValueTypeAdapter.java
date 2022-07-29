@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-public class ValueTypeAdapter<R extends AbstractValueType<T>, T> extends JsonAdapter<R> {
+public class ValueTypeAdapter<R extends AbstractValueType<T>, T extends Comparable<? super T>> extends JsonAdapter<R> {
 
     private final JsonAdapter<T> typeAdapter;
     private final Class<R> rawType;

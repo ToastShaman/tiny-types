@@ -8,7 +8,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-public class ValueTypeAdapter<R extends AbstractValueType<T>, T> extends TypeAdapter<R> {
+public class ValueTypeAdapter<R extends AbstractValueType<T>, T extends Comparable<? super T>> extends TypeAdapter<R> {
 
     private final TypeAdapter<T> adapter;
     private final Class<R> rawType;
