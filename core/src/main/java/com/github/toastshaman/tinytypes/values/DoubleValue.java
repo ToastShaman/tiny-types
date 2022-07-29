@@ -34,6 +34,7 @@ public class DoubleValue extends AbstractValueType<Double> {
     public DoubleValue dec() {
         return new DoubleValue(value - 1, validator, showFn);
     }
+
     public DoubleValue plus(DoubleValue other) {
         return new DoubleValue(value + other.value, validator, showFn);
     }

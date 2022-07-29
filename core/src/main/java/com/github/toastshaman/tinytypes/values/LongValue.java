@@ -26,4 +26,28 @@ public class LongValue extends AbstractValueType<Long> {
     public LongValue(Long value, Validator<? super Long> validator, Function<Long, String> showFn) {
         super(value, validator, showFn);
     }
+
+    public LongValue dec() {
+        return new LongValue(value - 1, validator, showFn);
+    }
+
+    public LongValue plus(LongValue other) {
+        return new LongValue(value + other.value, validator, showFn);
+    }
+
+    public LongValue minus(LongValue other) {
+        return new LongValue(value - other.value, validator, showFn);
+    }
+
+    public LongValue times(LongValue other) {
+        return new LongValue(value * other.value, validator, showFn);
+    }
+
+    public LongValue div(LongValue other) {
+        return new LongValue(value / other.value, validator, showFn);
+    }
+
+    public LongValue rem(LongValue other) {
+        return new LongValue(value % other.value, validator, showFn);
+    }
 }
