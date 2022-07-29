@@ -26,4 +26,32 @@ public class IntegerValue extends AbstractValueType<Integer> {
     public IntegerValue(Integer value, Validator<? super Integer> validator, Function<Integer, String> showFn) {
         super(value, validator, showFn);
     }
+
+    public IntegerValue inc() {
+        return new IntegerValue(value + 1, validator, showFn);
+    }
+
+    public IntegerValue dec() {
+        return new IntegerValue(value - 1, validator, showFn);
+    }
+
+    public IntegerValue plus(IntegerValue other) {
+        return new IntegerValue(value + other.value, validator, showFn);
+    }
+
+    public IntegerValue minus(IntegerValue other) {
+        return new IntegerValue(value - other.value, validator, showFn);
+    }
+
+    public IntegerValue times(IntegerValue other) {
+        return new IntegerValue(value * other.value, validator, showFn);
+    }
+
+    public IntegerValue div(IntegerValue other) {
+        return new IntegerValue(value / other.value, validator, showFn);
+    }
+
+    public IntegerValue rem(IntegerValue other) {
+        return new IntegerValue(value % other.value, validator, showFn);
+    }
 }

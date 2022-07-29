@@ -26,4 +26,31 @@ public class DoubleValue extends AbstractValueType<Double> {
     public DoubleValue(Double value, Validator<? super Double> validator, Function<Double, String> showFn) {
         super(value, validator, showFn);
     }
+
+    public DoubleValue inc() {
+        return new DoubleValue(value + 1, validator, showFn);
+    }
+
+    public DoubleValue dec() {
+        return new DoubleValue(value - 1, validator, showFn);
+    }
+    public DoubleValue plus(DoubleValue other) {
+        return new DoubleValue(value + other.value, validator, showFn);
+    }
+
+    public DoubleValue minus(DoubleValue other) {
+        return new DoubleValue(value - other.value, validator, showFn);
+    }
+
+    public DoubleValue times(DoubleValue other) {
+        return new DoubleValue(value * other.value, validator, showFn);
+    }
+
+    public DoubleValue div(DoubleValue other) {
+        return new DoubleValue(value / other.value, validator, showFn);
+    }
+
+    public DoubleValue rem(DoubleValue other) {
+        return new DoubleValue(value % other.value, validator, showFn);
+    }
 }

@@ -9,7 +9,8 @@ import java.util.function.Function;
 public class AbstractValueType<T extends Comparable<? super T>> implements Comparable<AbstractValueType<T>> {
 
     protected final T value;
-    private final Function<T, String> showFn;
+    protected final Function<T, String> showFn;
+    protected final Validator<? super T> validator;
 
     public AbstractValueType(T value) {
         this(value, Validator.AlwaysValid(), Object::toString);
@@ -30,6 +31,7 @@ public class AbstractValueType<T extends Comparable<? super T>> implements Compa
             throw new ValidationException(this.getClass().getSimpleName(), it);
         });
 
+        this.validator = validator;
         this.showFn = showFn;
         this.value = value;
     }
