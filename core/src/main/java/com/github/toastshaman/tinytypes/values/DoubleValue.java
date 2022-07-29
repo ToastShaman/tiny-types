@@ -6,52 +6,45 @@ import com.github.toastshaman.tinytypes.validation.Validator;
 import java.util.function.Function;
 
 public class DoubleValue extends AbstractValueType<Double> {
-    public static DoubleValue ZERO = new DoubleValue(0D);
-    public static DoubleValue ONE = new DoubleValue(1D);
-    public static DoubleValue TWO = new DoubleValue(2D);
-    public static DoubleValue TEN = new DoubleValue(10D);
 
-    public DoubleValue(Double value) {
-        super(value);
-    }
+    public static DoubleValue ZERO = DoubleValue.of(0D);
+    public static DoubleValue ONE = DoubleValue.of(1D);
+    public static DoubleValue TWO = DoubleValue.of(2D);
+    public static DoubleValue TEN = DoubleValue.of(10D);
 
-    public DoubleValue(Double value, Validator<? super Double> validator) {
-        super(value, validator);
-    }
-
-    public DoubleValue(Double value, Function<Double, String> showFn) {
-        super(value, showFn);
-    }
-
-    public DoubleValue(Double value, Validator<? super Double> validator, Function<Double, String> showFn) {
+    public DoubleValue(Double value, Validator<Double> validator, Function<Double, String> showFn) {
         super(value, validator, showFn);
     }
 
     public DoubleValue inc() {
-        return new DoubleValue(value + 1, validator, showFn);
+        return plus(DoubleValue.ONE);
     }
 
     public DoubleValue dec() {
-        return new DoubleValue(value - 1, validator, showFn);
+        return minus(DoubleValue.ONE);
     }
 
     public DoubleValue plus(DoubleValue other) {
-        return new DoubleValue(value + other.value, validator, showFn);
+        return map(it -> it + other.value, DoubleValue::new);
     }
 
     public DoubleValue minus(DoubleValue other) {
-        return new DoubleValue(value - other.value, validator, showFn);
+        return map(it -> it - other.value, DoubleValue::new);
     }
 
     public DoubleValue times(DoubleValue other) {
-        return new DoubleValue(value * other.value, validator, showFn);
+        return map(it -> it * other.value, DoubleValue::new);
     }
 
     public DoubleValue div(DoubleValue other) {
-        return new DoubleValue(value / other.value, validator, showFn);
+        return map(it -> it / other.value, DoubleValue::new);
     }
 
     public DoubleValue rem(DoubleValue other) {
-        return new DoubleValue(value % other.value, validator, showFn);
+        return map(it -> it % other.value, DoubleValue::new);
+    }
+
+    public static DoubleValue of(Double value) {
+        return new DoubleValue(value, Validator.AlwaysValid(), Object::toString);
     }
 }

@@ -29,7 +29,7 @@ public interface Validator<T> {
         return Validator.of(Boolean.FALSE::equals, "must be false");
     }
 
-    static Validator<Object> AlwaysValid() {
+    static <R> Validator<R> AlwaysValid() {
         return Validator.of(value -> true, "must be valid");
     }
 

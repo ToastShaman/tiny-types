@@ -5,6 +5,6 @@ import com.github.toastshaman.tinytypes.values.NonBlankStringValue;
 
 public class Firstname extends NonBlankStringValue {
     public Firstname(String value) {
-        super(value, Validator.MaxLength(60));
+        super(value, Validator.MaxLength(60), Object::toString);
     }
 }

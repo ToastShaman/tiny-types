@@ -12,35 +12,35 @@ class ObfuscateTest {
     @ParameterizedTest
     @ValueSource(strings = {"18362789", "foo", "foobar"})
     void hides_all(String value) {
-        assertThat(new StringValue(value, Obfuscate.fully()).toString())
+        assertThat(StringValue.of(value, Obfuscate.fully()).toString())
                 .isEqualTo("********");
     }
 
     @ParameterizedTest
     @CsvSource(value = {"18362789,********789", "foo,********", "foobar,********bar"})
     void keeps_last_three(String value, String expected) {
-        assertThat(new StringValue(value, Obfuscate.keepLast(3)).toString())
+        assertThat(StringValue.of(value, Obfuscate.keepLast(3)).toString())
                 .isEqualTo(expected);
     }
 
     @ParameterizedTest
     @CsvSource(value = {"18362789,183********", "foo,********", "foobar,foo********"})
     void keeps_first_three(String value, String expected) {
-        assertThat(new StringValue(value, Obfuscate.keepFirst(3)).toString())
+        assertThat(StringValue.of(value, Obfuscate.keepFirst(3)).toString())
                 .isEqualTo(expected);
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0, -1})
     void first_handles_negative_values(int keep) {
-        assertThat(new StringValue("foobar", Obfuscate.keepFirst(keep)).toString())
+        assertThat(StringValue.of("foobar", Obfuscate.keepFirst(keep)).toString())
                 .isEqualTo("********");
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0, -1})
     void last_handles_negative_values(int keep) {
-        assertThat(new StringValue("foobar", Obfuscate.keepLast(keep)).toString())
+        assertThat(StringValue.of("foobar", Obfuscate.keepLast(keep)).toString())
                 .isEqualTo("********");
     }
 }

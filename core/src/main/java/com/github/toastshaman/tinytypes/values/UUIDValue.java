@@ -8,23 +8,11 @@ import java.util.function.Function;
 
 public class UUIDValue extends AbstractValueType<UUID> {
 
-    public UUIDValue(UUID value) {
-        super(value);
-    }
-
-    public UUIDValue(UUID value, Validator<? super UUID> validator) {
-        super(value, validator);
-    }
-
-    public UUIDValue(UUID value, Function<UUID, String> showFn) {
-        super(value, showFn);
-    }
-
-    public UUIDValue(UUID value, Validator<? super UUID> validator, Function<UUID, String> showFn) {
+    public UUIDValue(UUID value, Validator<UUID> validator, Function<UUID, String> showFn) {
         super(value, validator, showFn);
     }
 
     public static UUIDValue random() {
-        return new UUIDValue(UUID.randomUUID());
+        return new UUIDValue(UUID.randomUUID(), Validator.AlwaysValid(), UUID::toString);
     }
 }

@@ -6,22 +6,10 @@ import com.github.toastshaman.tinytypes.validation.Validator;
 import java.util.function.Function;
 
 public class BooleanValue extends AbstractValueType<Boolean> {
-    public static BooleanValue TRUE = new BooleanValue(true);
-    public static BooleanValue FALSE = new BooleanValue(false);
+    public static BooleanValue TRUE = BooleanValue.of(true);
+    public static BooleanValue FALSE = BooleanValue.of(false);
 
-    public BooleanValue(Boolean value) {
-        super(value);
-    }
-
-    public BooleanValue(Boolean value, Validator<? super Boolean> validator) {
-        super(value, validator);
-    }
-
-    public BooleanValue(Boolean value, Function<Boolean, String> showFn) {
-        super(value, showFn);
-    }
-
-    public BooleanValue(Boolean value, Validator<? super Boolean> validator, Function<Boolean, String> showFn) {
+    public BooleanValue(Boolean value, Validator<Boolean> validator, Function<Boolean, String> showFn) {
         super(value, validator, showFn);
     }
 
@@ -35,5 +23,9 @@ public class BooleanValue extends AbstractValueType<Boolean> {
 
     public boolean isFalse() {
         return !value;
+    }
+
+    public static BooleanValue of(Boolean value) {
+        return new BooleanValue(value, Validator.AlwaysValid(), Object::toString);
     }
 }

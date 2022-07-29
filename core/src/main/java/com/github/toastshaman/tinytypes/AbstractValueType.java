@@ -1,30 +1,21 @@
 package com.github.toastshaman.tinytypes;
 
+import com.github.toastshaman.tinytypes.functions.TriFunction;
 import com.github.toastshaman.tinytypes.validation.ValidationException;
 import com.github.toastshaman.tinytypes.validation.Validator;
 
 import java.util.Objects;
 import java.util.function.Function;
 
-public class AbstractValueType<T extends Comparable<? super T>> implements Comparable<AbstractValueType<T>> {
+public abstract class AbstractValueType<T extends Comparable<? super T>> implements Comparable<AbstractValueType<T>> {
 
     protected final T value;
     protected final Function<T, String> showFn;
-    protected final Validator<? super T> validator;
+    protected final Validator<T> validator;
 
-    public AbstractValueType(T value) {
-        this(value, Validator.AlwaysValid(), Object::toString);
-    }
-
-    public AbstractValueType(T value, Validator<? super T> validator) {
-        this(value, validator, Object::toString);
-    }
-
-    public AbstractValueType(T value, Function<T, String> showFn) {
-        this(value, Validator.AlwaysValid(), showFn);
-    }
-
-    public AbstractValueType(T value, Validator<? super T> validator, Function<T, String> showFn) {
+    public AbstractValueType(T value,
+                             Validator<T> validator,
+                             Function<T, String> showFn) {
         Objects.requireNonNull(value);
         Objects.requireNonNull(showFn);
         Objects.requireNonNull(validator).isValid(value).peekLeft(it -> {
@@ -42,6 +33,13 @@ public class AbstractValueType<T extends Comparable<? super T>> implements Compa
 
     public T unwrap() {
         return value;
+    }
+
+    protected <R extends AbstractValueType<T>> R map(
+            Function<T, T> mapperFn,
+            TriFunction<T, Validator<T>, Function<T, String>, R> constructorFn
+    ) {
+        return constructorFn.apply(mapperFn.apply(value), validator, showFn);
     }
 
     @Override
