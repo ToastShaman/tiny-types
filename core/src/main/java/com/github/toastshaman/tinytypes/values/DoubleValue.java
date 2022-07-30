@@ -3,6 +3,7 @@ package com.github.toastshaman.tinytypes.values;
 import com.github.toastshaman.tinytypes.AbstractValueType;
 import com.github.toastshaman.tinytypes.validation.Validator;
 
+import java.math.BigInteger;
 import java.util.function.Function;
 
 public class DoubleValue extends AbstractValueType<Double> {
@@ -45,6 +46,20 @@ public class DoubleValue extends AbstractValueType<Double> {
     }
 
     public static DoubleValue of(Double value) {
-        return new DoubleValue(value, Validator.AlwaysValid(), Object::toString);
+        return of(value, Validator.AlwaysValid(), Object::toString);
+    }
+
+    public static DoubleValue of(Double value, Validator<Double> validator) {
+        return of(value, validator, Object::toString);
+    }
+
+    public static DoubleValue of(Double value, Function<Double, String> showFn) {
+        return of(value, Validator.AlwaysValid(), showFn);
+    }
+
+    public static DoubleValue of(Double value,
+                                 Validator<Double> validator,
+                                 Function<Double, String> show) {
+        return new DoubleValue(value, validator, show);
     }
 }

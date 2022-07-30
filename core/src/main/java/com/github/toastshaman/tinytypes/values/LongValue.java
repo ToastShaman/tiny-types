@@ -3,6 +3,7 @@ package com.github.toastshaman.tinytypes.values;
 import com.github.toastshaman.tinytypes.AbstractValueType;
 import com.github.toastshaman.tinytypes.validation.Validator;
 
+import java.time.LocalTime;
 import java.util.function.Function;
 
 public class LongValue extends AbstractValueType<Long> {
@@ -45,6 +46,20 @@ public class LongValue extends AbstractValueType<Long> {
     }
 
     public static LongValue of(Long value) {
-        return new LongValue(value, Validator.AlwaysValid(), Object::toString);
+        return of(value, Validator.AlwaysValid(), Object::toString);
+    }
+
+    public static LongValue of(Long value, Validator<Long> validator) {
+        return of(value, validator, Object::toString);
+    }
+
+    public static LongValue of(Long value, Function<Long, String> showFn) {
+        return of(value, Validator.AlwaysValid(), showFn);
+    }
+
+    public static LongValue of(Long value,
+                               Validator<Long> validator,
+                               Function<Long, String> show) {
+        return new LongValue(value, validator, show);
     }
 }

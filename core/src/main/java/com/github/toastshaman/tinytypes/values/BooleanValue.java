@@ -3,6 +3,7 @@ package com.github.toastshaman.tinytypes.values;
 import com.github.toastshaman.tinytypes.AbstractValueType;
 import com.github.toastshaman.tinytypes.validation.Validator;
 
+import java.math.BigInteger;
 import java.util.function.Function;
 
 public class BooleanValue extends AbstractValueType<Boolean> {
@@ -25,7 +26,22 @@ public class BooleanValue extends AbstractValueType<Boolean> {
         return !value;
     }
 
+
     public static BooleanValue of(Boolean value) {
-        return new BooleanValue(value, Validator.AlwaysValid(), Object::toString);
+        return of(value, Validator.AlwaysValid(), Object::toString);
+    }
+
+    public static BooleanValue of(Boolean value, Validator<Boolean> validator) {
+        return of(value, validator, Object::toString);
+    }
+
+    public static BooleanValue of(Boolean value, Function<Boolean, String> showFn) {
+        return of(value, Validator.AlwaysValid(), showFn);
+    }
+
+    public static BooleanValue of(Boolean value,
+                                  Validator<Boolean> validator,
+                                  Function<Boolean, String> show) {
+        return new BooleanValue(value, validator, show);
     }
 }

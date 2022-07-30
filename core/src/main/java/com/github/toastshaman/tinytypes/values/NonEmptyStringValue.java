@@ -16,14 +16,16 @@ public class NonEmptyStringValue extends StringValue {
     }
 
     public static NonEmptyStringValue of(String value, Validator<String> validator) {
-        return new NonEmptyStringValue(value, validator, Objects::toString);
+        return of(value, validator, Object::toString);
     }
 
     public static NonEmptyStringValue of(String value, Function<String, String> showFn) {
         return of(value, Validator.AlwaysValid(), showFn);
     }
 
-    public static NonEmptyStringValue of(String value, Validator<String> validator, Function<String, String> showFn) {
-        return new NonEmptyStringValue(value, validator, showFn);
+    public static NonEmptyStringValue of(String value,
+                                         Validator<String> validator,
+                                         Function<String, String> show) {
+        return new NonEmptyStringValue(value, validator, show);
     }
 }

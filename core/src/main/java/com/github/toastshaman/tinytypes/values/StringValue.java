@@ -23,7 +23,9 @@ public class StringValue extends AbstractValueType<String> {
         return of(value, Validator.AlwaysValid(), showFn);
     }
 
-    public static StringValue of(String value, Validator<String> validator, Function<String, String> showFn) {
-        return new StringValue(value, validator, showFn);
+    public static StringValue of(String value,
+                                 Validator<String> validator,
+                                 Function<String, String> show) {
+        return new StringValue(value, validator, show);
     }
 }

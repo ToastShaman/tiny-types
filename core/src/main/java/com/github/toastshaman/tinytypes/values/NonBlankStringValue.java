@@ -16,14 +16,16 @@ public class NonBlankStringValue extends StringValue {
     }
 
     public static NonBlankStringValue of(String value, Validator<String> validator) {
-        return new NonBlankStringValue(value, validator, Objects::toString);
+        return of(value, validator, Object::toString);
     }
 
     public static NonBlankStringValue of(String value, Function<String, String> showFn) {
         return of(value, Validator.AlwaysValid(), showFn);
     }
 
-    public static NonBlankStringValue of(String value, Validator<String> validator, Function<String, String> showFn) {
-        return new NonBlankStringValue(value, validator, showFn);
+    public static NonBlankStringValue of(String value,
+                                         Validator<String> validator,
+                                         Function<String, String> show) {
+        return new NonBlankStringValue(value, validator, show);
     }
 }

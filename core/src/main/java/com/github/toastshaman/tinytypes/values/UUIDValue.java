@@ -15,4 +15,23 @@ public class UUIDValue extends AbstractValueType<UUID> {
     public static UUIDValue random() {
         return new UUIDValue(UUID.randomUUID(), Validator.AlwaysValid(), UUID::toString);
     }
+
+
+    public static UUIDValue of(UUID value) {
+        return of(value, Validator.AlwaysValid(), Object::toString);
+    }
+
+    public static UUIDValue of(UUID value, Validator<UUID> validator) {
+        return of(value, validator, Object::toString);
+    }
+
+    public static UUIDValue of(UUID value, Function<UUID, String> showFn) {
+        return of(value, Validator.AlwaysValid(), showFn);
+    }
+
+    public static UUIDValue of(UUID value,
+                               Validator<UUID> validator,
+                               Function<UUID, String> show) {
+        return new UUIDValue(value, validator, show);
+    }
 }

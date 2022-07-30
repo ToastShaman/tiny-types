@@ -40,7 +40,7 @@ class IntegerValueTest {
         }
 
         public MyCounter map(Function<Integer, Integer> mapper) {
-            return map(mapper, (value, validator, showFn) -> new MyCounter(value));
+            return new MyCounter(mapper.apply(value));
         }
     }
 }

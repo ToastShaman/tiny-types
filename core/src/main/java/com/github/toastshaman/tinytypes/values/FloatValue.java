@@ -45,6 +45,20 @@ public class FloatValue extends AbstractValueType<Float> {
     }
 
     public static FloatValue of(Float value) {
-        return new FloatValue(value, Validator.AlwaysValid(), Object::toString);
+        return of(value, Validator.AlwaysValid(), Object::toString);
+    }
+
+    public static FloatValue of(Float value, Validator<Float> validator) {
+        return of(value, validator, Object::toString);
+    }
+
+    public static FloatValue of(Float value, Function<Float, String> showFn) {
+        return of(value, Validator.AlwaysValid(), showFn);
+    }
+
+    public static FloatValue of(Float value,
+                                Validator<Float> validator,
+                                Function<Float, String> show) {
+        return new FloatValue(value, validator, show);
     }
 }

@@ -3,6 +3,7 @@ package com.github.toastshaman.tinytypes.values;
 import com.github.toastshaman.tinytypes.AbstractValueType;
 import com.github.toastshaman.tinytypes.validation.Validator;
 
+import java.time.Instant;
 import java.util.function.Function;
 
 public class IntegerValue extends AbstractValueType<Integer> {
@@ -45,6 +46,20 @@ public class IntegerValue extends AbstractValueType<Integer> {
     }
 
     public static IntegerValue of(Integer value) {
-        return new IntegerValue(value, Validator.AlwaysValid(), Object::toString);
+        return of(value, Validator.AlwaysValid(), Object::toString);
+    }
+
+    public static IntegerValue of(Integer value, Validator<Integer> validator) {
+        return of(value, validator, Object::toString);
+    }
+
+    public static IntegerValue of(Integer value, Function<Integer, String> showFn) {
+        return of(value, Validator.AlwaysValid(), showFn);
+    }
+
+    public static IntegerValue of(Integer value,
+                                  Validator<Integer> validator,
+                                  Function<Integer, String> show) {
+        return new IntegerValue(value, validator, show);
     }
 }
