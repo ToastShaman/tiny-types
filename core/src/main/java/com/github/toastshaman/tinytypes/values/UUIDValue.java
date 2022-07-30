@@ -16,7 +16,6 @@ public class UUIDValue extends AbstractValueType<UUID> {
         return new UUIDValue(UUID.randomUUID(), Validator.AlwaysValid(), UUID::toString);
     }
 
-
     public static UUIDValue of(UUID value) {
         return of(value, Validator.AlwaysValid(), Object::toString);
     }

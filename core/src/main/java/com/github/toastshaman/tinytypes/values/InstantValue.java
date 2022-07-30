@@ -3,7 +3,6 @@ package com.github.toastshaman.tinytypes.values;
 import com.github.toastshaman.tinytypes.AbstractValueType;
 import com.github.toastshaman.tinytypes.validation.Validator;
 
-import java.time.Clock;
 import java.time.Instant;
 import java.util.function.Function;
 

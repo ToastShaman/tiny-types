@@ -2,7 +2,6 @@ package com.github.toastshaman.tinytypes.values;
 
 import com.github.toastshaman.tinytypes.validation.Validator;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 public class NonBlankStringValue extends StringValue {
