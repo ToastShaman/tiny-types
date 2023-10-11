@@ -2,6 +2,7 @@ package com.github.toastshaman.tinytypes.events;
 
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Predicate;
 
 public final class RecordingEvents implements Events {
 
@@ -23,8 +24,10 @@ public final class RecordingEvents implements Events {
         captured.add(event);
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> List<T> filterInstanceOf(Class<T> type) {
-        return captured.stream().filter(type::isInstance).map(it -> (T) it).toList();
+    public <T extends Event> List<Event> filterInstanceOf(Class<T> type) {
+        Predicate<Event> isMetadataMatching = it -> it instanceof MetadataEvent m && type.isInstance(m.event());
+        Predicate<Event> isEventMatching = type::isInstance;
+
+        return captured.stream().filter(isMetadataMatching.or(isEventMatching)).toList();
     }
 }

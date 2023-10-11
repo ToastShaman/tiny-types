@@ -1,17 +1,25 @@
 package com.github.toastshaman.tinytypes.events;
 
-import com.github.toastshaman.tinytypes.values.NonBlankStringValue;
+import java.util.Objects;
 
-public final class EventCategory extends NonBlankStringValue {
+public record EventCategory(String value) {
 
-    public static final EventCategory INFO = EventCategory.of("INFO");
-    public static final EventCategory WARN = EventCategory.of("WARN");
-    public static final EventCategory ERROR = EventCategory.of("ERROR");
-    public static final EventCategory AUDIT = EventCategory.of("AUDIT");
-    public static final EventCategory METRIC = EventCategory.of("METRIC");
+    public static EventCategory INFO = EventCategory.of("info");
 
-    public EventCategory(String value) {
-        super(value);
+    public static EventCategory ERROR = EventCategory.of("error");
+
+    public static EventCategory WARN = EventCategory.of("warn");
+
+    public EventCategory {
+        Objects.requireNonNull(value, "value must not be null");
+        if (value.isBlank()) {
+            throw new IllegalArgumentException("value must not be blank");
+        }
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 
     public static EventCategory of(String value) {
