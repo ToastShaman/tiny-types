@@ -9,13 +9,17 @@ import org.junit.jupiter.api.Test;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class EventsTest {
 
+    private final RecordingEvents recordingEvents = new RecordingEvents();
+
+    private final PrintStreamEventLogger print = new PrintStreamEventLogger();
+
     @Test
-    void can_append() {
-        var recordingEvents = new RecordingEvents();
-        var events = recordingEvents.appendNext(recordingEvents);
+    void can_chain_multiple_events() {
+        var events = recordingEvents.and(print);
+
         events.record(new MyEvent("Hello"));
 
-        assertThatEvents(recordingEvents).contains(MyEvent.class, 2);
+        assertThatEvents(recordingEvents).contains(MyEvent.class);
     }
 
     private record MyEvent(String value) implements Event {}

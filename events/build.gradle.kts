@@ -1,6 +1,5 @@
 dependencies {
-    api(project(":core"))
-    api(libs.json)
+    api(libs.vavr)
     api(libs.slf4j.api)
 
     testImplementation(project(":testing-events"))

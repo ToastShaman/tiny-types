@@ -4,9 +4,9 @@ public interface Events {
 
     void record(Event event);
 
-    default Events appendNext(Events next) {
+    default Events and(Events next) {
         return event -> {
-            Events.this.record(event);
+            this.record(event);
             next.record(event);
         };
     }
