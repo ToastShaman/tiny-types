@@ -9,7 +9,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = "tiny-types-testing-events"
+            artifactId = "testing-events"
             from(components["java"])
         }
     }

@@ -3,6 +3,7 @@ rootProject.name = "tiny-types"
 include("core")
 include("format-jackson")
 include("events")
+include("events-format-jackson")
 include("fp")
 include("time")
 include("testing-core")
