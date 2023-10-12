@@ -1,6 +1,6 @@
 dependencies {
     api(project(":core"))
-    implementation(libs.jackson.databind)
+    api(libs.jackson.databind)
 
     testImplementation(libs.assertj.core)
     testImplementation(libs.assertj.json)
@@ -11,7 +11,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = "tiny-types-format-jackson"
+            artifactId = "format-jackson"
             from(components["java"])
         }
     }

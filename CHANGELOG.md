@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+* Changed Maven `artifactId`
 * Added event filters support
 * Upgraded Gradle to v8.4
 * Added Changelog.md

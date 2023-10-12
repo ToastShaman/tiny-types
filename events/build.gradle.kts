@@ -15,7 +15,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = "tiny-types-events"
+            artifactId = "events"
             from(components["java"])
         }
     }
