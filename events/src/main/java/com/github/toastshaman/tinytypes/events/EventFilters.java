@@ -2,7 +2,7 @@ package com.github.toastshaman.tinytypes.events;
 
 import java.time.Clock;
 
-public class EventFilters {
+public final class EventFilters {
 
     public static EventFilter AddEventName = next -> event -> {
         var aClass = event instanceof MetadataEvent m ? m.event().getClass() : event.getClass();
