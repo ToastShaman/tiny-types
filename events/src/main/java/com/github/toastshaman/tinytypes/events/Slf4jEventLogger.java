@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class Slf4jEventLogger implements Events {
+public final class Slf4jEventLogger implements Events, Consumer<String> {
 
     private static final Logger log = LoggerFactory.getLogger("EVENTS");
 
@@ -21,6 +21,11 @@ public final class Slf4jEventLogger implements Events {
 
     @Override
     public void record(Event event) {
-        writer.accept(event.toString());
+        accept(event.toString());
+    }
+
+    @Override
+    public void accept(String text) {
+        writer.accept(text);
     }
 }

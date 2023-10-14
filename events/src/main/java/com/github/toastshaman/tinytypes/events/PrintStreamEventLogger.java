@@ -2,8 +2,9 @@ package com.github.toastshaman.tinytypes.events;
 
 import java.io.PrintStream;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public final class PrintStreamEventLogger implements Events, AutoCloseable {
+public final class PrintStreamEventLogger implements Events, AutoCloseable, Consumer<String> {
 
     private final PrintStream writer;
 
@@ -17,7 +18,12 @@ public final class PrintStreamEventLogger implements Events, AutoCloseable {
 
     @Override
     public void record(Event event) {
-        writer.println(event.toString());
+        accept(event.toString());
+    }
+
+    @Override
+    public void accept(String text) {
+        writer.println(text);
         writer.flush();
     }
 

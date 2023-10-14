@@ -3,7 +3,6 @@ package com.github.toastshaman.tinytypes.events.format.jackson;
 import static com.github.toastshaman.tinytypes.events.EventCategory.INFO;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -15,7 +14,7 @@ class JacksonEventLoggerTest {
     @Test
     void can_log_events() {
         var out = new StringBuilder();
-        var events = new JacksonEventLogger(out::append, new ObjectMapper().registerModule(new EventsModule()));
+        var events = new JacksonEventLogger(out::append);
 
         var event = new MyEvent(42, "Hello World")
                 .addMetadata("category", INFO)
