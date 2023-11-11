@@ -13,11 +13,12 @@ public final class RecordingEvents implements Events {
     }
 
     public RecordingEvents(int maxSize) {
+        if (maxSize <= 0) throw new IllegalArgumentException("max size must be greater than 0");
         this.captured = new LinkedBlockingQueue<>(maxSize);
     }
 
     @Override
-    public void record(Event event) {
+    public synchronized void record(Event event) {
         if (captured.remainingCapacity() <= 0) {
             captured.clear();
         }
@@ -25,9 +26,24 @@ public final class RecordingEvents implements Events {
     }
 
     public <T extends Event> List<Event> filterInstanceOf(Class<T> type) {
-        Predicate<Event> isMetadataMatching = it -> it instanceof MetadataEvent m && type.isInstance(m.event());
-        Predicate<Event> isEventMatching = type::isInstance;
+        return captured.stream()
+                .filter(getMetadataMatching(type).or(type::isInstance))
+                .toList();
+    }
 
-        return captured.stream().filter(isMetadataMatching.or(isEventMatching)).toList();
+    public <T extends Event> boolean anyMatch(Class<T> type) {
+        return captured.stream().anyMatch(getMetadataMatching(type).or(type::isInstance));
+    }
+
+    public <T extends Event> boolean allMatch(Class<T> type) {
+        return captured.stream().allMatch(getMetadataMatching(type).or(type::isInstance));
+    }
+
+    public <T extends Event> boolean noneMatch(Class<T> type) {
+        return captured.stream().noneMatch(getMetadataMatching(type).or(type::isInstance));
+    }
+
+    private static <T extends Event> Predicate<Event> getMetadataMatching(Class<T> type) {
+        return it -> it instanceof MetadataEvent m && type.isInstance(m.event());
     }
 }
