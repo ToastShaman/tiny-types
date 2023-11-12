@@ -1,0 +1,391 @@
+package com.github.toastshaman.tinytypes.fp;
+
+import static com.github.toastshaman.tinytypes.fp.Result.Failure;
+import static com.github.toastshaman.tinytypes.fp.Result.Success;
+
+import io.vavr.Function2;
+import io.vavr.Function3;
+import io.vavr.Function4;
+import io.vavr.Function5;
+import io.vavr.Function6;
+import io.vavr.Tuple2;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
+
+public sealed interface Result<T, E> permits Success, Failure {
+
+    static <T, E> Result<T, E> success(T value) {
+        return new Success<>(value);
+    }
+
+    static <T, E> Result<T, E> failure(E value) {
+        return new Failure<>(value);
+    }
+
+    static <T> Result<T, Exception> resultFrom(Supplier<T> supplier) {
+        try {
+            return new Success<>(supplier.get());
+        } catch (Exception e) {
+            return new Failure<>(e);
+        }
+    }
+
+    static <T, E> Tuple2<List<T>, List<E>> partition(Iterable<Result<T, E>> values) {
+        var oks = new ArrayList<T>();
+        var errs = new ArrayList<E>();
+
+        for (Result<T, E> result : values) {
+            if (result instanceof Result.Success<T, E> success) oks.add(success.value);
+            if (result instanceof Result.Failure<T, E> failure) errs.add(failure.reason);
+        }
+
+        return new Tuple2<>(List.copyOf(oks), List.copyOf(errs));
+    }
+
+    static <T, E> List<T> anyValues(Iterable<Result<T, E>> values) {
+        return StreamSupport.stream(values.spliterator(), false)
+                .filter(Result::isSuccess)
+                .map(it -> (Success<T, E>) it)
+                .map(it -> it.value)
+                .toList();
+    }
+
+    static <T, E> Result<List<T>, E> allValues(Iterable<Result<T, E>> values) {
+        var partition = partition(values);
+        var ok = partition._1;
+        var errs = partition._2;
+        return !errs.isEmpty() ? new Failure<>(errs.get(0)) : new Success<>(ok);
+    }
+
+    static <T1, T2, U, E> Result<U, E> zip(Result<T1, E> r1, Result<T2, E> r2, Function2<T1, T2, U> fn) {
+        return r1.flatMap(v1 -> r2.map(v2 -> fn.apply(v1, v2)));
+    }
+
+    static <T1, T2, T3, U, E> Result<U, E> zip(
+            Result<T1, E> r1, Result<T2, E> r2, Result<T3, E> r3, Function3<T1, T2, T3, U> fn) {
+        return r1.flatMap(v1 -> r2.flatMap(v2 -> r3.map(v3 -> fn.apply(v1, v2, v3))));
+    }
+
+    static <T1, T2, T3, T4, U, E> Result<U, E> zip(
+            Result<T1, E> r1, Result<T2, E> r2, Result<T3, E> r3, Result<T4, E> r4, Function4<T1, T2, T3, T4, U> fn) {
+        return r1.flatMap(v1 -> r2.flatMap(v2 -> r3.flatMap(v3 -> r4.map(v4 -> fn.apply(v1, v2, v3, v4)))));
+    }
+
+    static <T1, T2, T3, T4, T5, U, E> Result<U, E> zip(
+            Result<T1, E> r1,
+            Result<T2, E> r2,
+            Result<T3, E> r3,
+            Result<T4, E> r4,
+            Result<T5, E> r5,
+            Function5<T1, T2, T3, T4, T5, U> fn) {
+        return r1.flatMap(
+                v1 -> r2.flatMap(v2 -> r3.flatMap(v3 -> r4.flatMap(v4 -> r5.map(v5 -> fn.apply(v1, v2, v3, v4, v5))))));
+    }
+
+    static <T1, T2, T3, T4, T5, T6, U, E> Result<U, E> zip(
+            Result<T1, E> r1,
+            Result<T2, E> r2,
+            Result<T3, E> r3,
+            Result<T4, E> r4,
+            Result<T5, E> r5,
+            Result<T6, E> r6,
+            Function6<T1, T2, T3, T4, T5, T6, U> fn) {
+        return r1.flatMap(v1 -> r2.flatMap(v2 ->
+                r3.flatMap(v3 -> r4.flatMap(v4 -> r5.flatMap(v5 -> r6.map(v6 -> fn.apply(v1, v2, v3, v4, v5, v6)))))));
+    }
+
+    static <T1, T2, U, E> Result<U, E> flatZip(Result<T1, E> r1, Result<T2, E> r2, Function2<T1, T2, Result<U, E>> fn) {
+        return r1.flatMap(v1 -> r2.flatMap(v2 -> fn.apply(v1, v2)));
+    }
+
+    static <T1, T2, T3, U, E> Result<U, E> flatZip(
+            Result<T1, E> r1, Result<T2, E> r2, Result<T3, E> r3, Function3<T1, T2, T3, Result<U, E>> fn) {
+        return r1.flatMap(v1 -> r2.flatMap(v2 -> r3.flatMap(v3 -> fn.apply(v1, v2, v3))));
+    }
+
+    static <T1, T2, T3, T4, U, E> Result<U, E> flatZip(
+            Result<T1, E> r1,
+            Result<T2, E> r2,
+            Result<T3, E> r3,
+            Result<T4, E> r4,
+            Function4<T1, T2, T3, T4, Result<U, E>> fn) {
+        return r1.flatMap(v1 -> r2.flatMap(v2 -> r3.flatMap(v3 -> r4.flatMap(v4 -> fn.apply(v1, v2, v3, v4)))));
+    }
+
+    static <T1, T2, T3, T4, T5, U, E> Result<U, E> flatZip(
+            Result<T1, E> r1,
+            Result<T2, E> r2,
+            Result<T3, E> r3,
+            Result<T4, E> r4,
+            Result<T5, E> r5,
+            Function5<T1, T2, T3, T4, T5, Result<U, E>> fn) {
+        return r1.flatMap(v1 ->
+                r2.flatMap(v2 -> r3.flatMap(v3 -> r4.flatMap(v4 -> r5.flatMap(v5 -> fn.apply(v1, v2, v3, v4, v5))))));
+    }
+
+    static <T1, T2, T3, T4, T5, T6, U, E> Result<U, E> flatZip(
+            Result<T1, E> r1,
+            Result<T2, E> r2,
+            Result<T3, E> r3,
+            Result<T4, E> r4,
+            Result<T5, E> r5,
+            Result<T6, E> r6,
+            Function6<T1, T2, T3, T4, T5, T6, Result<U, E>> fn) {
+        return r1.flatMap(v1 -> r2.flatMap(v2 -> r3.flatMap(
+                v3 -> r4.flatMap(v4 -> r5.flatMap(v5 -> r6.flatMap(v6 -> fn.apply(v1, v2, v3, v4, v5, v6)))))));
+    }
+
+    boolean isSuccess();
+
+    boolean isFailure();
+
+    <T1> Result<T1, E> flatMap(Function<T, Result<T1, E>> fn);
+
+    <T1> Result<T1, E> map(Function<T, T1> fn);
+
+    <E1> Result<T, E1> mapFailure(Function<E, E1> fn);
+
+    <E1> Result<T, E1> flatMapFailure(Function<E, Result<T, E1>> fn);
+
+    Result<T, E> onSuccess(Consumer<T> fn);
+
+    Result<T, E> onFailure(Consumer<E> fn);
+
+    T getOrElse(T other);
+
+    T getOrElseGet(Supplier<T> other);
+
+    T getOrNull();
+
+    <X extends Throwable> T getOrElseThrow(Supplier<X> fn) throws X;
+
+    E getFailureOrElse(E other);
+
+    E getFailureOrElseGet(Supplier<E> fn);
+
+    E getFailureOrNull();
+
+    Result<E, T> swap();
+
+    <R> R fold(Function<T, R> successFn, Function<E, R> failureFn);
+
+    Result<T, E> recover(Function<E, T> f);
+
+    Optional<T> asOptional();
+
+    record Success<T, E>(T value) implements Result<T, E> {
+
+        public Success {
+            Objects.requireNonNull(value);
+        }
+
+        @Override
+        public boolean isSuccess() {
+            return true;
+        }
+
+        @Override
+        public boolean isFailure() {
+            return false;
+        }
+
+        @Override
+        public <T1> Result<T1, E> flatMap(Function<T, Result<T1, E>> fn) {
+            return fn.apply(value);
+        }
+
+        @Override
+        public <T1> Result<T1, E> map(Function<T, T1> fn) {
+            return flatMap(value -> new Success<>(fn.apply(value)));
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <E1> Result<T, E1> mapFailure(Function<E, E1> fn) {
+            return (Result<T, E1>) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <E1> Result<T, E1> flatMapFailure(Function<E, Result<T, E1>> fn) {
+            return (Result<T, E1>) this;
+        }
+
+        @Override
+        public Result<T, E> onSuccess(Consumer<T> fn) {
+            fn.accept(value);
+            return this;
+        }
+
+        @Override
+        public Result<T, E> onFailure(Consumer<E> fn) {
+            return this;
+        }
+
+        @Override
+        public T getOrElse(T other) {
+            return value;
+        }
+
+        @Override
+        public T getOrElseGet(Supplier<T> other) {
+            return value;
+        }
+
+        @Override
+        public T getOrNull() {
+            return value;
+        }
+
+        @Override
+        public <X extends Throwable> T getOrElseThrow(Supplier<X> fn) {
+            return value;
+        }
+
+        @Override
+        public E getFailureOrElse(E other) {
+            return other;
+        }
+
+        @Override
+        public E getFailureOrElseGet(Supplier<E> fn) {
+            return fn.get();
+        }
+
+        @Override
+        public E getFailureOrNull() {
+            return null;
+        }
+
+        @Override
+        public Result<E, T> swap() {
+            return new Failure<>(value);
+        }
+
+        @Override
+        public <R> R fold(Function<T, R> successFn, Function<E, R> failureFn) {
+            return successFn.apply(value);
+        }
+
+        @Override
+        public Result<T, E> recover(Function<E, T> f) {
+            return this;
+        }
+
+        @Override
+        public Optional<T> asOptional() {
+            return Optional.of(value);
+        }
+    }
+
+    record Failure<T, E>(E reason) implements Result<T, E> {
+
+        public Failure {
+            Objects.requireNonNull(reason);
+        }
+
+        @Override
+        public boolean isSuccess() {
+            return false;
+        }
+
+        @Override
+        public boolean isFailure() {
+            return true;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T1> Result<T1, E> flatMap(Function<T, Result<T1, E>> fn) {
+            return (Result<T1, E>) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T1> Result<T1, E> map(Function<T, T1> fn) {
+            return (Result<T1, E>) this;
+        }
+
+        @Override
+        public <E1> Result<T, E1> mapFailure(Function<E, E1> fn) {
+            return flatMapFailure(value -> new Failure<>(fn.apply(value)));
+        }
+
+        @Override
+        public <E1> Result<T, E1> flatMapFailure(Function<E, Result<T, E1>> fn) {
+            return fn.apply(reason);
+        }
+
+        @Override
+        public Result<T, E> onSuccess(Consumer<T> fn) {
+            return this;
+        }
+
+        @Override
+        public Result<T, E> onFailure(Consumer<E> fn) {
+            fn.accept(reason);
+            return this;
+        }
+
+        @Override
+        public T getOrElse(T other) {
+            return other;
+        }
+
+        @Override
+        public T getOrElseGet(Supplier<T> other) {
+            return other.get();
+        }
+
+        @Override
+        public T getOrNull() {
+            return null;
+        }
+
+        @Override
+        public <X extends Throwable> T getOrElseThrow(Supplier<X> fn) throws X {
+            throw fn.get();
+        }
+
+        @Override
+        public E getFailureOrElse(E other) {
+            return reason;
+        }
+
+        @Override
+        public E getFailureOrElseGet(Supplier<E> fn) {
+            return reason;
+        }
+
+        @Override
+        public E getFailureOrNull() {
+            return reason;
+        }
+
+        @Override
+        public Result<E, T> swap() {
+            return new Success<>(reason);
+        }
+
+        @Override
+        public <R> R fold(Function<T, R> successFn, Function<E, R> failureFn) {
+            return failureFn.apply(reason);
+        }
+
+        @Override
+        public Result<T, E> recover(Function<E, T> f) {
+            return new Success<>(f.apply(reason));
+        }
+
+        @Override
+        public Optional<T> asOptional() {
+            return Optional.empty();
+        }
+    }
+}
