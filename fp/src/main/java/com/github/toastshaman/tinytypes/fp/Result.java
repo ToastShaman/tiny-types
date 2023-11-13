@@ -60,7 +60,34 @@ public sealed interface Result<T, E> permits Success, Failure {
         var partition = partition(values);
         var ok = partition._1;
         var errs = partition._2;
-        return !errs.isEmpty() ? new Failure<>(errs.get(0)) : new Success<>(ok);
+        return errs.isEmpty() ? new Success<>(ok) : new Failure<>(errs.get(0));
+    }
+
+    static <T, T1, E> Result<T1, E> foldResult(
+            Iterable<T> values, Result<T1, E> initial, Function2<T1, T, Result<T1, E>> operation) {
+        var accumulator = initial;
+        for (T el : values) {
+            accumulator = accumulator.flatMap(value -> operation.apply(value, el));
+        }
+        return accumulator;
+    }
+
+    static <T, T1, E> Result<List<T1>, E> mapAllValues(Iterable<T> values, Function<T, Result<T1, E>> f) {
+        var acc = new ArrayList<T1>();
+
+        for (T value : values) {
+            var result = f.apply(value);
+
+            if (result instanceof Result.Success<T1, E> success) {
+                acc.add(success.value);
+            }
+
+            if (result instanceof Result.Failure<T1, E> failure) {
+                return Result.failure(failure.reason);
+            }
+        }
+
+        return Result.success(List.copyOf(acc));
     }
 
     static <T1, T2, U, E> Result<U, E> zip(Result<T1, E> r1, Result<T2, E> r2, Function2<T1, T2, U> fn) {

@@ -103,6 +103,43 @@ class ResultTest {
         assertThat(zipped.getOrNull()).isEqualTo(3.0);
     }
 
+    @Test
+    void can_fold_results() {
+        Result<Integer, Object> folded =
+                Result.foldResult(List.of(1, 2, 3, 4, 5), Result.success(0), (acc, i) -> Result.success(acc + i));
+
+        assertThat(folded).isInstanceOf(Success.class);
+        assertThat(folded.getOrNull()).isEqualTo(15);
+    }
+
+    @Test
+    void can_fold_results_with_failures() {
+        Result<Integer, Object> folded = Result.foldResult(List.of(), Result.success(0), (acc, i) -> Result.failure(1));
+
+        assertThat(folded).isInstanceOf(Success.class);
+        assertThat(folded.getOrNull()).isEqualTo(0);
+    }
+
+    @Test
+    void can_fold_results_with_initial_failure() {
+        Result<Integer, Object> folded = Result.foldResult(List.of(), Result.failure(0), (acc, i) -> Result.failure(1));
+
+        assertThat(folded).isInstanceOf(Failure.class);
+        assertThat(folded.getFailureOrNull()).isEqualTo(0);
+    }
+
+    @Test
+    void can_map_all_values_in_a_list() {
+        var ok = Result.mapAllValues(List.of(1, 2, 3, 4, 5), it -> Result.success(it + 1));
+        var err = Result.mapAllValues(List.of(1, 2, 3, 4, 5), it -> Result.failure(it + 1));
+
+        assertThat(ok).isInstanceOfSatisfying(Success.class, it -> assertThat(it.getOrNull())
+                .isEqualTo(List.of(2, 3, 4, 5, 6)));
+
+        assertThat(err).isInstanceOfSatisfying(Failure.class, it -> assertThat(it.getFailureOrNull())
+                .isEqualTo(2));
+    }
+
     @Nested
     class SuccessfulResultTest {
 
