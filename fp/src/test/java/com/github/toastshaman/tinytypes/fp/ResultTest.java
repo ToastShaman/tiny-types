@@ -26,12 +26,16 @@ class ResultTest {
 
     @Test
     void can_create_result_from_supplier() {
-        var ok = Result.resultFrom(() -> 1);
-        var err = Result.resultFrom(() -> {
+        var ok1 = Result.of(() -> 1);
+        var ok2 = Result.ofSupplier(() -> 1);
+        var ok3 = Result.ofCallable(() -> 1);
+        var err = Result.ofSupplier(() -> {
             throw new RuntimeException("oops");
         });
 
-        assertThat(ok).isInstanceOf(Success.class);
+        assertThat(ok1).isInstanceOf(Success.class);
+        assertThat(ok2).isInstanceOf(Success.class);
+        assertThat(ok3).isInstanceOf(Success.class);
         assertThat(err).isInstanceOf(Failure.class);
     }
 
@@ -124,8 +128,8 @@ class ResultTest {
     void can_fold_results_with_initial_failure() {
         Result<Integer, Object> folded = Result.foldResult(List.of(), Result.failure(0), (acc, i) -> Result.failure(1));
 
-        assertThat(folded).isInstanceOf(Failure.class);
-        assertThat(folded.getFailureOrNull()).isEqualTo(0);
+        assertThat(folded).isInstanceOfSatisfying(Failure.class, it -> assertThat(it.reason())
+                .isEqualTo(0));
     }
 
     @Test
@@ -136,7 +140,7 @@ class ResultTest {
         assertThat(ok).isInstanceOfSatisfying(Success.class, it -> assertThat(it.getOrNull())
                 .isEqualTo(List.of(2, 3, 4, 5, 6)));
 
-        assertThat(err).isInstanceOfSatisfying(Failure.class, it -> assertThat(it.getFailureOrNull())
+        assertThat(err).isInstanceOfSatisfying(Failure.class, it -> assertThat(it.reason())
                 .isEqualTo(2));
     }
 
@@ -220,28 +224,7 @@ class ResultTest {
 
         @Test
         void can_get_or_else_throw() {
-            assertThatNoException().isThrownBy(() -> getResult().getOrElseThrow(RuntimeException::new));
-        }
-
-        @Test
-        void can_get_failure_or_else() {
-            var idx = getResult().getFailureOrElse(2);
-
-            assertThat(idx).isEqualTo(2);
-        }
-
-        @Test
-        void can_get_failure_or_else_get() {
-            var idx = getResult().getFailureOrElseGet(() -> 2);
-
-            assertThat(idx).isEqualTo(2);
-        }
-
-        @Test
-        void can_get_failure_or_null() {
-            var idx = getResult().getFailureOrNull();
-
-            assertThat(idx).isNull();
+            assertThatNoException().isThrownBy(() -> getResult().getOrThrow(it -> new RuntimeException(it.toString())));
         }
 
         @Test
@@ -356,30 +339,9 @@ class ResultTest {
         }
 
         @Test
-        void can_get_or_else_throw() {
-            assertThatThrownBy(() -> getResult().getOrElseThrow(RuntimeException::new))
+        void can_get_or_throws_underlying_exception() {
+            assertThatThrownBy(() -> getResult().getOrThrow(it -> new RuntimeException(it.toString())))
                     .isInstanceOf(RuntimeException.class);
-        }
-
-        @Test
-        void can_get_failure_or_else() {
-            var idx = getResult().getFailureOrElse(2);
-
-            assertThat(idx).isEqualTo(1);
-        }
-
-        @Test
-        void can_get_failure_or_else_get() {
-            var idx = getResult().getFailureOrElseGet(() -> 2);
-
-            assertThat(idx).isEqualTo(1);
-        }
-
-        @Test
-        void can_get_failure_or_null() {
-            var idx = getResult().getFailureOrNull();
-
-            assertThat(idx).isEqualTo(1);
         }
 
         @Test

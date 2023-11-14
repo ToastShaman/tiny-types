@@ -3,16 +3,15 @@ package com.github.toastshaman.tinytypes.fp;
 import static com.github.toastshaman.tinytypes.fp.Result.Failure;
 import static com.github.toastshaman.tinytypes.fp.Result.Success;
 
+import io.vavr.CheckedFunction0;
 import io.vavr.Function2;
 import io.vavr.Function3;
 import io.vavr.Function4;
 import io.vavr.Function5;
 import io.vavr.Function6;
 import io.vavr.Tuple2;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,10 +27,26 @@ public sealed interface Result<T, E> permits Success, Failure {
         return new Failure<>(value);
     }
 
-    static <T> Result<T, Exception> resultFrom(Supplier<T> supplier) {
+    static <T> Result<T, Throwable> of(CheckedFunction0<? extends T> supplier) {
+        try {
+            return new Success<>(supplier.apply());
+        } catch (Throwable t) {
+            return new Failure<>(t);
+        }
+    }
+
+    static <T> Result<T, Throwable> ofSupplier(Supplier<T> supplier) {
         try {
             return new Success<>(supplier.get());
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            return new Failure<>(e);
+        }
+    }
+
+    static <T> Result<T, Throwable> ofCallable(Callable<T> supplier) {
+        try {
+            return new Success<>(supplier.call());
+        } catch (Throwable e) {
             return new Failure<>(e);
         }
     }
@@ -190,13 +205,7 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     T getOrNull();
 
-    <X extends Throwable> T getOrElseThrow(Supplier<X> fn) throws X;
-
-    E getFailureOrElse(E other);
-
-    E getFailureOrElseGet(Supplier<E> fn);
-
-    E getFailureOrNull();
+    <X extends Throwable> T getOrThrow(Function<E, X> f) throws X;
 
     Result<E, T> swap();
 
@@ -271,23 +280,8 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
 
         @Override
-        public <X extends Throwable> T getOrElseThrow(Supplier<X> fn) {
+        public <X extends Throwable> T getOrThrow(Function<E, X> f) {
             return value;
-        }
-
-        @Override
-        public E getFailureOrElse(E other) {
-            return other;
-        }
-
-        @Override
-        public E getFailureOrElseGet(Supplier<E> fn) {
-            return fn.get();
-        }
-
-        @Override
-        public E getFailureOrNull() {
-            return null;
         }
 
         @Override
@@ -376,23 +370,8 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
 
         @Override
-        public <X extends Throwable> T getOrElseThrow(Supplier<X> fn) throws X {
-            throw fn.get();
-        }
-
-        @Override
-        public E getFailureOrElse(E other) {
-            return reason;
-        }
-
-        @Override
-        public E getFailureOrElseGet(Supplier<E> fn) {
-            return reason;
-        }
-
-        @Override
-        public E getFailureOrNull() {
-            return reason;
+        public <X extends Throwable> T getOrThrow(Function<E, X> f) throws X {
+            throw f.apply(reason);
         }
 
         @Override
