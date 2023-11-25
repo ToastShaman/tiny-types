@@ -163,6 +163,13 @@ class ResultTest {
         }
 
         @Test
+        void can_bimap() {
+            var result = getResult().bimap(it -> it + 1, it -> it - 1);
+
+            assertThat(result).isEqualTo(new Success<>(2));
+        }
+
+        @Test
         void can_flat_map() {
             var result = getResult().flatMap(it -> new Success<>(it + 1));
 
@@ -276,6 +283,13 @@ class ResultTest {
             var result = getResult().map(it -> it + 1);
 
             assertThat(result).isEqualTo(new Failure<>(1));
+        }
+
+        @Test
+        void can_bimap() {
+            var result = getResult().bimap(it -> it + 1, it -> it - 1);
+
+            assertThat(result).isEqualTo(new Failure<>(0));
         }
 
         @Test

@@ -10,6 +10,8 @@ import io.vavr.Function4;
 import io.vavr.Function5;
 import io.vavr.Function6;
 import io.vavr.Tuple2;
+import io.vavr.control.Either;
+import io.vavr.control.Try;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -191,6 +193,8 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     <T1> Result<T1, E> map(Function<T, T1> fn);
 
+    <T1, E1> Result<T1, E1> bimap(Function<T, T1> fn1, Function<E, E1> fn2);
+
     <E1> Result<T, E1> mapFailure(Function<E, E1> fn);
 
     <E1> Result<T, E1> flatMapFailure(Function<E, Result<T, E1>> fn);
@@ -215,10 +219,14 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     Optional<T> asOptional();
 
+    Either<E, T> asEither();
+
+    <X extends Throwable> Try<T> asTry(Function<E, X> f);
+
     record Success<T, E>(T value) implements Result<T, E> {
 
         public Success {
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(value, "value must not be null");
         }
 
         @Override
@@ -239,6 +247,11 @@ public sealed interface Result<T, E> permits Success, Failure {
         @Override
         public <T1> Result<T1, E> map(Function<T, T1> fn) {
             return flatMap(value -> new Success<>(fn.apply(value)));
+        }
+
+        @Override
+        public <T1, E1> Result<T1, E1> bimap(Function<T, T1> fn1, Function<E, E1> fn2) {
+            return map(fn1).mapFailure(fn2);
         }
 
         @Override
@@ -303,12 +316,22 @@ public sealed interface Result<T, E> permits Success, Failure {
         public Optional<T> asOptional() {
             return Optional.of(value);
         }
+
+        @Override
+        public Either<E, T> asEither() {
+            return Either.right(value);
+        }
+
+        @Override
+        public <X extends Throwable> Try<T> asTry(Function<E, X> f) {
+            return Try.success(value);
+        }
     }
 
     record Failure<T, E>(E reason) implements Result<T, E> {
 
         public Failure {
-            Objects.requireNonNull(reason);
+            Objects.requireNonNull(reason, "reason must not be null");
         }
 
         @Override
@@ -331,6 +354,11 @@ public sealed interface Result<T, E> permits Success, Failure {
         @SuppressWarnings("unchecked")
         public <T1> Result<T1, E> map(Function<T, T1> fn) {
             return (Result<T1, E>) this;
+        }
+
+        @Override
+        public <T1, E1> Result<T1, E1> bimap(Function<T, T1> fn1, Function<E, E1> fn2) {
+            return map(fn1).mapFailure(fn2);
         }
 
         @Override
@@ -392,6 +420,16 @@ public sealed interface Result<T, E> permits Success, Failure {
         @Override
         public Optional<T> asOptional() {
             return Optional.empty();
+        }
+
+        @Override
+        public Either<E, T> asEither() {
+            return Either.left(reason);
+        }
+
+        @Override
+        public <X extends Throwable> Try<T> asTry(Function<E, X> f) {
+            return Try.failure(f.apply(reason));
         }
     }
 }
