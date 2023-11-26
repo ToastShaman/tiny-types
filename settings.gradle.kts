@@ -8,6 +8,7 @@ include("fp")
 include("time")
 include("testing-core")
 include("testing-events")
+include("testing-fp")
 
 dependencyResolutionManagement {
     versionCatalogs {
