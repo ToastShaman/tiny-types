@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("assertj", "3.24.2")
-            version("jackson", "2.15.2")
+            version("jackson", "2.16.0")
             version("junit", "5.10.1")
             version("slf4j", "2.0.9")
 
