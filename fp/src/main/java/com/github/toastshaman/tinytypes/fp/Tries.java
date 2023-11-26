@@ -89,4 +89,8 @@ public final class Tries {
 
         return Try.success(List.copyOf(acc));
     }
+
+    public static <T> Result<T, Throwable> toResult(Try<T> t) {
+        return t.isSuccess() ? Result.success(t.get()) : Result.failure(t.getCause());
+    }
 }
