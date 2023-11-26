@@ -67,9 +67,8 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     static <T, E> List<T> anyValues(Iterable<Result<T, E>> values) {
         return StreamSupport.stream(values.spliterator(), false)
-                .filter(Result::isSuccess)
-                .map(it -> (Success<T, E>) it)
-                .map(it -> it.value)
+                .map(Result::getOrNull)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
