@@ -2,9 +2,9 @@ plugins {
     java
     `java-library`
     `maven-publish`
-    id("com.adarshr.test-logger") version "3.2.0"
-    id("com.github.ben-manes.versions") version "0.47.0"
-    id("com.diffplug.spotless") version "6.20.0"
+    id("com.adarshr.test-logger") version "4.0.0"
+    id("com.github.ben-manes.versions") version "0.50.0"
+    id("com.diffplug.spotless") version "6.23.2"
 }
 
 subprojects {
@@ -24,9 +24,7 @@ subprojects {
 
     java {
         withSourcesJar()
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
+        sourceCompatibility = JavaVersion.VERSION_21
     }
 
     tasks.withType<JavaCompile> {
@@ -39,7 +37,7 @@ subprojects {
 
     spotless {
         java {
-            palantirJavaFormat()
+            palantirJavaFormat("2.38.0")
         }
     }
 
