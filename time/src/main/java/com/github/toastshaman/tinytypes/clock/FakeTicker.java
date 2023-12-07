@@ -1,6 +1,9 @@
 package com.github.toastshaman.tinytypes.clock;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -13,6 +16,10 @@ public final class FakeTicker implements Ticker {
     @Override
     public long read() {
         return nanos.getAndAdd(autoIncrementStepNanos);
+    }
+
+    public FakeTicker at(Instant now) {
+        return advance(now.toEpochMilli(), MILLISECONDS);
     }
 
     public FakeTicker advance(long time, TimeUnit timeUnit) {

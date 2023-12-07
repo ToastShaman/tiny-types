@@ -12,7 +12,6 @@ import io.vavr.Function6;
 import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
