@@ -12,11 +12,16 @@ import io.vavr.Function6;
 import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public sealed interface Result<T, E> permits Success, Failure {
@@ -222,6 +227,8 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     <X extends Throwable> Try<T> asTry(Function<E, X> f);
 
+    Stream<T> stream();
+
     record Success<T, E>(T value) implements Result<T, E> {
 
         public Success {
@@ -324,6 +331,11 @@ public sealed interface Result<T, E> permits Success, Failure {
         @Override
         public <X extends Throwable> Try<T> asTry(Function<E, X> f) {
             return Try.success(value);
+        }
+
+        @Override
+        public Stream<T> stream() {
+            return Stream.of(value);
         }
     }
 
@@ -429,6 +441,11 @@ public sealed interface Result<T, E> permits Success, Failure {
         @Override
         public <X extends Throwable> Try<T> asTry(Function<E, X> f) {
             return Try.failure(f.apply(reason));
+        }
+
+        @Override
+        public Stream<T> stream() {
+            return Stream.empty();
         }
     }
 }
