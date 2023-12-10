@@ -20,7 +20,8 @@ class SpringJdbcActionTest {
     JdbcDataSource dataSource;
 
     NamedParameterJdbcTemplate jdbcTemplate;
-    private TransactionTemplate txTemplate;
+
+    TransactionTemplate txTemplate;
 
     @BeforeEach
     public void setup() {
