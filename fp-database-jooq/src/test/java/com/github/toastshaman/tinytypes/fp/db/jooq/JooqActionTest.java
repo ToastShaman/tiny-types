@@ -63,6 +63,5 @@ class JooqActionTest {
                 cfg.dsl().deleteFrom(table("vets")).where(field("id").eq(id)).execute());
     }
 
-    record Vet(Integer id, String firstName, String lastName) {
-    }
+    record Vet(Integer id, String firstName, String lastName) {}
 }

@@ -1,7 +1,7 @@
 package com.github.toastshaman.tinytypes.fp.db.jooq;
 
-import com.github.toastshaman.tinytypes.fp.Reader;
 import io.vavr.Tuple2;
+import io.vavr.control.Either;
 import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,6 +49,10 @@ public final class JooqAction<R> {
         return JooqAction.of(ctx -> Try.of(() -> action.apply(ctx)));
     }
 
+    public JooqAction<Either<Throwable, R>> asEither() {
+        return asTry().map(Try::toEither);
+    }
+
     public <U> JooqAction<U> andThen(JooqAction<U> other) {
         return JooqAction.of(ctx -> {
             action.apply(ctx);
@@ -60,8 +64,8 @@ public final class JooqAction<R> {
         return flatMap(a -> other.map(b -> new Tuple2<>(a, b)));
     }
 
-    public Reader<DSLContext, R> withTransaction() {
-        return Reader.of(ctx -> ctx.transactionResult(action::apply));
+    public JooqAction<R> withTransaction() {
+        return JooqAction.of(ctx -> ctx.dsl().transactionResult(action::apply));
     }
 
     public R apply(DSLContext context) {
