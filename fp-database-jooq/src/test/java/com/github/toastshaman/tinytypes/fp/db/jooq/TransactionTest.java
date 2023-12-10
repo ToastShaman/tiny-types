@@ -5,10 +5,12 @@ import static org.jooq.SQLDialect.H2;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.flywaydb.core.Flyway;
-import org.h2.jdbcx.JdbcDataSource;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -17,16 +19,18 @@ import org.junit.jupiter.api.Test;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class TransactionTest {
 
-    JdbcDataSource dataSource;
-
     DSLContext context;
+
+    HikariDataSource dataSource;
 
     @BeforeEach
     public void setup() {
-        dataSource = new JdbcDataSource();
-        dataSource.setURL("jdbc:h2:mem:db;DB_CLOSE_DELAY=-1;");
-        dataSource.setUser("sa");
-        dataSource.setPassword("sa");
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:h2:mem:db");
+        config.setUsername("sa");
+        config.setPassword("sa");
+
+        dataSource = new HikariDataSource(config);
 
         Flyway.configure()
                 .dataSource(dataSource)
@@ -35,6 +39,11 @@ class TransactionTest {
                 .migrate();
 
         context = DSL.using(dataSource, H2);
+    }
+
+    @AfterEach
+    public void teardown() {
+        dataSource.close();
     }
 
     @Test
