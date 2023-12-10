@@ -1,5 +1,4 @@
 dependencies {
-    api(project(":fp"))
     api(libs.vavr)
     api(libs.jooq)
 

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class JooqActionTest {
+class TransactionTest {
 
     JdbcDataSource dataSource;
 
@@ -39,18 +39,16 @@ class JooqActionTest {
 
     @Test
     void runs_query_and_delete_as_part_of_a_transaction() {
-        var numberOfDeletedRecords = findVetById(1)
-                .flatMap(v -> deleteVetById(v.id))
-                .withTransaction()
-                .apply(context);
+        var numberOfDeletedRecords =
+                findVetById(1).flatMap(v -> deleteVetById(v.id)).execute(context);
 
         assertThat(numberOfDeletedRecords)
                 .withFailMessage("should have deleted one record")
                 .isEqualTo(1);
     }
 
-    private JooqAction<Vet> findVetById(int id) {
-        return JooqAction.of(ctx -> ctx.dsl()
+    private Transaction<Vet> findVetById(int id) {
+        return Transaction.of(ctx -> ctx.dsl()
                 .fetchOne("SELECT * FROM vets WHERE id = ?", id)
                 .map(record -> new Vet(
                         record.getValue(0, Integer.class),
@@ -58,8 +56,8 @@ class JooqActionTest {
                         record.getValue(2, String.class))));
     }
 
-    private JooqAction<Integer> deleteVetById(int id) {
-        return JooqAction.of(cfg ->
+    private Transaction<Integer> deleteVetById(int id) {
+        return Transaction.of(cfg ->
                 cfg.dsl().deleteFrom(table("vets")).where(field("id").eq(id)).execute());
     }
 
