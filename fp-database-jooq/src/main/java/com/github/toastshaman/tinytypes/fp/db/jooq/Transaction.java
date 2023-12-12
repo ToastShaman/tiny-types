@@ -2,7 +2,9 @@ package com.github.toastshaman.tinytypes.fp.db.jooq;
 
 import io.vavr.control.Either;
 import io.vavr.control.Try;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jooq.Configuration;
@@ -43,10 +45,10 @@ public final class Transaction<R> {
         return asTry().map(Try::toEither);
     }
 
-    public <U> Transaction<U> andThen(Transaction<U> other) {
+    public <U> Transaction<U> andThen(Transaction<U> after) {
         return Transaction.of(ctx -> {
             f.apply(ctx);
-            return other.f.apply(ctx);
+            return after.f.apply(ctx);
         });
     }
 
@@ -56,6 +58,19 @@ public final class Transaction<R> {
 
     private Transaction<R> wrapInTransaction() {
         return Transaction.of(ctx -> ctx.dsl().transactionResult(f::apply));
+    }
+
+    public static <R1, R2, U> Transaction<U> zip(Transaction<R1> r1, Transaction<R2> r2, BiFunction<R1, R2, U> f) {
+        return r1.flatMap(v1 -> r2.map(v2 -> f.apply(v1, v2)));
+    }
+
+    public static <R1, R2, U> Transaction<U> flatZip(
+            Transaction<R1> r1, Transaction<R2> r2, BiFunction<R1, R2, Transaction<U>> f) {
+        return r1.flatMap(v1 -> r2.flatMap(v2 -> f.apply(v1, v2)));
+    }
+
+    public static <R> Transaction<List<R>> flatten(List<Transaction<R>> l) {
+        return new Transaction<>(t -> l.stream().map(it -> it.f.apply(t)).toList());
     }
 
     @Override

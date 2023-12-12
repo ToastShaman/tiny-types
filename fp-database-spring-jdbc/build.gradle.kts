@@ -4,6 +4,7 @@ dependencies {
 
     testImplementation(libs.h2)
     testImplementation(libs.flyway)
+    testImplementation(libs.hikari)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter.params)

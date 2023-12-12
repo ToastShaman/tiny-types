@@ -24,8 +24,8 @@ class TransactionTest {
     HikariDataSource dataSource;
 
     @BeforeEach
-    public void setup() {
-        HikariConfig config = new HikariConfig();
+    void setup() {
+        var config = new HikariConfig();
         config.setJdbcUrl("jdbc:h2:mem:db");
         config.setUsername("sa");
         config.setPassword("sa");
@@ -42,7 +42,7 @@ class TransactionTest {
     }
 
     @AfterEach
-    public void teardown() {
+    void teardown() {
         dataSource.close();
     }
 
@@ -56,7 +56,7 @@ class TransactionTest {
                 .isEqualTo(1);
     }
 
-    private Transaction<Vet> findVetById(int id) {
+    Transaction<Vet> findVetById(int id) {
         return Transaction.of(ctx -> ctx.dsl()
                 .fetchOne("SELECT * FROM vets WHERE id = ?", id)
                 .map(record -> new Vet(
@@ -65,7 +65,7 @@ class TransactionTest {
                         record.getValue(2, String.class))));
     }
 
-    private Transaction<Integer> deleteVetById(int id) {
+    Transaction<Integer> deleteVetById(int id) {
         return Transaction.of(cfg ->
                 cfg.dsl().deleteFrom(table("vets")).where(field("id").eq(id)).execute());
     }
