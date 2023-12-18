@@ -6,7 +6,11 @@ import io.vavr.Tuple3;
 import io.vavr.Tuple4;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 public final class Lens<S, A> {
 
@@ -55,10 +59,6 @@ public final class Lens<S, A> {
         return getter.andThen(Optional::ofNullable).apply(s);
     }
 
-    public Reader<S, A> asReader() {
-        return Reader.of(getter);
-    }
-
     public S set(S s, A a) {
         return setter.apply(s, a);
     }
@@ -67,20 +67,24 @@ public final class Lens<S, A> {
         return set(s, f.apply(get(s)));
     }
 
-    public <B> Reader<S, B> map(Function<A, B> f) {
-        return Reader.of(getter.andThen(f));
-    }
-
-    public Reader<S, Optional<A>> filter(Predicate<A> f) {
-        return map(a -> Optional.ofNullable(a).filter(f));
-    }
-
     public <C> Lens<C, A> compose(Lens<C, S> before) {
         return new Lens<>(c -> get(before.get(c)), (c, a) -> before.mod(c, s -> set(s, a)));
     }
 
     public <C> Lens<S, C> andThen(Lens<A, C> after) {
         return after.compose(this);
+    }
+
+    public Reader<S, A> asReader() {
+        return Reader.of(getter);
+    }
+
+    public <B> Reader<S, B> map(Function<A, B> f) {
+        return Reader.of(getter.andThen(f));
+    }
+
+    public Reader<S, Optional<A>> filter(Predicate<A> f) {
+        return map(a -> Optional.ofNullable(a).filter(f));
     }
 
     @Override

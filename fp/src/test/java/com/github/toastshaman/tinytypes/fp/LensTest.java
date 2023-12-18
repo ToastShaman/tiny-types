@@ -58,7 +58,7 @@ class LensTest {
     }
 
     @Test
-    void and_then() {
+    void can_chain_using_then() {
         var aLens = Lens.of(A::b, A::withB);
         var idxLens = Lens.of(B::index, B::withIndex);
         var lens = aLens.andThen(idxLens);
@@ -67,6 +67,23 @@ class LensTest {
 
         assertThat(lens.get(value)).isEqualTo(2);
         assertThat(lens.set(value, 3)).isEqualTo(new A(1, new B(3)));
+    }
+
+    @Test
+    void can_chain_using_compose() {
+        var aLens = Lens.of(A::b, A::withB);
+        var idxLens = Lens.of(B::index, B::withIndex);
+        var lens = idxLens.compose(aLens);
+
+        var value = new A(1, new B(2));
+
+        assertThat(lens.get(value)).isEqualTo(2);
+        assertThat(lens.set(value, 3)).isEqualTo(new A(1, new B(3)));
+    }
+
+    @Test
+    void can_turn_into_a_reader() {
+        assertThat(nameLens.asReader().apply(person)).isEqualTo("Irving");
     }
 
     record Person(String name, int age) {
