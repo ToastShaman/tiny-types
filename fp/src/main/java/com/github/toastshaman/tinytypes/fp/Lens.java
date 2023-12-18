@@ -1,7 +1,5 @@
 package com.github.toastshaman.tinytypes.fp;
 
-import io.vavr.Function3;
-import io.vavr.Function4;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -9,22 +7,22 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public final class Lens<A, B> {
+public final class Lens<S, A> {
 
-    private final Function<A, B> getter;
+    private final Function<S, A> getter;
 
-    private final BiFunction<A, B, A> setter;
+    private final BiFunction<S, A, S> setter;
 
-    public Lens(Function<A, B> getter, BiFunction<A, B, A> setter) {
+    public Lens(Function<S, A> getter, BiFunction<S, A, S> setter) {
         this.getter = Objects.requireNonNull(getter);
         this.setter = Objects.requireNonNull(setter);
     }
 
-    public static <A, B> Lens<A, B> of(Function<A, B> getter, BiFunction<A, B, A> setter) {
+    public static <S, A> Lens<S, A> of(Function<S, A> getter, BiFunction<S, A, S> setter) {
         return new Lens<>(getter, setter);
     }
 
-    public static <A, B> Lens<A, B> mutableOf(Function<A, B> getter, BiConsumer<A, B> mutator) {
+    public static <S, A> Lens<S, A> mutableOf(Function<S, A> getter, BiConsumer<S, A> mutator) {
         Objects.requireNonNull(mutator);
         return new Lens<>(getter, (a, b) -> {
             mutator.accept(a, b);
@@ -32,36 +30,28 @@ public final class Lens<A, B> {
         });
     }
 
-    public B get(A a) {
-        return getter.apply(a);
+    public A get(S s) {
+        return getter.apply(s);
     }
 
-    public Optional<B> maybe(A a) {
-        return getter.andThen(Optional::ofNullable).apply(a);
+    public Optional<A> maybe(S s) {
+        return getter.andThen(Optional::ofNullable).apply(s);
     }
 
-    public A set(A a, B b) {
-        return setter.apply(a, b);
+    public S set(S s, A a) {
+        return setter.apply(s, a);
     }
 
-    public A mod(A a, UnaryOperator<B> unaryOperator) {
-        return set(a, unaryOperator.apply(get(a)));
+    public S mod(S s, UnaryOperator<A> f) {
+        return set(s, f.apply(get(s)));
     }
 
-    public <C> Lens<C, B> compose(Lens<C, A> that) {
-        return new Lens<>(c -> get(that.get(c)), (c, b) -> that.mod(c, a -> set(a, b)));
+    public <C> Lens<C, A> compose(Lens<C, S> before) {
+        return new Lens<>(c -> get(before.get(c)), (c, a) -> before.mod(c, s -> set(s, a)));
     }
 
-    public <C> Lens<A, C> andThen(Lens<B, C> that) {
-        return that.compose(this);
-    }
-
-    public <C> Function3<A, B, C, A> zip2(Lens<A, C> second) {
-        return (a, b, c) -> second.set(set(a, b), c);
-    }
-
-    public <C, D> Function4<A, B, C, D, A> zip3(Lens<A, C> second, Lens<A, D> third) {
-        return (a, b, c, d) -> third.set(second.set(set(a, b), c), d);
+    public <C> Lens<S, C> andThen(Lens<A, C> after) {
+        return after.compose(this);
     }
 
     @Override
