@@ -10,7 +10,6 @@ import io.vavr.Tuple4;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
