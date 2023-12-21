@@ -1,6 +1,16 @@
 package com.github.toastshaman.tinytypes.fp;
 
-import io.vavr.*;
+import io.vavr.Function2;
+import io.vavr.Function3;
+import io.vavr.Function4;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.Tuple3;
+import io.vavr.Tuple4;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -27,6 +37,22 @@ public final class Reader<S, A> {
 
     public <U> Reader<S, U> flatMap(Function<A, Reader<S, U>> f) {
         return new Reader<>(s -> f.apply(apply(s)).apply(s));
+    }
+
+    public Result<A, Throwable> asResult(S s) {
+        return Result.of(() -> reader.apply(s));
+    }
+
+    public Option<A> asOption(S s) {
+        return Option.ofOptional(maybe(s));
+    }
+
+    public Try<A> asTry(S s) {
+        return asOption(s).toTry();
+    }
+
+    public Either<Throwable, A> asEither(S s) {
+        return asTry(s).toEither();
     }
 
     public static <S, A> Reader<S, A> of(Function<S, A> f) {

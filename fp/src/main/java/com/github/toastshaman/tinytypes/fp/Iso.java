@@ -25,6 +25,14 @@ public final class Iso<IN, OUT> {
         return reverseGet.apply(out);
     }
 
+    public Reader<IN, OUT> asReader() {
+        return Reader.of(get);
+    }
+
+    public Reader<OUT, IN> asReverseReader() {
+        return Reader.of(reverseGet);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

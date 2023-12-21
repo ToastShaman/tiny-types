@@ -4,6 +4,10 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 import io.vavr.Tuple4;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -75,16 +79,32 @@ public final class Lens<S, A> {
         return after.compose(this);
     }
 
-    public Reader<S, A> asReader() {
-        return Reader.of(getter);
-    }
-
     public <B> Reader<S, B> map(Function<A, B> f) {
         return Reader.of(getter.andThen(f));
     }
 
     public Reader<S, Optional<A>> filter(Predicate<A> f) {
         return map(a -> Optional.ofNullable(a).filter(f));
+    }
+
+    public Reader<S, A> asReader() {
+        return Reader.of(getter);
+    }
+
+    public Result<A, Throwable> asResult(S s) {
+        return Result.of(() -> getter.apply(s));
+    }
+
+    public Option<A> asOption(S s) {
+        return Option.ofOptional(maybe(s));
+    }
+
+    public Try<A> asTry(S s) {
+        return asOption(s).toTry();
+    }
+
+    public Either<Throwable, A> asEither(S s) {
+        return asTry(s).toEither();
     }
 
     @Override

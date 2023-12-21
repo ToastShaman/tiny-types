@@ -1,6 +1,5 @@
 package com.github.toastshaman.tinytypes.fp;
 
-import io.vavr.Tuple2;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -10,6 +9,10 @@ public final class Converter<S, T> {
 
     public Converter(Function<S, T> mapper) {
         this.mapper = Objects.requireNonNull(mapper);
+    }
+
+    public static <S, T> Converter<S, T> of(Function<S, T> mapper) {
+        return new Converter<>(mapper);
     }
 
     public T convert(S source) {
@@ -32,12 +35,8 @@ public final class Converter<S, T> {
         return new Converter<>(mapper.andThen(it -> next.apply(it).mapper.apply(it)));
     }
 
-    public <T2> Converter<S, Tuple2<T, T2>> zip(Converter<S, T2> other) {
-        return Converter.of(it -> new Tuple2<>(convert(it), other.convert(it)));
-    }
-
-    public static <S, T> Converter<S, T> of(Function<S, T> mapper) {
-        return new Converter<>(mapper);
+    public Reader<S, T> asReader() {
+        return Reader.of(mapper);
     }
 
     @Override
