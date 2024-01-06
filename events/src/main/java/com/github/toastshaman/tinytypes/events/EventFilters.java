@@ -1,8 +1,11 @@
 package com.github.toastshaman.tinytypes.events;
 
 import java.time.Clock;
+import org.slf4j.MDC;
 
 public final class EventFilters {
+
+    private EventFilters() {}
 
     public static EventFilter AddEventName = next -> event -> {
         var aClass = event instanceof MetadataEvent m ? m.event().getClass() : event.getClass();
@@ -21,5 +24,7 @@ public final class EventFilters {
         return next -> event -> next.record(event.addMetadata("timestamp", clock.instant()));
     }
 
-    private EventFilters() {}
+    public static EventFilter AddMDCContext() {
+        return next -> event -> MDC.getCopyOfContextMap().forEach(event::addMetadata);
+    }
 }
