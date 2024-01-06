@@ -267,8 +267,7 @@ class ResultTest {
 
         @Test
         void can_filter() {
-            var first = Result.<Integer, Throwable>success(1)
-                    .filter(it -> it < 5, it -> new NoSuchElementException());
+            var first = Result.<Integer, Throwable>success(1).filter(it -> it < 5, it -> new NoSuchElementException());
 
             var second = Result.<Integer, Throwable>failure(new RuntimeException())
                     .filter(it -> it < 5, it -> new NoSuchElementException());

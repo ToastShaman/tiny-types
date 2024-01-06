@@ -1,0 +1,52 @@
+package com.github.toastshaman.tinytypes.format.jackson;
+
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import io.vavr.control.Try;
+import java.util.Objects;
+import java.util.function.Supplier;
+
+public final class JsonPaths {
+
+    private JsonPaths() {}
+
+    public static JsonPathContext parse(String json) {
+        return new JsonPathContext(() -> JsonPath.using(Configuration.builder()
+                        .jsonProvider(new JacksonJsonProvider(ObjectMappers.mapper))
+                        .mappingProvider(new JacksonMappingProvider(ObjectMappers.mapper))
+                        .build())
+                .parse(Objects.requireNonNull(json)));
+    }
+
+    public static class JsonPathContext {
+
+        private final Try<DocumentContext> context;
+
+        public JsonPathContext(Supplier<DocumentContext> context) {
+            this.context = Try.ofSupplier(context);
+        }
+
+        public <T> Try<T> read(String path) {
+            return context.map(it -> it.read(path));
+        }
+
+        public <T> Try<T> read(String path, Class<T> type) {
+            return context.map(it -> it.read(path, type));
+        }
+
+        public Try<String> readString(String path) {
+            return read(path, String.class);
+        }
+
+        public Try<Long> readLong(String path) {
+            return read(path, Long.class);
+        }
+
+        public Try<Double> readDouble(String path) {
+            return read(path, Double.class);
+        }
+    }
+}
