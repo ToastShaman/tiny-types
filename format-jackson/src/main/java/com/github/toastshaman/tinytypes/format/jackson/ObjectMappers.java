@@ -1,15 +1,5 @@
 package com.github.toastshaman.tinytypes.format.jackson;
 
-import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS;
-import static com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS;
-import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -21,11 +11,25 @@ import com.github.toastshaman.tinytypes.format.jackson.JsonPaths.JsonPathContext
 import io.vavr.Function0;
 import io.vavr.Lazy;
 import io.vavr.control.Try;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.OutputStream;
+import java.io.Writer;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
+
+import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS;
+import static com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS;
+import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
 public final class ObjectMappers {
 
@@ -83,11 +87,41 @@ public final class ObjectMappers {
         return Try.of(() -> mapper.writeValueAsString(f.get()));
     }
 
-    public static <T> Try<JSONObject> convert(T object) {
+    public static <T> Try<Void> write(Writer writer, T object) {
+        return write(writer, () -> object);
+    }
+
+    public static <T> Try<Void> write(Writer writer, Supplier<T> object) {
+        return Try.withResources(() -> writer).of(it -> {
+            mapper.writeValue(it, object.get());
+            return null;
+        });
+    }
+
+    public static <T> Try<Void> write(OutputStream outputStream, T object) {
+        return write(outputStream, () -> object);
+    }
+
+    public static <T> Try<Void> write(OutputStream outputStream, Supplier<T> object) {
+        return Try.withResources(() -> outputStream).of(it -> {
+            mapper.writeValue(it, object.get());
+            return null;
+        });
+    }
+
+    public static <T> Try<JSONObject> convertToJSON(T object) {
+        return convertToJSON(() -> object);
+    }
+
+    public static <T> Try<JSONObject> convertToJSON(Supplier<T> f) {
+        return Try.of(() -> new JSONObject(mapper.writeValueAsString(f.get())));
+    }
+
+    public static <T> Try<Map<String, Object>> convert(T object) {
         return convert(() -> object);
     }
 
-    public static <T> Try<JSONObject> convert(Supplier<T> f) {
-        return Try.of(() -> new JSONObject(mapper.writeValueAsString(f.get())));
+    public static <T> Try<Map<String, Object>> convert(Supplier<T> object) {
+        return Try.of(() -> mapper.convertValue(object.get(), new TypeReference<>() {}));
     }
 }

@@ -1,11 +1,11 @@
 package com.github.toastshaman.tinytypes.format.jackson;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.vavr.api.VavrAssertions.assertThat;
-
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.vavr.api.VavrAssertions.assertThat;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class ObjectMappersTest {
