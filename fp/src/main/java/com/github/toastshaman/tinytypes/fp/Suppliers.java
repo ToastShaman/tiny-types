@@ -18,8 +18,7 @@ public final class Suppliers {
         return f.apply(s1.get(), s2.get());
     }
 
-    public static <S1, S2, S3, R> R zip(
-            Supplier<S1> s1, Supplier<S2> s2, Supplier<S3> s3, Function3<S1, S2, S3, R> f) {
+    public static <S1, S2, S3, R> R zip(Supplier<S1> s1, Supplier<S2> s2, Supplier<S3> s3, Function3<S1, S2, S3, R> f) {
         return f.apply(s1.get(), s2.get(), s3.get());
     }
 

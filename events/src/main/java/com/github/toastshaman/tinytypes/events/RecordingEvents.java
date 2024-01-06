@@ -2,11 +2,14 @@ package com.github.toastshaman.tinytypes.events;
 
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
 public final class RecordingEvents implements Events {
 
     public final LinkedBlockingQueue<Event> captured;
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     public RecordingEvents() {
         this(500);
@@ -18,11 +21,16 @@ public final class RecordingEvents implements Events {
     }
 
     @Override
-    public synchronized void record(Event event) {
-        if (captured.remainingCapacity() <= 0) {
-            captured.clear();
+    public void record(Event event) {
+        lock.lock();
+        try {
+            if (captured.remainingCapacity() <= 0) {
+                captured.clear();
+            }
+            captured.add(event);
+        } finally {
+            lock.unlock();
         }
-        captured.add(event);
     }
 
     public <T extends Event> List<Event> filterInstanceOf(Class<T> type) {
