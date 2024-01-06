@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -202,6 +203,8 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     <E1> Result<T, E1> flatMapFailure(Function<E, Result<T, E1>> fn);
 
+    Result<T, E> filter(Predicate<T> predicate, Function<T, E> errorProvider);
+
     Result<T, E> onSuccess(Consumer<T> fn);
 
     Result<T, E> onFailure(Consumer<E> fn);
@@ -269,6 +272,14 @@ public sealed interface Result<T, E> permits Success, Failure {
         @SuppressWarnings("unchecked")
         public <E1> Result<T, E1> flatMapFailure(Function<E, Result<T, E1>> fn) {
             return (Result<T, E1>) this;
+        }
+
+        @Override
+        public Result<T, E> filter(Predicate<T> predicate, Function<T, E> errorProvider) {
+            if (predicate.test(value)) {
+                return this;
+            }
+            return new Failure<>(errorProvider.apply(value));
         }
 
         @Override
@@ -379,6 +390,11 @@ public sealed interface Result<T, E> permits Success, Failure {
         @Override
         public <E1> Result<T, E1> flatMapFailure(Function<E, Result<T, E1>> fn) {
             return fn.apply(reason);
+        }
+
+        @Override
+        public Result<T, E> filter(Predicate<T> predicate, Function<T, E> errorProvider) {
+            return this;
         }
 
         @Override

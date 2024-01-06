@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.github.toastshaman.tinytypes.fp.Result.Failure;
 import com.github.toastshaman.tinytypes.fp.Result.Success;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -264,6 +265,18 @@ class ResultTest {
             assertThat(idx).isEqualTo(2);
         }
 
+        @Test
+        void can_filter() {
+            var first = Result.<Integer, Throwable>success(1)
+                    .filter(it -> it < 5, it -> new NoSuchElementException());
+
+            var second = Result.<Integer, Throwable>failure(new RuntimeException())
+                    .filter(it -> it < 5, it -> new NoSuchElementException());
+
+            assertThat(first).isInstanceOf(Success.class);
+            assertThat(second).isInstanceOf(Failure.class);
+        }
+
         private static Result<Integer, Integer> getResult() {
             return Result.success(1);
         }
@@ -386,6 +399,17 @@ class ResultTest {
             var idx = getResult().fold(it -> it + 1, it -> it + 2);
 
             assertThat(idx).isEqualTo(3);
+        }
+
+        @Test
+        void can_filter() {
+            var first = Result.<Integer, Throwable>success(1).filter(it -> it > 5, it -> new NoSuchElementException());
+
+            var second = Result.<Integer, Throwable>failure(new RuntimeException())
+                    .filter(it -> it < 5, it -> new NoSuchElementException());
+
+            assertThat(first).isInstanceOf(Failure.class);
+            assertThat(second).isInstanceOf(Failure.class);
         }
 
         private static Result<Integer, Integer> getResult() {
