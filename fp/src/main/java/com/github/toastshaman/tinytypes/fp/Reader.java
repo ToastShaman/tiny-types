@@ -13,6 +13,7 @@ import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public final class Reader<S, A> {
 
@@ -52,6 +53,10 @@ public final class Reader<S, A> {
 
     public Either<Throwable, A> asEither(S s) {
         return asTry(s).toEither();
+    }
+
+    public Stream<A> asStream(S s) {
+        return Stream.of(reader.apply(s));
     }
 
     public static <S, A> Reader<S, A> of(Function<S, A> f) {
