@@ -15,4 +15,11 @@ class FakerTest {
 
         assertThat(uuid.toString()).isEqualTo("062b5b81-2040-3b91-a6da-cf5e71dc8ea1");
     }
+
+    @Test
+    void random_ulid() {
+        var ulid = new Faker().ulid().random();
+
+        assertThat(ulid.toString()).isEqualTo("065DDR28207E8TDPPFBSRXS3N1");
+    }
 }

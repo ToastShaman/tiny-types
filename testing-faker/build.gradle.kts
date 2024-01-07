@@ -1,5 +1,6 @@
 dependencies {
     api(libs.datafaker)
+    api(libs.ulid)
 
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)

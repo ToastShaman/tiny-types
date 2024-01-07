@@ -17,4 +17,8 @@ public final class Faker extends BaseFaker {
     public UUIDProvider uuid() {
         return getProvider(UUIDProvider.class, UUIDProvider::new, this);
     }
+
+    public UlidProvider ulid() {
+        return getProvider(UlidProvider.class, UlidProvider::new, this);
+    }
 }

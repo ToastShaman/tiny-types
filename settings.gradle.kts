@@ -45,6 +45,7 @@ dependencyResolutionManagement {
             library("assertj-vavr", "org.assertj:assertj-vavr:0.4.3")
 
             library("datafaker", "net.datafaker:datafaker:2.1.0")
+            library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
         }
     }
 }
