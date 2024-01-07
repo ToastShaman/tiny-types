@@ -1,5 +1,6 @@
 package com.github.toastshaman.tinytypes.format.jackson;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -7,6 +8,7 @@ import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.control.Try;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class JsonPaths {
@@ -14,9 +16,13 @@ public final class JsonPaths {
     private JsonPaths() {}
 
     public static JsonPathContext parse(String json) {
-        return new JsonPathContext(() -> JsonPath.using(Configuration.builder()
-                        .jsonProvider(new JacksonJsonProvider(ObjectMappers.mapper))
-                        .mappingProvider(new JacksonMappingProvider(ObjectMappers.mapper))
+        return customise(Json.standard().mapper()).apply(json);
+    }
+
+    public static Function<String, JsonPathContext> customise(ObjectMapper mapper) {
+        return json -> new JsonPathContext(() -> JsonPath.using(Configuration.builder()
+                        .jsonProvider(new JacksonJsonProvider(mapper))
+                        .mappingProvider(new JacksonMappingProvider(mapper))
                         .build())
                 .parse(Objects.requireNonNull(json)));
     }

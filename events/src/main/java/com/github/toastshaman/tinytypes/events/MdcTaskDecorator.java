@@ -1,8 +1,7 @@
 package com.github.toastshaman.tinytypes.events;
 
-import org.slf4j.MDC;
-
 import java.util.function.UnaryOperator;
+import org.slf4j.MDC;
 
 public final class MdcTaskDecorator implements UnaryOperator<Runnable> {
 
