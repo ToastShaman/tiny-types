@@ -7,7 +7,6 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.control.Try;
-
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
