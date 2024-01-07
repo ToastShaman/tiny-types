@@ -7,6 +7,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import io.vavr.control.Try;
+
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -20,11 +21,14 @@ public final class JsonPaths {
     }
 
     public static Function<String, JsonPathContext> customise(ObjectMapper mapper) {
-        return json -> new JsonPathContext(() -> JsonPath.using(Configuration.builder()
-                        .jsonProvider(new JacksonJsonProvider(mapper))
-                        .mappingProvider(new JacksonMappingProvider(mapper))
-                        .build())
-                .parse(Objects.requireNonNull(json)));
+        var cfg = Configuration.builder()
+                .jsonProvider(new JacksonJsonProvider(mapper))
+                .mappingProvider(new JacksonMappingProvider(mapper))
+                .build();
+
+        var parseContext = JsonPath.using(cfg);
+
+        return json -> new JsonPathContext(() -> parseContext.parse(Objects.requireNonNull(json)));
     }
 
     public static class JsonPathContext {
