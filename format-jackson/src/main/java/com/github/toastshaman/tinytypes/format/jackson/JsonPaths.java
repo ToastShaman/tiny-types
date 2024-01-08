@@ -27,7 +27,7 @@ public final class JsonPaths {
 
         var parseContext = JsonPath.using(cfg);
 
-        return json -> new JsonPathContext(() -> parseContext.parse(Objects.requireNonNull(json)));
+        return json -> new JsonPathContext(() -> parseContext.parse(json));
     }
 
     public static class JsonPathContext {
