@@ -147,14 +147,6 @@ public final class Json {
             this.mapper = Objects.requireNonNull(mapper);
         }
 
-        public Try<JSONObject> readAsJSONObject(String json) {
-            return read(json, JSONObject.class);
-        }
-
-        public Try<JSONArray> readAsJSONArray(String json) {
-            return read(json, JSONArray.class);
-        }
-
         public <T> Try<T> read(String json, Class<T> clazz) {
             return Try.of(() -> mapper.readValue(json, clazz));
         }
@@ -169,6 +161,14 @@ public final class Json {
 
         public JsonPathContext parse(String json) {
             return JsonPaths.parse(json);
+        }
+
+        public Try<JSONObject> readJSONObject(String json) {
+            return read(json, JSONObject.class);
+        }
+
+        public Try<JSONArray> readJSONArray(String json) {
+            return read(json, JSONArray.class);
         }
     }
 }

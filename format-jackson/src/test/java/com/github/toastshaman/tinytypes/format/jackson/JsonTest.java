@@ -69,9 +69,16 @@ class JsonTest {
 
     @Test
     void can_read_as_json_object() {
-        var result = Json.standard().decoder().readAsJSONObject(json);
+        var result = Json.standard().decoder().readJSONObject(json);
 
         assertThat(result).isSuccess();
+    }
+
+    @Test
+    void can_read_list() {
+        var result = Json.standard().decoder().readList("[1,2,3,4]");
+
+        assertThat(result).hasValueSatisfying(it -> assertThat(it).hasSize(4));
     }
 
     @Test

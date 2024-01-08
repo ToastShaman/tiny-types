@@ -38,14 +38,6 @@ public final class JsonPaths {
             this.context = Try.ofSupplier(context);
         }
 
-        public <T> Try<T> read(String path) {
-            return context.map(it -> it.read(path));
-        }
-
-        public <T> Try<T> read(String path, Class<T> type) {
-            return context.map(it -> it.read(path, type));
-        }
-
         public Try<String> readString(String path) {
             return read(path, String.class);
         }
@@ -56,6 +48,14 @@ public final class JsonPaths {
 
         public Try<Double> readDouble(String path) {
             return read(path, Double.class);
+        }
+
+        public <T> Try<T> read(String path, Class<T> type) {
+            return context.map(it -> it.read(path, type));
+        }
+
+        public <T> Try<T> read(String path) {
+            return context.map(it -> it.read(path));
         }
     }
 }
