@@ -123,6 +123,14 @@ public final class Json {
             });
         }
 
+        public <T> Try<byte[]> writeAsBytes(T object) {
+            return writeAsBytes(() -> object);
+        }
+
+        public <T> Try<byte[]> writeAsBytes(Supplier<T> f) {
+            return Try.of(() -> mapper.writeValueAsBytes(f.get()));
+        }
+
         public <T> Try<JSONObject> convertToJSON(T object) {
             return convertToJSON(() -> object);
         }
