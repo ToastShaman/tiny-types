@@ -33,9 +33,9 @@ dependencyResolutionManagement {
             library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
 
             library("h2", "com.h2database:h2:2.2.224")
-            library("jooq", "org.jooq:jooq:3.19.1")
-            library("spring-jdbc", "org.springframework:spring-jdbc:6.1.2")
-            library("flyway", "org.flywaydb:flyway-core:10.4.1")
+            library("jooq", "org.jooq:jooq:3.19.2")
+            library("spring-jdbc", "org.springframework:spring-jdbc:6.1.3")
+            library("flyway", "org.flywaydb:flyway-core:10.5.0")
             library("hikari", "com.zaxxer:HikariCP:5.1.0")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
