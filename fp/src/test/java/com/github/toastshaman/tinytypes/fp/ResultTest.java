@@ -255,7 +255,7 @@ class ResultTest {
 
         @Test
         void can_return_optional() {
-            assertThat(getResult().asOptional()).isNotEmpty();
+            assertThat(getResult().maybe()).isNotEmpty();
         }
 
         @Test
@@ -390,7 +390,7 @@ class ResultTest {
 
         @Test
         void can_return_optional() {
-            assertThat(getResult().asOptional()).isEmpty();
+            assertThat(getResult().maybe()).isEmpty();
         }
 
         @Test

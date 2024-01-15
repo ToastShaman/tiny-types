@@ -223,7 +223,7 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     Result<T, E> recover(Function<E, T> f);
 
-    Optional<T> asOptional();
+    Optional<T> maybe();
 
     Either<E, T> asEither();
 
@@ -329,7 +329,7 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
 
         @Override
-        public Optional<T> asOptional() {
+        public Optional<T> maybe() {
             return Optional.of(value);
         }
 
@@ -444,7 +444,7 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
 
         @Override
-        public Optional<T> asOptional() {
+        public Optional<T> maybe() {
             return Optional.empty();
         }
 
