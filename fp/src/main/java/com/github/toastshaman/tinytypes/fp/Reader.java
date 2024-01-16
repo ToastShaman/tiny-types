@@ -55,7 +55,7 @@ public final class Reader<S, A> {
         return asTry(s).toEither();
     }
 
-    public Stream<A> asStream(S s) {
+    public Stream<A> stream(S s) {
         return Stream.of(reader.apply(s));
     }
 
