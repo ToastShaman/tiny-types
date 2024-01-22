@@ -23,7 +23,7 @@ dependencyResolutionManagement {
             version("vavr", "0.10.4")
 
             library("json","org.json:json:20230618")
-            library("json-path", "com.jayway.jsonpath:json-path:2.8.0")
+            library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
             library("vavr", "io.vavr", "vavr").versionRef("vavr")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
@@ -33,9 +33,9 @@ dependencyResolutionManagement {
             library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
 
             library("h2", "com.h2database:h2:2.2.224")
-            library("jooq", "org.jooq:jooq:3.19.2")
+            library("jooq", "org.jooq:jooq:3.19.3")
             library("spring-jdbc", "org.springframework:spring-jdbc:6.1.3")
-            library("flyway", "org.flywaydb:flyway-core:10.5.0")
+            library("flyway", "org.flywaydb:flyway-core:10.6.0")
             library("hikari", "com.zaxxer:HikariCP:5.1.0")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")

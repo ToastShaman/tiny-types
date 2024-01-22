@@ -12,13 +12,11 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTE
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.toastshaman.tinytypes.events.Event;
 import com.github.toastshaman.tinytypes.events.Events;
-
 import java.util.Objects;
 import java.util.function.Consumer;
 
