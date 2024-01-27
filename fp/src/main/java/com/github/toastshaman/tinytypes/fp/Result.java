@@ -215,6 +215,8 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     T getOrNull();
 
+    Result<T, E> or(Supplier<Result<T, E>> f);
+
     <X extends Throwable> T getOrThrow(Function<E, X> f) throws X;
 
     Result<E, T> swap();
@@ -306,6 +308,11 @@ public sealed interface Result<T, E> permits Success, Failure {
         @Override
         public T getOrNull() {
             return value;
+        }
+
+        @Override
+        public Result<T, E> or(Supplier<Result<T, E>> f) {
+            return this;
         }
 
         @Override
@@ -421,6 +428,11 @@ public sealed interface Result<T, E> permits Success, Failure {
         @Override
         public T getOrNull() {
             return null;
+        }
+
+        @Override
+        public Result<T, E> or(Supplier<Result<T, E>> f) {
+            return f.get();
         }
 
         @Override
