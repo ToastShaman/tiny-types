@@ -16,9 +16,9 @@ include("testing-faker")
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            version("assertj", "3.25.1")
+            version("assertj", "3.25.3")
             version("jackson", "2.16.1")
-            version("junit", "5.10.1")
+            version("junit", "5.10.2")
             version("slf4j", "2.0.9")
             version("vavr", "0.10.4")
 
@@ -35,13 +35,13 @@ dependencyResolutionManagement {
             library("h2", "com.h2database:h2:2.2.224")
             library("jooq", "org.jooq:jooq:3.19.3")
             library("spring-jdbc", "org.springframework:spring-jdbc:6.1.3")
-            library("flyway", "org.flywaydb:flyway-core:10.6.0")
+            library("flyway", "org.flywaydb:flyway-core:10.7.2")
             library("hikari", "com.zaxxer:HikariCP:5.1.0")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")
             library("assertj-core", "org.assertj", "assertj-core").versionRef("assertj")
-            library("assertj-json", "net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
+            library("assertj-json", "net.javacrumbs.json-unit:json-unit-assertj:3.2.4")
             library("assertj-vavr", "org.assertj:assertj-vavr:0.4.3")
 
             library("datafaker", "net.datafaker:datafaker:2.1.0")
