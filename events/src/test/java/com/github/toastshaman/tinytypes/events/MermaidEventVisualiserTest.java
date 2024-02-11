@@ -36,7 +36,6 @@ class MermaidEventVisualiserTest {
                         SecondEvent((SecondEvent))
                         ThirdEvent[/ThirdEvent\\]
                         FirstEvent-->SecondEvent
-                        ThirdEvent-->SecondEvent
                         SecondEvent-->ThirdEvent
                             </pre>
                             <script type="module">
@@ -67,7 +66,6 @@ class MermaidEventVisualiserTest {
                                  SecondEvent((SecondEvent))
                                  ThirdEvent[/ThirdEvent\\]
                                  FirstEvent-->SecondEvent
-                                 ThirdEvent-->SecondEvent
                                  SecondEvent-->ThirdEvent
                                  """);
     }

@@ -111,7 +111,8 @@ public final class MermaidEventVisualiser implements Events {
             var right = iterator.hasNext() ? iterator.next() : null;
             if (right == null) {
                 iterator.previous();
-                edges.add(EVENTS_TO_EDGE.apply(left, iterator.previous()));
+                edges.add(EVENTS_TO_EDGE.apply(iterator.previous(), left));
+                break;
             } else {
                 edges.add(EVENTS_TO_EDGE.apply(left, right));
             }
