@@ -7,11 +7,11 @@ public interface EventFilter {
     Events filter(Events events);
 
     default EventFilter then(EventFilter next) {
-        return it -> filter(next.filter(it));
+        return events -> filter(next.filter(events));
     }
 
     default Events then(Events next) {
-        return it -> filter(next).record(it);
+        return event -> filter(next).record(event);
     }
 
     static EventFilter of(Function<Events, Events> fn) {

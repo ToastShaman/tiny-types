@@ -1,15 +1,24 @@
-package com.github.toastshaman.tinytypes.events;
+package com.github.toastshaman.tinytypes.events.visual.mermaid;
 
-import static com.github.toastshaman.tinytypes.events.MermaidEventVisualiser.Orientation.TB;
-import static com.github.toastshaman.tinytypes.events.MermaidEventVisualiser.OutputFormat.HTML;
+import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.Orientation.TB;
+import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.OutputFormat.RAW;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.synchronizedList;
 
+import com.github.toastshaman.tinytypes.events.Event;
+import com.github.toastshaman.tinytypes.events.Events;
+import com.github.toastshaman.tinytypes.events.MetadataEvent;
 import io.vavr.Function2;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
+import org.json.JSONObject;
 
 public final class MermaidEventVisualiser implements Events {
 
@@ -83,7 +92,9 @@ public final class MermaidEventVisualiser implements Events {
 
         StringBuilder fmt = new StringBuilder();
         fmt.append(firstId);
+        fmt.append(" ");
         fmt.append("-->");
+        fmt.append(" ");
         if (!label.isBlank()) {
             fmt.append("|").append(label).append("|");
         }
@@ -121,8 +132,30 @@ public final class MermaidEventVisualiser implements Events {
         return edges;
     }
 
-    public void render(Writer writer) {
-        render(HTML, TB, writer);
+    public URI liveEditor() {
+        return liveEditor(TB);
+    }
+
+    public URI liveEditor(Orientation orientation) {
+        try {
+            var code = renderToString(RAW, orientation);
+            var options = new JSONObject().put("code", code).put("mermaid", new JSONObject().put("theme", "dark"));
+            var encoded =
+                    Base64.getUrlEncoder().encodeToString(options.toString().getBytes(UTF_8));
+            return new URI("https://mermaid.live/edit#base64:%s".formatted(encoded));
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String renderToString(OutputFormat outputFormat) {
+        return renderToString(outputFormat, TB);
+    }
+
+    public String renderToString(OutputFormat outputFormat, Orientation orientation) {
+        var writer = new StringWriter();
+        render(outputFormat, orientation, writer);
+        return writer.toString();
     }
 
     public void render(OutputFormat outputFormat, Writer writer) {
