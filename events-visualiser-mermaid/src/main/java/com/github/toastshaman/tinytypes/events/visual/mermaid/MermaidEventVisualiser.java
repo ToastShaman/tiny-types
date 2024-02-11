@@ -1,7 +1,7 @@
 package com.github.toastshaman.tinytypes.events.visual.mermaid;
 
-import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.Orientation.TB;
-import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.OutputFormat.RAW;
+import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.MermaidOrientation.TB;
+import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.MermaidOutputFormat.RAW;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.synchronizedList;
 
@@ -22,13 +22,13 @@ import org.json.JSONObject;
 
 public final class MermaidEventVisualiser implements Events {
 
-    public enum OutputFormat {
+    public enum MermaidOutputFormat {
         RAW,
         HTML,
         MARKDOWN
     }
 
-    public enum Orientation {
+    public enum MermaidOrientation {
         TB,
         TD,
         BT,
@@ -136,7 +136,7 @@ public final class MermaidEventVisualiser implements Events {
         return liveEditor(TB);
     }
 
-    public URI liveEditor(Orientation orientation) {
+    public URI liveEditor(MermaidOrientation orientation) {
         try {
             var code = renderToString(RAW, orientation);
             var options = new JSONObject().put("code", code).put("mermaid", new JSONObject().put("theme", "dark"));
@@ -148,21 +148,21 @@ public final class MermaidEventVisualiser implements Events {
         }
     }
 
-    public String renderToString(OutputFormat outputFormat) {
+    public String renderToString(MermaidOutputFormat outputFormat) {
         return renderToString(outputFormat, TB);
     }
 
-    public String renderToString(OutputFormat outputFormat, Orientation orientation) {
+    public String renderToString(MermaidOutputFormat outputFormat, MermaidOrientation orientation) {
         var writer = new StringWriter();
         render(outputFormat, orientation, writer);
         return writer.toString();
     }
 
-    public void render(OutputFormat outputFormat, Writer writer) {
+    public void render(MermaidOutputFormat outputFormat, Writer writer) {
         render(outputFormat, TB, writer);
     }
 
-    public void render(OutputFormat outputFormat, Orientation orientation, Writer writer) {
+    public void render(MermaidOutputFormat outputFormat, MermaidOrientation orientation, Writer writer) {
         var template =
                 switch (outputFormat) {
                     case RAW -> """
