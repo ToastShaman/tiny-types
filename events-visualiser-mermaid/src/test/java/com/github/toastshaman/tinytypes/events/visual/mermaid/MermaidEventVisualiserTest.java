@@ -48,7 +48,25 @@ class MermaidEventVisualiserTest {
     }
 
     @Test
-    void can_render_as_string() {
+    void can_render_single_node_as_string() {
+        var mermaid = new MermaidEventVisualiser();
+        var events = new MermaidStylingFilter().filter(mermaid);
+
+        events.record(new FirstEvent());
+        var output = new StringWriter();
+        mermaid.render(RAW, output);
+
+        assertThat(output.toString())
+                .isEqualTo(
+                        """
+                                 flowchart TB
+                                 FirstEvent[I am the first event]
+
+                                 """);
+    }
+
+    @Test
+    void can_render_multiple_nodes_as_string() {
         var mermaid = new MermaidEventVisualiser();
         var events = new MermaidStylingFilter().filter(mermaid);
 

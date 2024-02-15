@@ -34,6 +34,11 @@ public record MermaidEventsGraph(ValueGraph<MermaidNode, MermaidEdgeLabel> graph
 
     public static MermaidEventsGraph from(List<Event> events) {
         var graph = ValueGraphBuilder.directed().<MermaidNode, MermaidEdgeLabel>build();
+
+        if (events.size() == 1) {
+            graph.addNode(MermaidNode.of(events.getFirst()));
+        }
+
         for (int i = 0; i < events.size() - 1; i++) {
             var first = MermaidNode.of(events.get(i));
             var second = MermaidNode.of(events.get(i + 1));
