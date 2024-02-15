@@ -24,8 +24,12 @@ public record MermaidNode(Event event) {
         return event instanceof MetadataEvent meta ? meta.maybe("mermaid_node_shape") : Optional.empty();
     }
 
-    public Optional<String> maybeEdgeLabel() {
-        return event instanceof MetadataEvent meta ? meta.maybe("mermaid_edge_text") : Optional.empty();
+    public Optional<String> maybeOutgoingEdgeLabel() {
+        return event instanceof MetadataEvent meta ? meta.maybe("mermaid_outgoing_edge_text") : Optional.empty();
+    }
+
+    public Optional<String> maybeIncomingEdgeLabel() {
+        return event instanceof MetadataEvent meta ? meta.maybe("mermaid_incoming_edge_text") : Optional.empty();
     }
 
     public String render() {

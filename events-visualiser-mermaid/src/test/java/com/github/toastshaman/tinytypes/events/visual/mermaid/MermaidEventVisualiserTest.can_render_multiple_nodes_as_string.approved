@@ -1,0 +1,6 @@
+flowchart TB
+FirstEvent[I am the first event]
+SecondEvent((SecondEvent))
+ThirdEvent[/ThirdEvent\]
+FirstEvent -->|I am the first label|SecondEvent
+SecondEvent -->|I am the second label\nI am the third label|ThirdEvent

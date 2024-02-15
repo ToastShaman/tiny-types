@@ -3,9 +3,9 @@ package com.github.toastshaman.tinytypes.events.visual.mermaid;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public record MermaidEdgeLabel(List<String> labels) {
 
@@ -13,11 +13,9 @@ public record MermaidEdgeLabel(List<String> labels) {
         requireNonNull(labels);
     }
 
-    public static MermaidEdgeLabel from(MermaidNode... nodes) {
-        var labels = Arrays.stream(nodes)
-                .map(MermaidNode::maybeEdgeLabel)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+    public static MermaidEdgeLabel from(MermaidNode left, MermaidNode right) {
+        var labels = Stream.of(left.maybeOutgoingEdgeLabel(), right.maybeIncomingEdgeLabel())
+                .flatMap(Optional::stream)
                 .toList();
 
         return new MermaidEdgeLabel(labels);
@@ -32,7 +30,7 @@ public record MermaidEdgeLabel(List<String> labels) {
             return "%s --> %s".formatted(left.id(), right.id());
         }
 
-        var text = String.join("\n", labels);
-        return "%s -->|%s|%s".formatted(left.id(), right.id(), text);
+        var text = String.join("\\n", labels);
+        return "%s -->|%s|%s".formatted(left.id(), text, right.id());
     }
 }

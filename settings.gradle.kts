@@ -45,6 +45,7 @@ dependencyResolutionManagement {
             library("assertj-core", "org.assertj", "assertj-core").versionRef("assertj")
             library("assertj-json", "net.javacrumbs.json-unit:json-unit-assertj:3.2.4")
             library("assertj-vavr", "org.assertj:assertj-vavr:0.4.3")
+            library("okeydoke", "com.oneeyedmen:okeydoke:2.0.3")
 
             library("datafaker", "net.datafaker:datafaker:2.1.0")
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")

@@ -6,6 +6,7 @@ dependencies {
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.okeydoke)
 }
 
 publishing {
