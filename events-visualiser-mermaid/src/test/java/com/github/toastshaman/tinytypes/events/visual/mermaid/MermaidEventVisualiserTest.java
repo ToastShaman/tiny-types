@@ -41,9 +41,7 @@ class MermaidEventVisualiserTest {
                         FirstEvent --> SecondEvent
                         SecondEvent --> ThirdEvent
                             </pre>
-                            <script type="module">
-                              import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-                            </script>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.8.0/mermaid.min.js" integrity="sha512-LjhAzAg2/5zsgtj/a6rKlyripQs594DkfL+vlA0qwrb/0McmLqIpglzZmrfAdbBURFS7LhFC2yvDDhilSx9UDg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                           </body>
                         </html>
                         """);
