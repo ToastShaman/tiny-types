@@ -4,12 +4,12 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 
 import com.github.toastshaman.tinytypes.events.Event;
-import com.google.common.graph.ValueGraph;
-import com.google.common.graph.ValueGraphBuilder;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
 import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
-public record MermaidEventsGraph(ValueGraph<MermaidNode, MermaidEdgeLabel> graph) {
+public record MermaidEventsGraph(MutableGraph<MermaidNode> graph) {
 
     public MermaidEventsGraph {
         requireNonNull(graph);
@@ -25,15 +25,13 @@ public record MermaidEventsGraph(ValueGraph<MermaidNode, MermaidEdgeLabel> graph
     public List<String> nodesWithLink() {
         return graph.edges().stream()
                 .sorted(comparing(it -> it.source().id()))
-                .map(it -> {
-                    var label = graph.edgeValue(it).orElse(MermaidEdgeLabel.empty());
-                    return label.render(it.source(), it.target());
-                })
+                .map(it -> MermaidEdgeLabel.from(it.source(), it.target()))
+                .map(MermaidEdgeLabel::render)
                 .toList();
     }
 
     public static MermaidEventsGraph from(List<Event> events) {
-        var graph = ValueGraphBuilder.directed().<MermaidNode, MermaidEdgeLabel>build();
+        var graph = GraphBuilder.directed().<MermaidNode>build();
 
         if (events.size() == 1) {
             graph.addNode(MermaidNode.of(events.getFirst()));
@@ -42,11 +40,10 @@ public record MermaidEventsGraph(ValueGraph<MermaidNode, MermaidEdgeLabel> graph
         for (int i = 0; i < events.size() - 1; i++) {
             var first = MermaidNode.of(events.get(i));
             var second = MermaidNode.of(events.get(i + 1));
-            var label = MermaidEdgeLabel.from(first, second);
 
             graph.addNode(first);
             graph.addNode(second);
-            graph.putEdgeValue(first, second, label);
+            graph.putEdge(first, second);
         }
 
         return new MermaidEventsGraph(graph);

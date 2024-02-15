@@ -2,30 +2,25 @@ package com.github.toastshaman.tinytypes.events.visual.mermaid;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public record MermaidEdgeLabel(List<String> labels) {
+public record MermaidEdgeLabel(MermaidNode left, MermaidNode right) {
 
     public MermaidEdgeLabel {
-        requireNonNull(labels);
+        requireNonNull(left);
+        requireNonNull(right);
     }
 
     public static MermaidEdgeLabel from(MermaidNode left, MermaidNode right) {
+        return new MermaidEdgeLabel(left, right);
+    }
+
+    public String render() {
         var labels = Stream.of(left.maybeOutgoingEdgeLabel(), right.maybeIncomingEdgeLabel())
                 .flatMap(Optional::stream)
                 .toList();
 
-        return new MermaidEdgeLabel(labels);
-    }
-
-    public static MermaidEdgeLabel empty() {
-        return new MermaidEdgeLabel(new ArrayList<>());
-    }
-
-    public String render(MermaidNode left, MermaidNode right) {
         if (labels.isEmpty()) {
             return "%s --> %s".formatted(left.id(), right.id());
         }
