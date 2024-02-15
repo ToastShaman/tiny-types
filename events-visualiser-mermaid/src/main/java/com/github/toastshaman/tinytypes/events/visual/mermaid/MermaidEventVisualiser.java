@@ -3,7 +3,6 @@ package com.github.toastshaman.tinytypes.events.visual.mermaid;
 import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidOrientation.TB;
 import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidOutputFormat.RAW;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.synchronizedList;
 
 import com.github.toastshaman.tinytypes.events.Event;
 import com.github.toastshaman.tinytypes.events.Events;
@@ -15,15 +14,23 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import org.json.JSONObject;
 
 public final class MermaidEventVisualiser implements Events {
 
-    private final List<Event> captured = synchronizedList(new ArrayList<>());
+    private final List<Event> captured = new ArrayList<>();
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     @Override
     public void record(Event event) {
-        captured.add(event);
+        lock.lock();
+        try {
+            captured.add(event);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public URI liveEditor() {
