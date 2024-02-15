@@ -8,7 +8,6 @@ import com.github.toastshaman.tinytypes.events.EventFilter;
 import com.github.toastshaman.tinytypes.events.Events;
 import com.oneeyedmen.okeydoke.Approver;
 import com.oneeyedmen.okeydoke.junit5.ApprovalsExtension;
-import java.io.StringWriter;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
@@ -29,10 +28,9 @@ class MermaidEventVisualiserTest {
         events.record(new SecondEvent());
         events.record(new ThirdEvent());
 
-        var output = new StringWriter();
-        mermaid.render(HTML, output);
+        var output = mermaid.renderToString(HTML);
 
-        approver.assertApproved(output.toString());
+        approver.assertApproved(output);
     }
 
     @Test
@@ -41,10 +39,10 @@ class MermaidEventVisualiserTest {
         var events = new MermaidStylingFilter().filter(mermaid);
 
         events.record(new FirstEvent());
-        var output = new StringWriter();
-        mermaid.render(RAW, output);
 
-        approver.assertApproved(output.toString());
+        var output = mermaid.renderToString(RAW);
+
+        approver.assertApproved(output);
     }
 
     @Test
@@ -56,10 +54,9 @@ class MermaidEventVisualiserTest {
         events.record(new SecondEvent());
         events.record(new ThirdEvent());
 
-        var output = new StringWriter();
-        mermaid.render(RAW, output);
+        var output = mermaid.renderToString(RAW);
 
-        approver.assertApproved(output.toString());
+        approver.assertApproved(output);
     }
 
     @Test
