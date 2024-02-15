@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public record MetadataEvent(Event event, Map<String, Object> metadata) implements Event {
 
@@ -25,5 +26,10 @@ public record MetadataEvent(Event event, Map<String, Object> metadata) implement
         var first = HashMap.ofAll(metadata);
         var second = HashMap.ofAll(value);
         return new MetadataEvent(event, first.merge(second).toJavaMap());
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> maybe(String key) {
+        return Optional.ofNullable((T) metadata.get(key));
     }
 }

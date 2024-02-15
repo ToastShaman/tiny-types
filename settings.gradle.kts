@@ -38,6 +38,7 @@ dependencyResolutionManagement {
             library("spring-jdbc", "org.springframework:spring-jdbc:6.1.3")
             library("flyway", "org.flywaydb:flyway-core:10.7.2")
             library("hikari", "com.zaxxer:HikariCP:5.1.0")
+            library("guava", "com.google.guava:guava:33.0.0-jre")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")

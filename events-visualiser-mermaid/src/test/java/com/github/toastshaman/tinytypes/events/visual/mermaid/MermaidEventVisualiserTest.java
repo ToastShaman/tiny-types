@@ -1,7 +1,7 @@
 package com.github.toastshaman.tinytypes.events.visual.mermaid;
 
-import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.MermaidOutputFormat.HTML;
-import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.MermaidOutputFormat.RAW;
+import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidOutputFormat.HTML;
+import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidOutputFormat.RAW;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.toastshaman.tinytypes.events.Event;

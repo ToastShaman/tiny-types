@@ -1,14 +1,12 @@
 package com.github.toastshaman.tinytypes.events.visual.mermaid;
 
-import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.MermaidOrientation.TB;
-import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidEventVisualiser.MermaidOutputFormat.RAW;
+import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidOrientation.TB;
+import static com.github.toastshaman.tinytypes.events.visual.mermaid.MermaidOutputFormat.RAW;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.synchronizedList;
 
 import com.github.toastshaman.tinytypes.events.Event;
 import com.github.toastshaman.tinytypes.events.Events;
-import com.github.toastshaman.tinytypes.events.MetadataEvent;
-import io.vavr.Function2;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -17,119 +15,15 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.function.Function;
 import org.json.JSONObject;
 
 public final class MermaidEventVisualiser implements Events {
-
-    public enum MermaidOutputFormat {
-        RAW,
-        HTML,
-        MARKDOWN
-    }
-
-    public enum MermaidOrientation {
-        TB,
-        TD,
-        BT,
-        RL,
-        LR
-    }
-
-    private static final Function<Event, String> EVENT_TO_ID = event -> {
-        if (event instanceof MetadataEvent m) {
-            return m.event().getClass().getSimpleName();
-        }
-        return event.getClass().getSimpleName();
-    };
-
-    private static final Function<Event, String> EVENT_TO_MERMAID_NODE_WITH_TEXT = event -> {
-        var eventName = EVENT_TO_ID.apply(event);
-
-        if (!(event instanceof MetadataEvent meta)) {
-            return eventName;
-        }
-
-        var maybeText = (String) meta.metadata().get("mermaid_node_text");
-        var maybeShape = (String) meta.metadata().get("mermaid_node_shape");
-        var fmt =
-                switch (maybeShape) {
-                    case "rounded" -> "%s(%s)";
-                    case "subroutine" -> "%s[[%s]]";
-                    case "database" -> "%s[(%s)]";
-                    case "circle" -> "%s((%s))";
-                    case "circle_double" -> "%s(((%s)))";
-                    case "asymmetric" -> "%s>%s]";
-                    case "rhombus" -> "%s{%s}";
-                    case "hexagon" -> "%s{{%s}}";
-                    case "parallelogram" -> "%s[/%s/]";
-                    case "parallelogram_alt" -> "%s[\\%s\\]";
-                    case "trapezoid" -> "%s[/%s\\]";
-                    case "trapezoid_alt" -> "%s[\\%s/]";
-                    case "rectangle" -> "%s[%s]";
-                    case null -> "%s[%s]";
-                    default -> throw new IllegalStateException("Unexpected value: %s".formatted(maybeShape));
-                };
-
-        return fmt.formatted(eventName, maybeText == null ? eventName : maybeText);
-    };
-
-    private static final Function2<Event, Event, String> EVENTS_TO_EDGE = (first, second) -> {
-        String firstId = EVENT_TO_ID.apply(first);
-        String secondId = EVENT_TO_ID.apply(second);
-        String outgoingLabel = "";
-        String incomingLabel = "";
-
-        if (first instanceof MetadataEvent m1) {
-            outgoingLabel = (String) m1.metadata().getOrDefault("mermaid_outgoing_edge_label", "");
-        }
-
-        if (second instanceof MetadataEvent m2) {
-            incomingLabel = (String) m2.metadata().getOrDefault("mermaid_incoming_edge_label", "");
-        }
-
-        String label = String.join("\n", outgoingLabel, incomingLabel);
-
-        StringBuilder fmt = new StringBuilder();
-        fmt.append(firstId);
-        fmt.append(" ");
-        fmt.append("-->");
-        fmt.append(" ");
-        if (!label.isBlank()) {
-            fmt.append("|").append(label).append("|");
-        }
-        fmt.append(secondId);
-        return fmt.toString();
-    };
 
     private final List<Event> captured = synchronizedList(new ArrayList<>());
 
     @Override
     public void record(Event event) {
         captured.add(event);
-    }
-
-    private List<String> nodesWithText() {
-        return captured.stream().map(EVENT_TO_MERMAID_NODE_WITH_TEXT).toList();
-    }
-
-    private List<String> nodesWithLinks() {
-        var edges = new ArrayList<String>();
-
-        var iterator = captured.listIterator();
-        while (iterator.hasNext()) {
-            var left = iterator.next();
-            var right = iterator.hasNext() ? iterator.next() : null;
-            if (right == null) {
-                iterator.previous();
-                edges.add(EVENTS_TO_EDGE.apply(iterator.previous(), left));
-                break;
-            } else {
-                edges.add(EVENTS_TO_EDGE.apply(left, right));
-            }
-        }
-
-        return edges;
     }
 
     public URI liveEditor() {
@@ -194,8 +88,9 @@ public final class MermaidEventVisualiser implements Events {
                             """;
                 };
 
-        var nodes = String.join("\n", nodesWithText());
-        var links = String.join("\n", nodesWithLinks());
+        var graph = MermaidEventsGraph.from(captured);
+        var nodes = String.join("\n", graph.nodesWithText());
+        var links = String.join("\n", graph.nodesWithLink());
         var output = template.replace("{ orientation }", orientation.name())
                 .replace("{ nodes_with_text }", nodes)
                 .replace("{ nodes_with_links }", links);
