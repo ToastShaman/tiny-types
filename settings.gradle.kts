@@ -23,7 +23,7 @@ dependencyResolutionManagement {
             version("slf4j", "2.0.9")
             version("vavr", "0.10.4")
 
-            library("json","org.json:json:20230618")
+            library("json","org.json:json:20240303")
             library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
             library("vavr", "io.vavr", "vavr").versionRef("vavr")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
