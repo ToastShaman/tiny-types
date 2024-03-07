@@ -36,7 +36,7 @@ dependencyResolutionManagement {
             library("h2", "com.h2database:h2:2.2.224")
             library("jooq", "org.jooq:jooq:3.19.5")
             library("spring-jdbc", "org.springframework:spring-jdbc:6.1.4")
-            library("flyway", "org.flywaydb:flyway-core:10.8.1")
+            library("flyway", "org.flywaydb:flyway-core:10.9.1")
             library("hikari", "com.zaxxer:HikariCP:5.1.0")
             library("guava", "com.google.guava:guava:33.0.0-jre")
 

@@ -8,6 +8,7 @@ import com.github.toastshaman.tinytypes.fp.Result.Failure;
 import com.github.toastshaman.tinytypes.fp.Result.Success;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -39,6 +40,19 @@ class ResultTest {
         assertThat(ok1).isInstanceOf(Success.class);
         assertThat(ok2).isInstanceOf(Success.class);
         assertThat(ok3).isInstanceOf(Success.class);
+        assertThat(err).isInstanceOf(Failure.class);
+    }
+
+    @Test
+    void can_create_result_from_optional() {
+        var ok1 = Result.ofOptional(Optional::empty);
+        var ok2 = Result.ofSupplier(() -> Optional.of(1));
+        var err = Result.ofSupplier(() -> {
+            throw new RuntimeException("oops");
+        });
+
+        assertThat(ok1).isInstanceOf(Failure.class);
+        assertThat(ok2).isInstanceOf(Success.class);
         assertThat(err).isInstanceOf(Failure.class);
     }
 

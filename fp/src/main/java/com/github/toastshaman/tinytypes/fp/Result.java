@@ -14,6 +14,7 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -42,7 +43,7 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
     }
 
-    static <T> Result<T, Throwable> ofSupplier(Supplier<T> supplier) {
+    static <T> Result<T, Throwable> ofSupplier(Supplier<? extends T> supplier) {
         try {
             return new Success<>(supplier.get());
         } catch (Throwable e) {
@@ -50,9 +51,19 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
     }
 
-    static <T> Result<T, Throwable> ofCallable(Callable<T> supplier) {
+    static <T> Result<T, Throwable> ofCallable(Callable<? extends T> supplier) {
         try {
             return new Success<>(supplier.call());
+        } catch (Throwable e) {
+            return new Failure<>(e);
+        }
+    }
+
+    static <T> Result<T, Throwable> ofOptional(Supplier<Optional<? extends T>> supplier) {
+        try {
+            return supplier.get()
+                    .map(Result::<T, Throwable>success)
+                    .orElseGet(() -> Result.failure(new NoSuchElementException()));
         } catch (Throwable e) {
             return new Failure<>(e);
         }
