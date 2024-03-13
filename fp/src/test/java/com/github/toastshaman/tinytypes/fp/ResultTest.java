@@ -263,8 +263,7 @@ class ResultTest {
         void can_recover() {
             var result = getResult().recover(it -> it + 1);
 
-            assertThat(result).isInstanceOfSatisfying(Success.class, it -> assertThat(it.value())
-                    .isEqualTo(1));
+            assertThat(result).isEqualTo(1);
         }
 
         @Test
@@ -398,8 +397,7 @@ class ResultTest {
         void can_recover() {
             var result = getResult().recover(it -> it + 1);
 
-            assertThat(result).isInstanceOfSatisfying(Success.class, it -> assertThat(it.value())
-                    .isEqualTo(2));
+            assertThat(result).isEqualTo(2);
         }
 
         @Test

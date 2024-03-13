@@ -234,7 +234,7 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     <R> R fold(Function<T, R> successFn, Function<E, R> failureFn);
 
-    Result<T, E> recover(Function<E, T> f);
+    T recover(Function<E, T> f);
 
     Optional<T> maybe();
 
@@ -342,8 +342,8 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
 
         @Override
-        public Result<T, E> recover(Function<E, T> f) {
-            return this;
+        public T recover(Function<E, T> f) {
+            return value;
         }
 
         @Override
@@ -462,8 +462,8 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
 
         @Override
-        public Result<T, E> recover(Function<E, T> f) {
-            return new Success<>(f.apply(reason));
+        public T recover(Function<E, T> f) {
+            return f.apply(reason);
         }
 
         @Override
