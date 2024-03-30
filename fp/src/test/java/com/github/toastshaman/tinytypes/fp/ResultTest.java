@@ -33,27 +33,40 @@ class ResultTest {
         var ok1 = Result.of(() -> 1);
         var ok2 = Result.ofSupplier(() -> 1);
         var ok3 = Result.ofCallable(() -> 1);
-        var err = Result.ofSupplier(() -> {
-            throw new RuntimeException("oops");
-        });
 
         assertThat(ok1).isInstanceOf(Success.class);
         assertThat(ok2).isInstanceOf(Success.class);
         assertThat(ok3).isInstanceOf(Success.class);
-        assertThat(err).isInstanceOf(Failure.class);
+    }
+
+    @Test
+    void can_create_result_from_supplier_with_errors() {
+        var err1 = Result.of(() -> {
+            throw new RuntimeException("oops");
+        });
+        var err2 = Result.ofSupplier(() -> {
+            throw new RuntimeException("oops");
+        });
+        var err3 = Result.ofCallable(() -> {
+            throw new RuntimeException("oops");
+        });
+
+        assertThat(err1).isInstanceOf(Failure.class);
+        assertThat(err2).isInstanceOf(Failure.class);
+        assertThat(err3).isInstanceOf(Failure.class);
     }
 
     @Test
     void can_create_result_from_optional() {
-        var ok1 = Result.ofOptional(Optional::empty);
-        var ok2 = Result.ofSupplier(() -> Optional.of(1));
-        var err = Result.ofSupplier(() -> {
+        var ok1 = Result.ofOptional(() -> Optional.of(1));
+        var err1 = Result.ofOptional(Optional::empty);
+        var err2 = Result.ofOptional(() -> {
             throw new RuntimeException("oops");
         });
 
-        assertThat(ok1).isInstanceOf(Failure.class);
-        assertThat(ok2).isInstanceOf(Success.class);
-        assertThat(err).isInstanceOf(Failure.class);
+        assertThat(ok1).isInstanceOf(Success.class);
+        assertThat(err1).isInstanceOf(Failure.class);
+        assertThat(err2).isInstanceOf(Failure.class);
     }
 
     @Test
@@ -106,22 +119,50 @@ class ResultTest {
 
     @Test
     void can_zip() {
-        Result<Integer, Throwable> first = Result.success(1);
-        Result<Double, Throwable> second = Result.success(2.0);
+        var r = Result.<Integer, Throwable>success(1);
 
-        var zipped = Result.zip(first, second, (a, b) -> a + b);
+        assertThat(Result.zip(r, r, Integer::sum)).extracting(Result::getOrNull).isEqualTo(2);
 
-        assertThat(zipped.getOrNull()).isEqualTo(3.0);
+        assertThat(Result.zip(r, r, r, (a, b, c) -> a + b + c))
+                .extracting(Result::getOrNull)
+                .isEqualTo(3);
+
+        assertThat(Result.zip(r, r, r, r, (a, b, c, d) -> a + b + c + d))
+                .extracting(Result::getOrNull)
+                .isEqualTo(4);
+
+        assertThat(Result.zip(r, r, r, r, r, (a, b, c, d, e) -> a + b + c + d + e))
+                .extracting(Result::getOrNull)
+                .isEqualTo(5);
+
+        assertThat(Result.zip(r, r, r, r, r, r, (a, b, c, d, e, f) -> a + b + c + d + e + f))
+                .extracting(Result::getOrNull)
+                .isEqualTo(6);
     }
 
     @Test
     void can_flat_zip() {
-        Result<Integer, Throwable> first = Result.success(1);
-        Result<Double, Throwable> second = Result.success(2.0);
+        var r = Result.<Integer, Throwable>success(1);
 
-        var zipped = Result.flatZip(first, second, (a, b) -> new Success<>(a + b));
+        assertThat(Result.flatZip(r, r, (a, b) -> r))
+                .extracting(Result::getOrNull)
+                .isEqualTo(1);
 
-        assertThat(zipped.getOrNull()).isEqualTo(3.0);
+        assertThat(Result.flatZip(r, r, r, (a, b, c) -> r))
+                .extracting(Result::getOrNull)
+                .isEqualTo(1);
+
+        assertThat(Result.flatZip(r, r, r, r, (a, b, c, d) -> r))
+                .extracting(Result::getOrNull)
+                .isEqualTo(1);
+
+        assertThat(Result.flatZip(r, r, r, r, r, (a, b, c, d, e) -> r))
+                .extracting(Result::getOrNull)
+                .isEqualTo(1);
+
+        assertThat(Result.flatZip(r, r, r, r, r, r, (a, b, c, d, e, f) -> r))
+                .extracting(Result::getOrNull)
+                .isEqualTo(1);
     }
 
     @Test
