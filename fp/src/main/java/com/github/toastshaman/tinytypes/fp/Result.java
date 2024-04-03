@@ -75,6 +75,10 @@ public sealed interface Result<T, E> permits Success, Failure {
             requireNonNull(successes);
             requireNonNull(failures);
         }
+
+        boolean hasFailures() {
+            return !failures.isEmpty();
+        }
     }
 
     @SafeVarargs
