@@ -74,12 +74,11 @@ class ResultTest {
         var exception = new RuntimeException("oops");
         Result<Integer, Throwable> first = Result.success(1);
         Result<Integer, Throwable> second = Result.failure(exception);
-        var results = List.of(first, second);
 
-        var partitioned = Result.partition(results);
+        var partitioned = Result.partition(first, second);
 
-        assertThat(partitioned._1).hasSize(1).containsExactly(1);
-        assertThat(partitioned._2).hasSize(1).containsExactly(exception);
+        assertThat(partitioned.successes()).hasSize(1).containsExactly(1);
+        assertThat(partitioned.failures()).hasSize(1).containsExactly(exception);
     }
 
     @Test

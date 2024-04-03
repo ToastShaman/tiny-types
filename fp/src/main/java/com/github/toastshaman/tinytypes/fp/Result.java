@@ -2,6 +2,7 @@ package com.github.toastshaman.tinytypes.fp;
 
 import static com.github.toastshaman.tinytypes.fp.Result.Failure;
 import static com.github.toastshaman.tinytypes.fp.Result.Success;
+import static java.util.Objects.requireNonNull;
 
 import io.vavr.CheckedFunction0;
 import io.vavr.Function2;
@@ -9,10 +10,10 @@ import io.vavr.Function3;
 import io.vavr.Function4;
 import io.vavr.Function5;
 import io.vavr.Function6;
-import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -69,7 +70,19 @@ public sealed interface Result<T, E> permits Success, Failure {
         }
     }
 
-    static <T, E> Tuple2<List<T>, List<E>> partition(Iterable<Result<T, E>> values) {
+    record PartitionedResult<T, E>(List<T> successes, List<E> failures) {
+        public PartitionedResult {
+            requireNonNull(successes);
+            requireNonNull(failures);
+        }
+    }
+
+    @SafeVarargs
+    static <T, E> PartitionedResult<T, E> partition(Result<T, E>... values) {
+        return partition(Arrays.stream(values).toList());
+    }
+
+    static <T, E> PartitionedResult<T, E> partition(Iterable<Result<T, E>> values) {
         var oks = new ArrayList<T>();
         var errs = new ArrayList<E>();
 
@@ -78,7 +91,7 @@ public sealed interface Result<T, E> permits Success, Failure {
             if (result instanceof Result.Failure<T, E> failure) errs.add(failure.reason);
         }
 
-        return new Tuple2<>(List.copyOf(oks), List.copyOf(errs));
+        return new PartitionedResult<>(List.copyOf(oks), List.copyOf(errs));
     }
 
     static <T, E> List<T> anyValues(Iterable<Result<T, E>> values) {
@@ -90,9 +103,9 @@ public sealed interface Result<T, E> permits Success, Failure {
 
     static <T, E> Result<List<T>, E> allValues(Iterable<Result<T, E>> values) {
         var partition = partition(values);
-        var ok = partition._1;
-        var errs = partition._2;
-        return errs.isEmpty() ? new Success<>(ok) : new Failure<>(errs.get(0));
+        var ok = partition.successes;
+        var errs = partition.failures;
+        return errs.isEmpty() ? new Success<>(ok) : new Failure<>(errs.getFirst());
     }
 
     static <T, T1, E> Result<T1, E> foldResult(
