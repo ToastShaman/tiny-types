@@ -76,7 +76,7 @@ public sealed interface Result<T, E> permits Success, Failure {
             requireNonNull(failures);
         }
 
-        boolean hasFailures() {
+        public boolean hasFailures() {
             return !failures.isEmpty();
         }
     }
