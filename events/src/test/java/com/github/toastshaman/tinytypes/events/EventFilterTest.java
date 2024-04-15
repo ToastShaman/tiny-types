@@ -1,13 +1,14 @@
 package com.github.toastshaman.tinytypes.events;
 
-import static com.github.toastshaman.tinytypes.events.EventCategory.*;
-import static com.github.toastshaman.tinytypes.events.EventCategory.INFO;
 import static com.github.toastshaman.tinytypes.events.EventFilters.AddEventName;
 import static com.github.toastshaman.tinytypes.events.EventFilters.AddServiceName;
 import static com.github.toastshaman.tinytypes.events.EventFilters.AddTimestamp;
 import static com.github.toastshaman.tinytypes.events.test.assertions.RecordingEventsAssertions.assertThatEvents;
 import static java.time.Instant.EPOCH;
 import static java.time.ZoneOffset.UTC;
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.InstanceOfAssertFactories.MAP;
+import static org.assertj.core.api.InstanceOfAssertFactories.type;
 
 import java.time.Clock;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -30,26 +31,25 @@ class EventFilterTest {
         events.record(MyEvent.random());
 
         assertThatEvents(recording)
-                .containsSingleSatisfying(
-                        MyEvent.class,
-                        it -> it.hasMetadataSatisfying(data -> {
-                            data.containsEntry("service", "my-service");
-                            data.containsEntry("timestamp", EPOCH);
-                            data.containsEntry("name", "MyEvent");
-                        }));
+                .containsSingle(MyEvent.class)
+                .asInstanceOf(type(MetadataEvent.class))
+                .extracting(MetadataEvent::metadata, as(MAP))
+                .containsEntry("service", "my-service")
+                .containsEntry("timestamp", EPOCH)
+                .containsEntry("name", "MyEvent");
     }
 
     @Test
     void can_add_custom_filter() {
-        var customFilter = EventFilter.of(next ->
-                event -> next.record(event.addMetadata("category", event instanceof Event.Error ? ERROR : INFO)));
-
-        var events = customFilter.then(printing.and(recording));
+        var events = EventFilter.of(next -> event -> next.record(event.addMetadata("hello", "world")))
+                .then(printing.and(recording));
 
         events.record(MyEvent.random());
 
         assertThatEvents(recording)
-                .containsSingleSatisfying(
-                        MyEvent.class, it -> it.hasMetadataSatisfying(data -> data.containsEntry("category", INFO)));
+                .containsSingle(MyEvent.class)
+                .asInstanceOf(type(MetadataEvent.class))
+                .extracting(MetadataEvent::metadata, as(MAP))
+                .containsEntry("hello", "world");
     }
 }
