@@ -24,7 +24,11 @@ subprojects {
 
     java {
         withSourcesJar()
-        sourceCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_23
+        targetCompatibility = JavaVersion.VERSION_23
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(23)
+        }
     }
 
     tasks.withType<JavaCompile> {
