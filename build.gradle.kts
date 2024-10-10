@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.github.ben-manes.versions") version "0.51.0"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "7.0.0.BETA2"
 }
 
 subprojects {
@@ -41,7 +41,7 @@ subprojects {
 
     spotless {
         java {
-            palantirJavaFormat("2.40.0")
+            palantirJavaFormat("2.50.0")
         }
     }
 

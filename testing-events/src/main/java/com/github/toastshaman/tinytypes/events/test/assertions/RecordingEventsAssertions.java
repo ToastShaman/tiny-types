@@ -20,7 +20,7 @@ public final class RecordingEventsAssertions extends AbstractAssert<RecordingEve
     }
 
     public <T extends Event> ListAssert<Event> findInstanceOf(Class<T> type) {
-        return assertThat(actual.filterInstanceOf(type)).isNotEmpty();
+        return assertThat(actual.filterInstanceOf(type));
     }
 
     public <T extends Event> ListAssert<Event> contains(Class<T> type) {

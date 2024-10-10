@@ -1,6 +1,6 @@
 package com.github.toastshaman.tinytypes.events;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 public record EventCategory(String value) {
 
@@ -11,7 +11,7 @@ public record EventCategory(String value) {
     public static EventCategory WARN = EventCategory.of("warn");
 
     public EventCategory {
-        Objects.requireNonNull(value, "value must not be null");
+        requireNonNull(value, "value must not be null");
         if (value.isBlank()) {
             throw new IllegalArgumentException("value must not be blank");
         }
