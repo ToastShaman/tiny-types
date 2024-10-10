@@ -14,6 +14,11 @@ public record MetadataEvent(Event event, Map<String, Object> metadata) implement
         this.metadata = Map.copyOf(requireNonNull(metadata, "metadata must not be null"));
     }
 
+    @Override
+    public EventCategory category() {
+        return event.category();
+    }
+
     public MetadataEvent plus(String key, Object value) {
         return new MetadataEvent(event, HashMap.ofAll(metadata).put(key, value).toJavaMap());
     }
