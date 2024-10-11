@@ -58,7 +58,7 @@ public final class EventFilters {
     }
 
     public static Predicate<Event> has(EventCategory category) {
-        return e -> category == e.category();
+        return e -> category.equals(e.category());
     }
 
     public static EventFilter Reject(Predicate<Event> predicate) {
