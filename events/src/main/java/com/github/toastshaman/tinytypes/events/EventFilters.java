@@ -89,6 +89,9 @@ public final class EventFilters {
     }
 
     public static EventFilter Sampling(double probability) {
+        if (probability < 0 || probability > 1) {
+            throw new IllegalArgumentException("Probability must be in range [0, 1]");
+        }
         return Accept(has(ERROR).or(has(WARN)).or(e -> Math.random() < probability));
     }
 
