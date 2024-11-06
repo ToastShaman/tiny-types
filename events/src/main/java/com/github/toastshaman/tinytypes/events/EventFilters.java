@@ -1,5 +1,8 @@
 package com.github.toastshaman.tinytypes.events;
 
+import static com.github.toastshaman.tinytypes.events.EventCategory.ERROR;
+import static com.github.toastshaman.tinytypes.events.EventCategory.WARN;
+
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -83,6 +86,10 @@ public final class EventFilters {
 
     public static EventFilter AddMDCContext() {
         return next -> event -> MDC.getCopyOfContextMap().forEach(event::addMetadata);
+    }
+
+    public static EventFilter Sampling(double probability) {
+        return Accept(has(ERROR).or(has(WARN)).or(e -> Math.random() < probability));
     }
 
     public static EventFilter Reject(EventCategory... categories) {
