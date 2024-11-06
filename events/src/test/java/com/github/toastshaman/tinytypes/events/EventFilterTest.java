@@ -34,9 +34,9 @@ class EventFilterTest {
                 .containsSingle(MyEvent.class)
                 .asInstanceOf(type(MetadataEvent.class))
                 .extracting(MetadataEvent::metadata, as(MAP))
-                .containsEntry("service", "my-service")
+                .containsEntry("service_name", "my-service")
                 .containsEntry("timestamp", EPOCH)
-                .containsEntry("name", "MyEvent");
+                .containsEntry("event_name", "MyEvent");
     }
 
     @Test

@@ -13,7 +13,7 @@ public final class EventFilters {
 
     public static EventFilter AddEventName = next -> event -> {
         var aClass = event instanceof MetadataEvent m ? m.event().getClass() : event.getClass();
-        var eventWithName = event.addMetadata("name", aClass.getSimpleName());
+        var eventWithName = event.addMetadata("event_name", aClass.getSimpleName());
         next.record(eventWithName);
     };
 
