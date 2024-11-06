@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.github.ben-manes.versions") version "0.51.0"
-    id("com.diffplug.spotless") version "7.0.0.BETA2"
+    id("com.diffplug.spotless") version "7.0.0.BETA4"
 }
 
 subprojects {

@@ -1,6 +1,8 @@
 package com.github.toastshaman.tinytypes.events;
 
 import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import org.slf4j.MDC;
@@ -15,8 +17,60 @@ public final class EventFilters {
         next.record(eventWithName);
     };
 
-    public static EventFilter AddServiceName(String name) {
-        return next -> event -> next.record(event.addMetadata("service", name));
+    public static EventFilter AddServiceName(String value) {
+        return AddStatic("service_name", value);
+    }
+
+    public static EventFilter AddServiceVersion(String value) {
+        return AddStatic("service_version", value);
+    }
+
+    public static EventFilter AddBuildId(String value) {
+        return AddStatic("service_build_id", value);
+    }
+
+    public static EventFilter AddGitHash(String value) {
+        return AddStatic("service_build_git_hash", value);
+    }
+
+    public static EventFilter AddDeploymentAt(Instant value) {
+        return AddStatic("service_build_deployment_at", value);
+    }
+
+    public static EventFilter AddDeploymentAge(Instant deployedAt, Clock clock) {
+        return next -> event -> next.record(event.addMetadata(
+                "service_build_deployment_age_minutes",
+                Duration.between(deployedAt, Instant.now(clock)).toMinutes()));
+    }
+
+    public static EventFilter AddUptime(Clock clock) {
+        var startedAt = Instant.now(clock);
+
+        return next -> event -> {
+            var uptimeInSeconds =
+                    Duration.between(startedAt, Instant.now(clock)).toSeconds();
+
+            var eventWithMetadata = event.addMetadata("uptime_sec", uptimeInSeconds)
+                    .addMetadata("uptime_sec_log_10", Math.log10(uptimeInSeconds));
+
+            next.record(eventWithMetadata);
+        };
+    }
+
+    public static EventFilter AddEnvironmentName(String value) {
+        return AddStatic("environment_name", value);
+    }
+
+    public static EventFilter AddTeamName(String value) {
+        return AddStatic("team_name", value);
+    }
+
+    public static EventFilter AddCloudRegion(String value) {
+        return AddStatic("cloud_region", value);
+    }
+
+    private static EventFilter AddStatic(String key, Object value) {
+        return next -> event -> next.record(event.addMetadata(key, value));
     }
 
     public static EventFilter AddTimestamp() {
