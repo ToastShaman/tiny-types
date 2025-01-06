@@ -17,13 +17,13 @@ include("testing-faker")
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            version("assertj", "3.26.3")
-            version("jackson", "2.18.1")
-            version("junit", "5.11.3")
+            version("assertj", "3.27.2")
+            version("jackson", "2.18.2")
+            version("junit", "5.11.4")
             version("slf4j", "2.0.9")
-            version("vavr", "0.10.4")
+            version("vavr", "0.10.5")
 
-            library("json","org.json:json:20240303")
+            library("json","org.json:json:20241224")
             library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
             library("vavr", "io.vavr", "vavr").versionRef("vavr")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
@@ -34,20 +34,20 @@ dependencyResolutionManagement {
             library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
 
             library("h2", "com.h2database:h2:2.3.232")
-            library("jooq", "org.jooq:jooq:3.19.15")
-            library("spring-jdbc", "org.springframework:spring-jdbc:6.1.13")
-            library("flyway", "org.flywaydb:flyway-core:10.20.1")
-            library("hikari", "com.zaxxer:HikariCP:6.1.0")
-            library("guava", "com.google.guava:guava:33.3.1-jre")
+            library("jooq", "org.jooq:jooq:3.19.16")
+            library("spring-jdbc", "org.springframework:spring-jdbc:6.2.1")
+            library("flyway", "org.flywaydb:flyway-core:11.1.0")
+            library("hikari", "com.zaxxer:HikariCP:6.2.1")
+            library("guava", "com.google.guava:guava:33.4.0-jre")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")
             library("assertj-core", "org.assertj", "assertj-core").versionRef("assertj")
-            library("assertj-json", "net.javacrumbs.json-unit:json-unit-assertj:3.5.0")
+            library("assertj-json", "net.javacrumbs.json-unit:json-unit-assertj:4.1.0")
             library("assertj-vavr", "org.assertj:assertj-vavr:0.4.3")
             library("okeydoke", "com.oneeyedmen:okeydoke:2.0.3")
 
-            library("datafaker", "net.datafaker:datafaker:2.4.1")
+            library("datafaker", "net.datafaker:datafaker:2.4.2")
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
         }
     }
