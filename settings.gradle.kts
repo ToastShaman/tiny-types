@@ -17,13 +17,13 @@ include("testing-faker")
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            version("assertj", "3.27.2")
-            version("jackson", "2.18.2")
-            version("junit", "5.11.4")
+            version("assertj", "3.27.3")
+            version("jackson", "2.18.3")
+            version("junit", "5.12.0")
             version("slf4j", "2.0.9")
             version("vavr", "0.10.5")
 
-            library("json","org.json:json:20241224")
+            library("json","org.json:json:20250107")
             library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
             library("vavr", "io.vavr", "vavr").versionRef("vavr")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
@@ -34,9 +34,9 @@ dependencyResolutionManagement {
             library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
 
             library("h2", "com.h2database:h2:2.3.232")
-            library("jooq", "org.jooq:jooq:3.19.16")
+            library("jooq", "org.jooq:jooq:3.20.1")
             library("spring-jdbc", "org.springframework:spring-jdbc:6.2.1")
-            library("flyway", "org.flywaydb:flyway-core:11.1.0")
+            library("flyway", "org.flywaydb:flyway-core:11.3.4")
             library("hikari", "com.zaxxer:HikariCP:6.2.1")
             library("guava", "com.google.guava:guava:33.4.0-jre")
 

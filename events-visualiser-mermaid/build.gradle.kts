@@ -4,9 +4,11 @@ dependencies {
     implementation(libs.guava)
 
     testImplementation(libs.assertj.core)
+    testImplementation(libs.okeydoke)
+
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter.params)
-    testImplementation(libs.okeydoke)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 publishing {

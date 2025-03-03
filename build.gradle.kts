@@ -3,8 +3,8 @@ plugins {
     `java-library`
     `maven-publish`
     id("com.adarshr.test-logger") version "4.0.0"
-    id("com.github.ben-manes.versions") version "0.51.0"
-    id("com.diffplug.spotless") version "7.0.0.BETA4"
+    id("com.github.ben-manes.versions") version "0.52.0"
+    id("com.diffplug.spotless") version "7.0.2"
 }
 
 subprojects {
@@ -35,13 +35,13 @@ subprojects {
         finalizedBy(tasks.spotlessApply)
     }
 
-    tasks.withType<Test> {
+    tasks.named<Test>("test") {
         useJUnitPlatform()
     }
 
     spotless {
         java {
-            palantirJavaFormat("2.50.0")
+            palantirJavaFormat("2.55.0")
         }
     }
 

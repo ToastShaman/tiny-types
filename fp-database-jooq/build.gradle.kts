@@ -6,9 +6,11 @@ dependencies {
     testImplementation(libs.flyway)
     testImplementation(libs.hikari)
     testImplementation(libs.assertj.core)
+    testImplementation(libs.slf4j.simple)
+
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter.params)
-    testImplementation(libs.slf4j.simple)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 publishing {

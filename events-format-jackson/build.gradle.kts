@@ -4,11 +4,13 @@ dependencies {
 
     testImplementation(libs.assertj.core)
     testImplementation(libs.assertj.json)
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.junit.jupiter.params)
 
     testImplementation(libs.jackson.datatype.json)
     testImplementation(libs.slf4j.simple)
+
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 publishing {
