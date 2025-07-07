@@ -18,7 +18,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("assertj", "3.27.3")
-            version("jackson", "2.19.0")
+            version("jackson", "2.19.1")
             version("junit", "5.13.0")
             version("slf4j", "2.0.9")
             version("vavr", "0.10.6")
@@ -34,9 +34,9 @@ dependencyResolutionManagement {
             library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
 
             library("h2", "com.h2database:h2:2.3.232")
-            library("jooq", "org.jooq:jooq:3.20.4")
+            library("jooq", "org.jooq:jooq:3.20.5")
             library("spring-jdbc", "org.springframework:spring-jdbc:6.2.7")
-            library("flyway", "org.flywaydb:flyway-core:11.9.0")
+            library("flyway", "org.flywaydb:flyway-core:11.10.1")
             library("hikari", "com.zaxxer:HikariCP:6.3.0")
             library("guava", "com.google.guava:guava:33.4.8-jre")
 

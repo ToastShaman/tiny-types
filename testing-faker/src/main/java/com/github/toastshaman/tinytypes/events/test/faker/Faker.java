@@ -2,9 +2,8 @@ package com.github.toastshaman.tinytypes.events.test.faker;
 
 import java.util.Locale;
 import java.util.Random;
-import net.datafaker.providers.base.BaseFaker;
 
-public final class Faker extends BaseFaker {
+public final class Faker extends net.datafaker.Faker {
 
     public Faker() {
         this(647383L);
@@ -15,10 +14,10 @@ public final class Faker extends BaseFaker {
     }
 
     public UUIDProvider uuid() {
-        return getProvider(UUIDProvider.class, UUIDProvider::new, this);
+        return getProvider(UUIDProvider.class, UUIDProvider::new);
     }
 
     public UlidProvider ulid() {
-        return getProvider(UlidProvider.class, UlidProvider::new, this);
+        return getProvider(UlidProvider.class, UlidProvider::new);
     }
 }
