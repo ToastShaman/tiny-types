@@ -1,6 +1,10 @@
 package com.github.toastshaman.tinytypes.fp;
 
-import io.vavr.*;
+import io.vavr.Function2;
+import io.vavr.Function3;
+import io.vavr.Function4;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Try;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +65,7 @@ public final class Tries {
         var ok = partition._1;
         var errs = partition._2;
 
-        return errs.isEmpty() ? Try.success(ok) : Try.failure(errs.get(0));
+        return errs.isEmpty() ? Try.success(ok) : Try.failure(errs.getFirst());
     }
 
     public static <T, T1> Try<T1> foldResult(Iterable<T> values, Try<T1> initial, Function2<T1, T, Try<T1>> operation) {
