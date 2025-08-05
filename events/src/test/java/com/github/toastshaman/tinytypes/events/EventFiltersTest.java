@@ -4,6 +4,8 @@ import static com.github.toastshaman.tinytypes.events.EventCategory.ERROR;
 import static com.github.toastshaman.tinytypes.events.EventFilters.*;
 import static com.github.toastshaman.tinytypes.events.test.assertions.RecordingEventsAssertions.assertThatEvents;
 import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.MAP;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
 
@@ -197,6 +199,121 @@ class EventFiltersTest {
                 .containsEntry("environment_name", "staging")
                 .containsEntry("team_name", "backend-team")
                 .containsEntry("cloud_region", "eu-west-1");
+    }
+
+    @Test
+    void sampling_rejects_invalid_probability_values() {
+        assertThatThrownBy(() -> Sampling(-0.1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Probability must be in range [0, 1]");
+
+        assertThatThrownBy(() -> Sampling(1.1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Probability must be in range [0, 1]");
+    }
+
+    @Test
+    void sampling_accepts_valid_probability_values() {
+        // These should not throw exceptions
+        Sampling(0.0);
+        Sampling(0.5);
+        Sampling(1.0);
+    }
+
+    @Test
+    void sampling_always_accepts_error_events() {
+        var recording = new RecordingEvents();
+        var events = Sampling(0.0).then(recording); // 0% probability for non-error events
+
+        // Record multiple error events - they should all be accepted
+        for (int i = 0; i < 10; i++) {
+            events.record(MyErrorEvent.random());
+        }
+
+        assertThatEvents(recording).hasSize(10);
+    }
+
+    @Test
+    void sampling_always_accepts_warn_events() {
+        var recording = new RecordingEvents();
+        var events = Sampling(0.0).then(recording); // 0% probability for non-warn events
+
+        // Record multiple warn events - they should all be accepted
+        for (int i = 0; i < 10; i++) {
+            events.record(MyWarnEvent.random());
+        }
+
+        assertThatEvents(recording).hasSize(10);
+    }
+
+    @Test
+    void sampling_with_zero_probability_rejects_non_error_warn_events() {
+        var recording = new RecordingEvents();
+        var events = Sampling(0.0).then(recording);
+
+        // Record multiple info events - they should all be rejected
+        for (int i = 0; i < 10; i++) {
+            events.record(MyEvent.random());
+        }
+
+        assertThatEvents(recording).isEmpty();
+    }
+
+    @Test
+    void sampling_with_full_probability_accepts_all_events() {
+        var recording = new RecordingEvents();
+        var events = Sampling(1.0).then(recording);
+
+        events.record(MyEvent.random());
+        events.record(MyErrorEvent.random());
+        events.record(MyWarnEvent.random());
+
+        assertThatEvents(recording).hasSize(3);
+    }
+
+    @Test
+    void sampling_with_partial_probability_accepts_error_warn_and_some_others() {
+        var recording = new RecordingEvents(1000);
+        var events = Sampling(0.5).then(recording);
+
+        // Add error and warn events - should always be accepted
+        events.record(MyErrorEvent.random());
+        events.record(MyWarnEvent.random());
+
+        // Add many info events - roughly half should be accepted due to probability
+        for (int i = 0; i < 1000; i++) {
+            events.record(MyEvent.random());
+        }
+
+        // Should have at least the 2 error/warn events, plus some info events
+        assertThatEvents(recording).hasSizeGreaterThanOrEqualTo(2);
+        assertThatEvents(recording).contains(MyErrorEvent.class);
+        assertThatEvents(recording).contains(MyWarnEvent.class);
+
+        // With 1000 trials at 50% probability, we should get roughly 500 info events
+        // Allow for some variance (between 400-600)
+        var infoEventCount = recording.captured.stream()
+                .mapToInt(event -> event instanceof MyEvent ? 1 : 0)
+                .sum();
+
+        assertThat(infoEventCount).isBetween(400, 600);
+    }
+
+    private record MyEvent(UUID id) implements Event {
+        public static MyEvent random() {
+            return new MyEvent(UUID.randomUUID());
+        }
+    }
+
+    private record MyWarnEvent(UUID id) implements Event {
+        @Override
+        public EventCategory category() {
+            return EventCategory.WARN;
+        }
+
+        public static MyWarnEvent random() {
+            return new MyWarnEvent(UUID.randomUUID());
+        }
     }
 
     private record MyErrorEvent(UUID id) implements Event {

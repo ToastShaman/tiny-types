@@ -41,4 +41,16 @@ public final class RecordingEventsAssertions extends AbstractAssert<RecordingEve
     public <T extends Event> ListAssert<Event> doesNotContain(Class<T> type) {
         return findInstanceOf(type).hasSize(0);
     }
+
+    public void hasSize(int i) {
+        assertThat(actual.captured).as("events").hasSize(i);
+    }
+
+    public void isEmpty() {
+        assertThat(actual.captured).as("events").isEmpty();
+    }
+
+    public void hasSizeGreaterThanOrEqualTo(int i) {
+        assertThat(actual.captured).as("events").hasSizeGreaterThanOrEqualTo(i);
+    }
 }
