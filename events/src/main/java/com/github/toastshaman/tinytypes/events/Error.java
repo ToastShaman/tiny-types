@@ -15,11 +15,11 @@ public record Error(String message, Throwable cause) implements Event {
         return ERROR;
     }
 
-    public static com.github.toastshaman.tinytypes.events.Error from(String message) {
-        return new com.github.toastshaman.tinytypes.events.Error(message, null);
+    public static Error from(String message) {
+        return new Error(message, null);
     }
 
-    public static com.github.toastshaman.tinytypes.events.Error from(String message, Throwable throwable) {
-        return new com.github.toastshaman.tinytypes.events.Error(message, throwable);
+    public static Error from(String message, Throwable throwable) {
+        return new Error(message, throwable);
     }
 }
