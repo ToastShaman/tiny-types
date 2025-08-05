@@ -155,6 +155,21 @@ class EventFiltersTest {
     }
 
     @Test
+    void can_add_correlation_id_metadata() {
+        var recording = new RecordingEvents();
+        var correlationId = UUID.randomUUID().toString();
+        var events = AddCorrelationId(() -> correlationId).then(recording);
+
+        events.record(MyEvent.random());
+
+        assertThatEvents(recording)
+                .containsSingle(MyEvent.class)
+                .asInstanceOf(type(MetadataEvent.class))
+                .extracting(MetadataEvent::metadata, as(MAP))
+                .containsEntry("correlation_id", correlationId);
+    }
+
+    @Test
     void can_filter_error_events() {
         var recording = new RecordingEvents();
         var events = Accept(ERROR).then(recording);

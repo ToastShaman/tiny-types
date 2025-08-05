@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import org.slf4j.MDC;
 
 public final class EventFilters {
@@ -70,6 +71,10 @@ public final class EventFilters {
 
     public static EventFilter AddCloudRegion(String value) {
         return AddStatic("cloud_region", value);
+    }
+
+    public static EventFilter AddCorrelationId(Supplier<String> id) {
+        return AddStatic("correlation_id", id.get());
     }
 
     private static EventFilter AddStatic(String key, Object value) {
