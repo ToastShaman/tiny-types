@@ -36,8 +36,8 @@ dependencyResolutionManagement {
             library("h2", "com.h2database:h2:2.3.232")
             library("jooq", "org.jooq:jooq:3.20.5")
             library("spring-jdbc", "org.springframework:spring-jdbc:6.2.7")
-            library("flyway", "org.flywaydb:flyway-core:11.10.1")
-            library("hikari", "com.zaxxer:HikariCP:6.3.0")
+            library("flyway", "org.flywaydb:flyway-core:11.10.5")
+            library("hikari", "com.zaxxer:HikariCP:7.0.0")
             library("guava", "com.google.guava:guava:33.4.8-jre")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
@@ -47,7 +47,7 @@ dependencyResolutionManagement {
             library("assertj-vavr", "org.assertj:assertj-vavr:0.4.3")
             library("okeydoke", "com.oneeyedmen:okeydoke:2.0.3")
 
-            library("datafaker", "net.datafaker:datafaker:2.4.3")
+            library("datafaker", "net.datafaker:datafaker:2.4.4")
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
         }
     }
