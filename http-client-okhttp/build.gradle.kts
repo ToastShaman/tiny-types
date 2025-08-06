@@ -1,4 +1,5 @@
 dependencies {
+    api(project(":core"))
     api(libs.vavr)
     api(libs.okhttp)
     api(libs.okhttp.logging.interceptor)

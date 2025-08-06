@@ -1,11 +1,12 @@
 package com.github.toastshaman.tinytypes.http;
 
+import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.vavr.api.VavrAssertions.assertThat;
 
 import java.io.IOException;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -16,29 +17,30 @@ import org.junit.jupiter.api.Test;
 class JsonPlaceholderHttpApiTest {
 
     @Test
-    void f() throws IOException {
-        OkHttpClient client = new OkHttpClient();
+    void can_retrieve_todo_from_external_api() throws IOException {
+        var client = new OkHttpClient();
 
-        MockWebServer server = new MockWebServer();
+        var server = new MockWebServer();
         server.enqueue(new MockResponse()
                 .setHeader("Content-Type", "application/json")
                 .setBody(
                         """
-                {
-                  "userId": 1,
-                  "id": 1,
-                  "title": "delectus aut autem",
-                  "completed": false
-                }""")
+                        {
+                          "userId": 1,
+                          "id": 1,
+                          "title": "delectus aut autem",
+                          "completed": false
+                        }""")
                 .setResponseCode(200));
         server.start();
 
-        HttpUrl baseUrl = server.url("/");
+        var baseUrl = server.url("/");
 
-        JsonPlaceholderApi api =
-                new JsonPlaceholderHttpApi(baseUrl, client, it -> it.addInterceptor(new ThrowIfUnsuccessful()));
+        JsonPlaceholderApi api = new JsonPlaceholderHttpApi(
+                baseUrl, client, it -> it.addInterceptor(new HttpLoggingInterceptor().setLevel(BODY))
+                        .addInterceptor(new ThrowIfUnsuccessful()));
 
-        GetTodoWithId getTodoWithId = new GetTodoWithId(1);
+        var getTodoWithId = new GetTodoWithId(TodoId.of(1));
 
         var result = api.execute(getTodoWithId);
 

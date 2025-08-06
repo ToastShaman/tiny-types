@@ -7,18 +7,16 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public record GetTodoWithId(int requestedId) implements JsonPlaceholderAction<Todo> {
+public record GetTodoWithId(TodoId id) implements JsonPlaceholderAction<Todo> {
 
     public GetTodoWithId {
-        if (requestedId <= 0) {
-            throw new IllegalArgumentException("Requested ID must be a positive integer");
-        }
+        Objects.requireNonNull(id, "id must not be null");
     }
 
     @Override
     public Request toRequest(HttpUrl.Builder builder) {
         var url = builder.addPathSegment("todos")
-                .addPathSegment(String.valueOf(requestedId))
+                .addPathSegment(id.transform(String::valueOf))
                 .build();
 
         return new Request.Builder()

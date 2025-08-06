@@ -5,13 +5,18 @@ import org.json.JSONObject;
 public record Todo(int userid, int id, String title, boolean completed) {
 
     public static class Json {
+
+        private Json() {
+            // Prevent instantiation
+        }
+
         public static Todo fromJson(String json) {
-            var jsonObject = new JSONObject(json);
-            return new Todo(
-                    jsonObject.getInt("userId"),
-                    jsonObject.getInt("id"),
-                    jsonObject.getString("title"),
-                    jsonObject.getBoolean("completed"));
+            var object = new JSONObject(json);
+            var userId = object.getInt("userId");
+            var id = object.getInt("id");
+            var title = object.getString("title");
+            var completed = object.getBoolean("completed");
+            return new Todo(userId, id, title, completed);
         }
     }
 }
