@@ -8,6 +8,7 @@ include("events-visualiser-mermaid")
 include("fp")
 include("fp-database-jooq")
 include("fp-database-spring-jdbc")
+include("http-client-okhttp")
 include("time")
 include("testing-core")
 include("testing-events")
@@ -22,6 +23,7 @@ dependencyResolutionManagement {
             version("junit", "5.13.0")
             version("slf4j", "2.0.9")
             version("vavr", "0.10.6")
+            version("okhttp", "5.1.0")
 
             library("json","org.json:json:20250517")
             library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
@@ -39,6 +41,10 @@ dependencyResolutionManagement {
             library("flyway", "org.flywaydb:flyway-core:11.10.5")
             library("hikari", "com.zaxxer:HikariCP:7.0.0")
             library("guava", "com.google.guava:guava:33.4.8-jre")
+
+            library("okhttp", "com.squareup.okhttp3", "okhttp").versionRef("okhttp")
+            library("okhttp-logging-interceptor", "com.squareup.okhttp3", "logging-interceptor").versionRef("okhttp")
+            library("okhttp-mockwebserver", "com.squareup.okhttp3", "mockwebserver").versionRef("okhttp")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")

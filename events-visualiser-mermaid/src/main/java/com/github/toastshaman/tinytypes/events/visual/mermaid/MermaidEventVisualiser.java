@@ -66,12 +66,14 @@ public final class MermaidEventVisualiser implements Events {
     public void render(MermaidOutputFormat outputFormat, MermaidOrientation orientation, Writer writer) {
         var template =
                 switch (outputFormat) {
-                    case RAW -> """
+                    case RAW ->
+                        """
                             flowchart { orientation }
                             { nodes_with_text }
                             { nodes_with_links }
                             """;
-                    case HTML -> """
+                    case HTML ->
+                        """
                             <!DOCTYPE html>
                             <html lang="en">
                               <body>
@@ -84,7 +86,8 @@ public final class MermaidEventVisualiser implements Events {
                               </body>
                             </html>
                             """;
-                    case MARKDOWN -> """
+                    case MARKDOWN ->
+                        """
                             ```mermaid
                             flowchart { orientation }
                             { nodes_with_text }

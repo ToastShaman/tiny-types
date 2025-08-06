@@ -85,12 +85,15 @@ class MermaidEventVisualiserTest {
         public Events filter(Events next) {
             return event -> next.record(
                     switch (event) {
-                        case FirstEvent e -> e.addMetadata("mermaid_node_text", "I am the first event")
-                                .addMetadata("mermaid_outgoing_edge_text", "I am the first label");
-                        case SecondEvent e -> e.addMetadata("mermaid_node_shape", "circle")
-                                .addMetadata("mermaid_outgoing_edge_text", "I am the second label");
-                        case ThirdEvent e -> e.addMetadata("mermaid_node_shape", "trapezoid")
-                                .addMetadata("mermaid_incoming_edge_text", "I am the third label");
+                        case FirstEvent e ->
+                            e.addMetadata("mermaid_node_text", "I am the first event")
+                                    .addMetadata("mermaid_outgoing_edge_text", "I am the first label");
+                        case SecondEvent e ->
+                            e.addMetadata("mermaid_node_shape", "circle")
+                                    .addMetadata("mermaid_outgoing_edge_text", "I am the second label");
+                        case ThirdEvent e ->
+                            e.addMetadata("mermaid_node_shape", "trapezoid")
+                                    .addMetadata("mermaid_incoming_edge_text", "I am the third label");
                         default -> event;
                     });
         }
