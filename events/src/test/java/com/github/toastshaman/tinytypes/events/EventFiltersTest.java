@@ -158,7 +158,7 @@ class EventFiltersTest {
     void can_add_correlation_id_metadata() {
         var recording = new RecordingEvents();
         var correlationId = UUID.randomUUID().toString();
-        var events = AddCorrelationId(() -> correlationId).then(recording);
+        var events = AddCorrelationId(event -> correlationId).then(recording);
 
         events.record(MyEvent.random());
 

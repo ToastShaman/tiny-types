@@ -7,9 +7,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-import org.slf4j.MDC;
 
 public final class EventFilters {
 
@@ -73,8 +72,13 @@ public final class EventFilters {
         return AddStatic("cloud_region", value);
     }
 
-    public static EventFilter AddCorrelationId(Supplier<String> id) {
-        return AddStatic("correlation_id", id.get());
+    public static EventFilter AddCorrelationId(Function<Event, String> id) {
+        return next -> event -> {
+            var correlationId = id.apply(event);
+            if (correlationId != null && !correlationId.isEmpty()) {
+                next.record(event.addMetadata("correlation_id", correlationId));
+            }
+        };
     }
 
     private static EventFilter AddStatic(String key, Object value) {
@@ -87,10 +91,6 @@ public final class EventFilters {
 
     public static EventFilter AddTimestamp(Clock clock) {
         return next -> event -> next.record(event.addMetadata("timestamp", clock.instant()));
-    }
-
-    public static EventFilter AddMDCContext() {
-        return next -> event -> MDC.getCopyOfContextMap().forEach(event::addMetadata);
     }
 
     public static EventFilter Sampling(double probability) {
