@@ -9,7 +9,6 @@ import io.vavr.control.Try;
 import java.util.Objects;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 
 public final class JsonPlaceholderHttpApi implements JsonPlaceholderApi {
 
@@ -33,20 +32,15 @@ public final class JsonPlaceholderHttpApi implements JsonPlaceholderApi {
 
     @Override
     public <R> Try<R> execute(JsonPlaceholderAction<R> action) {
-        try {
-            FailsafeExecutor<R> executor = action instanceof RetryableJsonPlaceholderAction<R> actionWithRetry
-                    ? Failsafe.with(actionWithRetry.retryPolicy())
-                    : Failsafe.none();
-            var request = action.toRequest(base.newBuilder());
-            return Try.of(() -> executor.get(() -> execute(request, action)));
-        } catch (Exception e) {
-            return Try.failure(e);
-        }
-    }
+        FailsafeExecutor<R> executor = action instanceof RetryableJsonPlaceholderAction<R> actionWithRetry
+                ? Failsafe.with(actionWithRetry.retryPolicy())
+                : Failsafe.none();
 
-    private <R> R execute(Request request, JsonPlaceholderAction<R> action) throws Exception {
-        try (var response = client.newCall(request).execute()) {
-            return action.fromResponse(response);
-        }
+        return Try.of(() -> executor.get(() -> {
+            var request = action.toRequest(base.newBuilder());
+            try (var response = client.newCall(request).execute()) {
+                return action.fromResponse(response);
+            }
+        }));
     }
 }
