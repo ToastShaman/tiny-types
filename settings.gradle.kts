@@ -45,6 +45,7 @@ dependencyResolutionManagement {
             library("okhttp", "com.squareup.okhttp3", "okhttp").versionRef("okhttp")
             library("okhttp-logging-interceptor", "com.squareup.okhttp3", "logging-interceptor").versionRef("okhttp")
             library("okhttp-mockwebserver", "com.squareup.okhttp3", "mockwebserver").versionRef("okhttp")
+            library("failsafe", "dev.failsafe:failsafe:3.3.2")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")

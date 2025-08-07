@@ -3,6 +3,7 @@ dependencies {
     api(libs.vavr)
     api(libs.okhttp)
     api(libs.okhttp.logging.interceptor)
+    api(libs.failsafe)
     api(libs.json)
 
     testImplementation(libs.okhttp.mockwebserver)

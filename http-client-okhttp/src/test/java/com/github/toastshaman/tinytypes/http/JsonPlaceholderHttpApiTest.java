@@ -53,4 +53,44 @@ class JsonPlaceholderHttpApiTest {
 
         server.close();
     }
+
+    @Test
+    void can_retrieve_todo_from_external_api_with_retry() throws IOException {
+        var client = new OkHttpClient();
+
+        var server = new MockWebServer();
+        server.enqueue(new MockResponse().setResponseCode(500));
+        server.enqueue(new MockResponse().setResponseCode(500));
+        server.enqueue(new MockResponse()
+                .setHeader("Content-Type", "application/json")
+                .setBody(
+                        """
+                        {
+                          "userId": 1,
+                          "id": 1,
+                          "title": "delectus aut autem",
+                          "completed": false
+                        }""")
+                .setResponseCode(200));
+        server.start();
+
+        var baseUrl = server.url("/");
+
+        JsonPlaceholderApi api = new JsonPlaceholderHttpApi(
+                baseUrl, client, it -> it.addInterceptor(new HttpLoggingInterceptor().setLevel(BODY))
+                        .addInterceptor(new ThrowIfUnsuccessful()));
+
+        var getTodoWithId = new GetTodoWithId(TodoId.of(1));
+
+        var result = api.execute(getTodoWithId);
+
+        assertThat(result).isSuccess().hasValueSatisfying(todo -> {
+            assertThat(todo.id()).isEqualTo(1);
+            assertThat(todo.title()).isEqualTo("delectus aut autem");
+            assertThat(todo.completed()).isFalse();
+            assertThat(todo.userid()).isEqualTo(1);
+        });
+
+        server.close();
+    }
 }

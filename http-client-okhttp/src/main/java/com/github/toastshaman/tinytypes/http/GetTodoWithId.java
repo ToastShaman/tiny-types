@@ -1,13 +1,14 @@
 package com.github.toastshaman.tinytypes.http;
 
-import io.vavr.control.Try;
+import dev.failsafe.RetryPolicy;
+import java.io.IOException;
+import java.time.Duration;
 import java.util.Objects;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
-public record GetTodoWithId(TodoId id) implements JsonPlaceholderAction<Todo> {
+public record GetTodoWithId(TodoId id) implements RetryableJsonPlaceholderAction<Todo> {
 
     public GetTodoWithId {
         Objects.requireNonNull(id, "id must not be null");
@@ -27,10 +28,15 @@ public record GetTodoWithId(TodoId id) implements JsonPlaceholderAction<Todo> {
     }
 
     @Override
-    public Try<Todo> fromResponse(Response response) {
-        return Try.of(response::body)
-                .mapTry(ResponseBody::string)
-                .filter(Objects::nonNull)
-                .map(Todo.Json::fromJson);
+    public Todo fromResponse(Response response) throws IOException {
+        return Todo.Json.fromJson(response.body().string());
+    }
+
+    @Override
+    public RetryPolicy<Todo> retryPolicy() {
+        return RetryPolicy.<Todo>builder()
+                .withMaxRetries(3)
+                .withBackoff(Duration.ofMillis(100), Duration.ofMillis(500))
+                .build();
     }
 }
