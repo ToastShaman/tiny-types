@@ -1,5 +1,10 @@
-package com.github.toastshaman.tinytypes.http;
+package com.github.toastshaman.tinytypes.http.action;
 
+import com.github.toastshaman.tinytypes.http.FailsafeHttpAction;
+import com.github.toastshaman.tinytypes.http.domain.Todo;
+import com.github.toastshaman.tinytypes.http.domain.TodoId;
+import dev.failsafe.Failsafe;
+import dev.failsafe.FailsafeExecutor;
 import dev.failsafe.RetryPolicy;
 import java.io.IOException;
 import java.time.Duration;
@@ -8,7 +13,7 @@ import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public record GetTodoWithId(TodoId id) implements RetryableJsonPlaceholderAction<Todo> {
+public record GetTodoWithId(TodoId id) implements FailsafeHttpAction<Todo> {
 
     public GetTodoWithId {
         Objects.requireNonNull(id, "id must not be null");
@@ -33,10 +38,12 @@ public record GetTodoWithId(TodoId id) implements RetryableJsonPlaceholderAction
     }
 
     @Override
-    public RetryPolicy<Todo> retryPolicy() {
-        return RetryPolicy.<Todo>builder()
+    public FailsafeExecutor<Todo> failsafe() {
+        var retry = RetryPolicy.<Todo>builder()
                 .withMaxRetries(3)
                 .withBackoff(Duration.ofMillis(100), Duration.ofMillis(500))
                 .build();
+
+        return Failsafe.with(retry);
     }
 }

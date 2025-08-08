@@ -1,4 +1,4 @@
-package com.github.toastshaman.tinytypes.http;
+package com.github.toastshaman.tinytypes.http.domain;
 
 import org.json.JSONObject;
 

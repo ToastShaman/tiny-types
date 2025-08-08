@@ -1,4 +1,4 @@
-package com.github.toastshaman.tinytypes.http;
+package com.github.toastshaman.tinytypes.http.domain;
 
 import com.github.toastshaman.tinytypes.validation.Validator;
 import com.github.toastshaman.tinytypes.values.IntegerValue;

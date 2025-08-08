@@ -1,5 +1,6 @@
 dependencies {
     api(project(":core"))
+    api(project(":events"))
     api(libs.vavr)
     api(libs.okhttp)
     api(libs.okhttp.logging.interceptor)

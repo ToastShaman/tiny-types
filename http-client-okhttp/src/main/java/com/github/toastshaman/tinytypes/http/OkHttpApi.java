@@ -1,27 +1,27 @@
 package com.github.toastshaman.tinytypes.http;
 
-import static io.vavr.Function1.identity;
+import static java.util.function.UnaryOperator.identity;
 
 import dev.failsafe.Failsafe;
 import dev.failsafe.FailsafeExecutor;
-import io.vavr.Function1;
 import io.vavr.control.Try;
 import java.util.Objects;
+import java.util.function.Function;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
-public final class JsonPlaceholderHttpApi implements JsonPlaceholderApi {
+public class OkHttpApi implements HttpApi {
 
     private final HttpUrl base;
 
     private final OkHttpClient client;
 
-    public JsonPlaceholderHttpApi(HttpUrl base, OkHttpClient client) {
+    public OkHttpApi(HttpUrl base, OkHttpClient client) {
         this(base, client, identity());
     }
 
-    public JsonPlaceholderHttpApi(
-            HttpUrl base, OkHttpClient client, Function1<OkHttpClient.Builder, OkHttpClient.Builder> customizer) {
+    public OkHttpApi(
+            HttpUrl base, OkHttpClient client, Function<OkHttpClient.Builder, OkHttpClient.Builder> customizer) {
         Objects.requireNonNull(customizer, "Customizer function must not be null");
         Objects.requireNonNull(base, "Base URL must not be null");
         Objects.requireNonNull(client, "HTTP client must not be null");
@@ -31,9 +31,9 @@ public final class JsonPlaceholderHttpApi implements JsonPlaceholderApi {
     }
 
     @Override
-    public <R> Try<R> execute(JsonPlaceholderAction<R> action) {
-        FailsafeExecutor<R> executor = action instanceof RetryableJsonPlaceholderAction<R> actionWithRetry
-                ? Failsafe.with(actionWithRetry.retryPolicy())
+    public <R> Try<R> execute(HttpAction<R> action) {
+        FailsafeExecutor<R> executor = action instanceof FailsafeHttpAction<R> actionWithFailsafe
+                ? actionWithFailsafe.failsafe()
                 : Failsafe.none();
 
         return Try.of(() -> executor.get(() -> {

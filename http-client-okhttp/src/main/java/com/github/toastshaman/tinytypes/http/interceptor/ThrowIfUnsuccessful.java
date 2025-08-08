@@ -1,4 +1,4 @@
-package com.github.toastshaman.tinytypes.http;
+package com.github.toastshaman.tinytypes.http.interceptor;
 
 import io.vavr.control.Try;
 import java.io.IOException;
