@@ -7,11 +7,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.vavr.api.VavrAssertions.assertThat;
 
 import com.github.toastshaman.tinytypes.http.action.GetTodoWithId;
+import com.github.toastshaman.tinytypes.http.domain.Todo;
 import com.github.toastshaman.tinytypes.http.domain.TodoId;
-import com.github.toastshaman.tinytypes.http.interceptor.ThrowIfUnsuccessful;
+import dev.failsafe.Failsafe;
+import dev.failsafe.RetryPolicy;
 import java.io.IOException;
+import java.time.Duration;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -43,9 +45,9 @@ class OkHttpApiTest {
 
         var api = new OkHttpApi(baseUrl, client, LoggingInterceptorWith(BODY).andThen(ThrowIfUnsuccessful()));
 
-        var getTodoWithId = new GetTodoWithId(TodoId.of(1));
+        var action = new GetTodoWithId(TodoId.of(1));
 
-        var result = api.execute(getTodoWithId);
+        var result = api.execute(action);
 
         assertThat(result).isSuccess().hasValueSatisfying(todo -> {
             assertThat(todo.id()).isEqualTo(1);
@@ -79,12 +81,21 @@ class OkHttpApiTest {
 
         var baseUrl = server.url("/");
 
-        var api = new OkHttpApi(baseUrl, client, it -> it.addInterceptor(new HttpLoggingInterceptor().setLevel(BODY))
-                .addInterceptor(new ThrowIfUnsuccessful()));
+        var api = new OkHttpApi(baseUrl, client, LoggingInterceptorWith(BODY).andThen(ThrowIfUnsuccessful()));
 
-        var getTodoWithId = new GetTodoWithId(TodoId.of(1));
+        var action = new GetTodoWithId(TodoId.of(1));
 
-        var result = api.execute(getTodoWithId);
+        var executor = Failsafe.with(RetryPolicy.<Todo>builder()
+                .withMaxRetries(3)
+                .withBackoff(Duration.ofMillis(100), Duration.ofMillis(500))
+                .build());
+
+        var actionWithRetry = FailsafeHttpAction.<Todo>builder()
+                .withAction(action)
+                .withFailsafe(executor)
+                .build();
+
+        var result = api.execute(actionWithRetry);
 
         assertThat(result).isSuccess().hasValueSatisfying(todo -> {
             assertThat(todo.id()).isEqualTo(1);
