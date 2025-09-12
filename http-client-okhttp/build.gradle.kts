@@ -7,6 +7,7 @@ dependencies {
     api(libs.failsafe)
     api(libs.json)
 
+    testImplementation(project(":testing-events"))
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter.params)

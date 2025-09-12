@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.toastshaman.tinytypes.events.Event;
 import com.github.toastshaman.tinytypes.events.RecordingEvents;
+import java.util.List;
+import java.util.function.Consumer;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.ObjectAssert;
@@ -25,6 +27,19 @@ public final class RecordingEventsAssertions extends AbstractAssert<RecordingEve
 
     public <T extends Event> ListAssert<Event> contains(Class<T> type) {
         return findInstanceOf(type).isNotEmpty();
+    }
+
+    public <T extends Event> RecordingEventsAssertions hasEventSatisfying(
+            Class<T> type, Consumer<List<Event>> requirements) {
+        var events = actual.filterInstanceOf(type);
+
+        if (events.isEmpty()) {
+            failWithMessage("no event found matching %s".formatted(type.getSimpleName()));
+        }
+
+        requirements.accept(events);
+
+        return this;
     }
 
     public <T extends Event> ObjectAssert<Event> containsSingle(Class<T> type) {
