@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("assertj", "3.27.3")
-            version("jackson", "2.19.1")
+            version("jackson", "2.20.0")
             version("junit", "5.13.0")
             version("slf4j", "2.0.9")
             version("vavr", "0.10.6")
@@ -35,11 +35,11 @@ dependencyResolutionManagement {
             library("jackson-datatype-jdk8", "com.fasterxml.jackson.datatype", "jackson-datatype-jdk8").versionRef("jackson")
             library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
 
-            library("h2", "com.h2database:h2:2.3.232")
-            library("jooq", "org.jooq:jooq:3.20.5")
+            library("h2", "com.h2database:h2:2.4.240")
+            library("jooq", "org.jooq:jooq:3.20.7")
             library("spring-jdbc", "org.springframework:spring-jdbc:6.2.7")
-            library("flyway", "org.flywaydb:flyway-core:11.10.5")
-            library("hikari", "com.zaxxer:HikariCP:7.0.0")
+            library("flyway", "org.flywaydb:flyway-core:11.13.1")
+            library("hikari", "com.zaxxer:HikariCP:7.0.2")
             library("guava", "com.google.guava:guava:33.4.8-jre")
 
             library("okhttp", "com.squareup.okhttp3", "okhttp").versionRef("okhttp")
@@ -54,7 +54,7 @@ dependencyResolutionManagement {
             library("assertj-vavr", "org.assertj:assertj-vavr:0.4.3")
             library("okeydoke", "com.oneeyedmen:okeydoke:2.0.3")
 
-            library("datafaker", "net.datafaker:datafaker:2.4.4")
+            library("datafaker", "net.datafaker:datafaker:2.5.1")
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
         }
     }
