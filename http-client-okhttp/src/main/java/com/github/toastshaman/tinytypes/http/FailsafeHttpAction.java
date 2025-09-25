@@ -32,13 +32,14 @@ public interface FailsafeHttpAction<R> extends HttpAction<R> {
         }
 
         public FailsafeHttpAction<R> build() {
-            Objects.requireNonNull(action);
-            Objects.requireNonNull(executor);
             return FailsafeHttpAction.of(action, executor);
         }
     }
 
     static <R> FailsafeHttpAction<R> of(HttpAction<R> action, FailsafeExecutor<R> executor) {
+        Objects.requireNonNull(action, "HTTP action must not be null");
+        Objects.requireNonNull(executor, "Failsafe executor must not be null");
+
         return new FailsafeHttpAction<>() {
             @Override
             public Request toRequest(HttpUrl.Builder builder) {
