@@ -1,6 +1,7 @@
 rootProject.name = "tiny-types"
 
 include("core")
+include("aws-sqs-connector")
 include("format-jackson")
 include("events")
 include("events-format-jackson")
@@ -24,6 +25,8 @@ dependencyResolutionManagement {
             version("slf4j", "2.0.9")
             version("vavr", "0.10.6")
             version("okhttp", "5.2.1")
+            version("aws", "2.35.10")
+            version("record-builder", "49")
 
             library("json","org.json:json:20250517")
             library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
@@ -46,6 +49,11 @@ dependencyResolutionManagement {
             library("okhttp-logging-interceptor", "com.squareup.okhttp3", "logging-interceptor").versionRef("okhttp")
             library("okhttp-mockwebserver", "com.squareup.okhttp3", "mockwebserver").versionRef("okhttp")
             library("failsafe", "dev.failsafe:failsafe:3.3.2")
+
+            library("aws-sqs", "software.amazon.awssdk", "sqs").versionRef("aws")
+
+            library("record-builder-core", "io.soabase.record-builder", "record-builder-core").versionRef("record-builder")
+            library("record-builder-processor", "io.soabase.record-builder", "record-builder-processor").versionRef("record-builder")
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")

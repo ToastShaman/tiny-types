@@ -41,7 +41,7 @@ subprojects {
 
     spotless {
         java {
-            palantirJavaFormat("2.73.0")
+            palantirJavaFormat("2.80.0")
         }
     }
 
