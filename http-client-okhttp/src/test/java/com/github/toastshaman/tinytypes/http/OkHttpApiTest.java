@@ -30,8 +30,7 @@ class OkHttpApiTest {
         var server = new MockWebServer();
         server.enqueue(new MockResponse()
                 .setHeader("Content-Type", "application/json")
-                .setBody(
-                        """
+                .setBody("""
                         {
                           "userId": 1,
                           "id": 1,
@@ -68,8 +67,7 @@ class OkHttpApiTest {
         server.enqueue(new MockResponse().setResponseCode(500));
         server.enqueue(new MockResponse()
                 .setHeader("Content-Type", "application/json")
-                .setBody(
-                        """
+                .setBody("""
                         {
                           "userId": 1,
                           "id": 1,

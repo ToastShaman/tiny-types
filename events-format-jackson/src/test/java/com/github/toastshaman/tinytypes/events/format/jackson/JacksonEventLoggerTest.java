@@ -22,9 +22,7 @@ class JacksonEventLoggerTest {
 
         events.record(event);
 
-        assertThatJson(out.toString())
-                .isEqualTo(
-                        """
+        assertThatJson(out.toString()).isEqualTo("""
         {"event":{"id":42,"name":"Hello World"},"metadata":{"context":{"nested":{"id":1}},"category":"info"}}
         """);
     }

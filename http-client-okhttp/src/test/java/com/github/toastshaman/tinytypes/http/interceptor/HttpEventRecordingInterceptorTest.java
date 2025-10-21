@@ -36,8 +36,7 @@ class HttpEventRecordingInterceptorTest {
 
         server.enqueue(new MockResponse()
                 .setHeader("Content-Type", "application/json")
-                .setBody(
-                        """
+                .setBody("""
                         {
                           "userId": 1,
                           "id": 1,

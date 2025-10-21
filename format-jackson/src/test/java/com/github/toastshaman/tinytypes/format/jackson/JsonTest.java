@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Test;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class JsonTest {
 
-    String json =
-            """
+    String json = """
                     {
                       "glossary": {
                         "title": "example glossary",
