@@ -4,9 +4,9 @@ import static com.github.toastshaman.tinytypes.aws.sqs.PollingSqsEvents.Failed;
 import static com.github.toastshaman.tinytypes.aws.sqs.PollingSqsEvents.Success;
 
 import com.github.toastshaman.tinytypes.events.Events;
+import io.soabase.recordbuilder.core.RecordBuilder;
 import java.util.List;
 import java.util.Objects;
-
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequestEntry;
@@ -20,12 +20,21 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
     private final SqsClient sqs;
 
     private final Events events;
+
+    private final Options options;
+
     private final SqsMessageHandler handler;
 
-    public PollingSqsMessageListener(QueueUrl queueUrl, SqsClient sqs, Events events, SqsMessageHandler handler) {
+    @RecordBuilder
+    @RecordBuilder.Options(addClassRetainedGenerated = true)
+    public record Options(int maxNumberOfMessages, int waitTimeSeconds) {}
+
+    public PollingSqsMessageListener(
+            QueueUrl queueUrl, SqsClient sqs, Events events, Options options, SqsMessageHandler handler) {
         this.sqs = Objects.requireNonNull(sqs, "sqs client must not be null");
         this.queueUrl = Objects.requireNonNull(queueUrl, "queue url must not be null");
         this.events = Objects.requireNonNull(events, "events must not be null");
+        this.options = Objects.requireNonNull(options, "options must not be null");
         this.handler = Objects.requireNonNull(handler, "handler must not be null");
     }
 
@@ -53,7 +62,8 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
     private List<Message> receiveMessages() {
         var request = ReceiveMessageRequest.builder()
                 .queueUrl(queueUrl.toString())
-                .maxNumberOfMessages(10)
+                .maxNumberOfMessages(options.maxNumberOfMessages)
+                .waitTimeSeconds(options.waitTimeSeconds)
                 .messageAttributeNames("All")
                 .build();
 
