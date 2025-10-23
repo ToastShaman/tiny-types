@@ -13,35 +13,34 @@ import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequestEntry;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
-public final class PollingSqsMessageListener implements SqsMessageListener {
-
-    private final QueueUrl queueUrl;
-
-    private final SqsClient sqs;
-
-    private final Events events;
-
-    private final Options options;
-
-    private final SqsMessageHandler handler;
+public record PollingSqsMessageListener(
+        QueueUrl queueUrl, SqsClient sqs, Events events, Options options, SqsMessageHandler handler)
+        implements SqsMessageListener {
 
     @RecordBuilder
     @RecordBuilder.Options(addClassRetainedGenerated = true)
-    public record Options(int maxNumberOfMessages, int waitTimeSeconds) {}
+    public record Options(int maxNumberOfMessages, int waitTimeSeconds) {
+        public Options {
+            if (maxNumberOfMessages < 1 || maxNumberOfMessages > 10) {
+                throw new IllegalArgumentException("maxNumberOfMessages must be between 1 and 10");
+            }
 
-    public PollingSqsMessageListener(
-            QueueUrl queueUrl, SqsClient sqs, Events events, Options options, SqsMessageHandler handler) {
-        this.sqs = Objects.requireNonNull(sqs, "sqs client must not be null");
-        this.queueUrl = Objects.requireNonNull(queueUrl, "queue url must not be null");
-        this.events = Objects.requireNonNull(events, "events must not be null");
-        this.options = Objects.requireNonNull(options, "options must not be null");
-        this.handler = Objects.requireNonNull(handler, "handler must not be null");
+            if (waitTimeSeconds < 0) {
+                throw new IllegalArgumentException("waitTimeSeconds must be greater than 0");
+            }
+        }
+    }
+
+    public PollingSqsMessageListener {
+        Objects.requireNonNull(sqs, "sqs client must not be null");
+        Objects.requireNonNull(queueUrl, "queue url must not be null");
+        Objects.requireNonNull(events, "events must not be null");
+        Objects.requireNonNull(options, "options must not be null");
+        Objects.requireNonNull(handler, "handler must not be null");
     }
 
     @Override
     public void poll() {
-        Objects.requireNonNull(handler, "SQS message handler cannot be null");
-
         try {
             var messages = receiveMessages();
 
