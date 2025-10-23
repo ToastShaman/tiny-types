@@ -12,6 +12,10 @@ dependencies {
 
     testImplementation(libs.json)
     testImplementation(libs.datafaker)
+
+    testImplementation(libs.testcontainers.junit)
+    testImplementation(libs.testcontainers.localstack)
+
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter.params)

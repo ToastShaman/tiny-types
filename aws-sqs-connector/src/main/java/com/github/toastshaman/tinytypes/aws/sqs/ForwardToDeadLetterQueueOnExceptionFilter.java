@@ -1,7 +1,6 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
 import com.github.toastshaman.tinytypes.events.Events;
-
 import java.util.Objects;
 import java.util.Optional;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -10,7 +9,8 @@ import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
-public record ForwardToDeadLetterQueueOnExceptionFilter(DeadLetterQueueUrl queueUrl, SqsClient sqs, Events events) implements SqsMessageFilter {
+public record ForwardToDeadLetterQueueOnExceptionFilter(DeadLetterQueueUrl queueUrl, SqsClient sqs, Events events)
+        implements SqsMessageFilter {
 
     public ForwardToDeadLetterQueueOnExceptionFilter {
         Objects.requireNonNull(queueUrl, "queueUrl must not be null");

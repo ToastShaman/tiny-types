@@ -27,8 +27,9 @@ dependencyResolutionManagement {
             version("okhttp", "5.2.1")
             version("aws", "2.35.10")
             version("record-builder", "49")
+            version("testcontainers", "1.21.3")
 
-            library("json","org.json:json:20250517")
+            library("json", "org.json:json:20250517")
             library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
             library("vavr", "io.vavr", "vavr").versionRef("vavr")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
@@ -64,6 +65,10 @@ dependencyResolutionManagement {
 
             library("datafaker", "net.datafaker:datafaker:2.5.2")
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
+
+            library("testcontainers-core", "org.testcontainers", "testcontainers").versionRef("testcontainers")
+            library("testcontainers-junit", "org.testcontainers", "junit-jupiter").versionRef("testcontainers")
+            library("testcontainers-localstack", "org.testcontainers", "localstack").versionRef("testcontainers")
         }
     }
 }
