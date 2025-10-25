@@ -27,19 +27,19 @@ class ChainingSqsMessageFilterTest {
 
     @Test
     void can_chain_multiple_filters_together() {
-        Sink sink = new Sink();
+        var captured = new ArrayList<String>();
 
         Function<Message, String> processing = message -> new JSONObject(message.body()).getString("message");
 
         var chain = MeasuringSqsMessageFilter(events)
                 .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                .andThen(ChainingSqsMessageFilter(processing.andThen(sink)));
+                .andThen(ChainingSqsMessageFilter(processing.andThen(captured::add)));
 
         var messages = someMessages();
 
         chain.handle(messages);
 
-        assertThat(sink.captured).containsExactly("Molly", "Max", "Daisy");
+        assertThat(captured).containsExactly("Molly", "Max", "Daisy");
     }
 
     List<Message> someMessages() {
@@ -51,16 +51,5 @@ class ChainingSqsMessageFilterTest {
                 .messageId(faker.internet().uuid())
                 .body(new JSONObject().put("message", faker.cat().name()).toString())
                 .build();
-    }
-
-    private static class Sink implements Function<String, Void> {
-
-        public final List<String> captured = new ArrayList<>();
-
-        @Override
-        public Void apply(String input) {
-            captured.add(input);
-            return null;
-        }
     }
 }

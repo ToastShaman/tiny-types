@@ -1,6 +1,6 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.ChainingSqsMessageFilter;
+import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.RetryingSqsMessageFilter;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -27,19 +27,18 @@ class RetryingSqsMessageFilterTest {
     void retries_on_exceptions() {
         var attempt = new AtomicInteger(0);
 
-        var chain = SqsMessageFilters.MeasuringSqsMessageFilter(events)
+        var chain = MeasuringSqsMessageFilter(events)
                 .andThen(RetryingSqsMessageFilter(policy -> policy.withMaxRetries(3)
                         .onFailure(_ -> System.out.println("Failed"))
                         .onRetry(_ -> System.out.println("Retrying..."))))
-                .andThen(ChainingSqsMessageFilter(_ -> {
+                .andThen(_ -> {
                     var i = attempt.incrementAndGet();
                     if (i < 3) {
                         System.out.printf("Attempt %d failed.%n", i);
                         throw new RuntimeException("Simulated failure");
                     }
                     System.out.printf("Attempt %d succeeded.%n", i);
-                    return null;
-                }));
+                });
 
         var messages = List.of(aMessage(), aMessage(), aMessage());
 
@@ -47,7 +46,7 @@ class RetryingSqsMessageFilterTest {
 
         assertThat(attempt.get())
                 .describedAs("should have failed 2 times and processed 3")
-                .isEqualTo(5);
+                .isEqualTo(3);
     }
 
     Message aMessage() {

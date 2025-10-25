@@ -32,8 +32,9 @@ import software.amazon.awssdk.services.sqs.model.Message;
 @Testcontainers
 class PollingSqsMessageListenerTest {
 
-    public static final String TEST_QUEUE_NAME = "test-queue";
-    public static final String TEST_DLQ_QUEUE_NAME = "test-dlq-queue";
+    String TEST_QUEUE_NAME = "test-queue";
+
+    String TEST_DLQ_QUEUE_NAME = "test-dlq-queue";
 
     Events events = new PrintStreamEventLogger();
 
@@ -93,11 +94,12 @@ class PollingSqsMessageListenerTest {
 
             var queueUrl = new QueueUrl(url);
 
-            var sink = new Sink();
+            var captured = new ArrayList<String>();
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                    .andThen(ChainingSqsMessageFilter(((Function<Message, String>) Message::body).andThen(sink)));
+                    .andThen(ChainingSqsMessageFilter(
+                            ((Function<Message, String>) Message::body).andThen(captured::add)));
 
             var listener = new PollingSqsMessageListener(queueUrl, client, events, new Options(5, 10), chain);
 
@@ -105,18 +107,7 @@ class PollingSqsMessageListenerTest {
             listener.poll();
 
             // then
-            assertThat(sink.captured).containsExactlyInAnyOrder("Max", "Misty", "Tator Tot", "Simba", "Angel");
-        }
-    }
-
-    private static class Sink implements Function<String, Void> {
-
-        public final List<String> captured = new ArrayList<>();
-
-        @Override
-        public Void apply(String input) {
-            captured.add(input);
-            return null;
+            assertThat(captured).containsExactlyInAnyOrder("Max", "Misty", "Tator Tot", "Simba", "Angel");
         }
     }
 }
