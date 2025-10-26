@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public record MeasuringSqsMessageFilter(Supplier<Instant> clock, Events events) implements SqsMessageFilter {
+public record MeasuringSqsMessageFilter(Supplier<Instant> clock, Events events) implements SqsMessagesFilter {
 
     public MeasuringSqsMessageFilter {
         Objects.requireNonNull(clock, "clock must not be null");
@@ -26,7 +26,7 @@ public record MeasuringSqsMessageFilter(Supplier<Instant> clock, Events events) 
     }
 
     @Override
-    public SqsMessageHandler filter(SqsMessageHandler handler) {
+    public SqsMessagesHandler filter(SqsMessagesHandler handler) {
         return messages -> {
             var startTime = clock.get();
             try {

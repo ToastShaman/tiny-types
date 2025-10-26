@@ -5,9 +5,7 @@ import dev.failsafe.RetryPolicy;
 import dev.failsafe.RetryPolicyBuilder;
 import java.time.Instant;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import software.amazon.awssdk.services.sqs.model.Message;
 
 public final class SqsMessageFilters {
 
@@ -27,7 +25,7 @@ public final class SqsMessageFilters {
         return new MeasuringSqsMessageFilter(clock, events);
     }
 
-    public static <T> ChainingSqsMessageFilter<T> ChainingSqsMessageFilter(Function<Message, T> handlers) {
-        return new ChainingSqsMessageFilter<>(handlers);
+    public static <T> ChainingSqsMessageFilter<T> ChainingSqsMessageFilter(SqsMessageHandler<T> handler) {
+        return new ChainingSqsMessageFilter<>(handler);
     }
 }

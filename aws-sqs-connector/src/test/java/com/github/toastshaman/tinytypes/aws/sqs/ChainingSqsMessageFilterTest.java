@@ -10,7 +10,6 @@ import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 import net.datafaker.Faker;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -29,11 +28,12 @@ class ChainingSqsMessageFilterTest {
     void can_chain_multiple_filters_together() {
         var captured = new ArrayList<String>();
 
-        Function<Message, String> processing = message -> new JSONObject(message.body()).getString("message");
-
         var chain = MeasuringSqsMessageFilter(events)
                 .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                .andThen(ChainingSqsMessageFilter(processing.andThen(captured::add)));
+                .andThen(ChainingSqsMessageFilter(((SqsMessageHandler<String>) Message::body)
+                        .andThen(JSONObject::new)
+                        .andThen(it -> it.getString("message"))
+                        .andThen(captured::add)));
 
         var messages = someMessages();
 

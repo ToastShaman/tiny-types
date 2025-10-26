@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
 public record ForwardToDeadLetterQueueOnExceptionFilter(DeadLetterQueueUrl queueUrl, SqsClient sqs, Events events)
-        implements SqsMessageFilter {
+        implements SqsMessagesFilter {
 
     public ForwardToDeadLetterQueueOnExceptionFilter {
         Objects.requireNonNull(queueUrl, "queueUrl must not be null");
@@ -19,7 +19,7 @@ public record ForwardToDeadLetterQueueOnExceptionFilter(DeadLetterQueueUrl queue
     }
 
     @Override
-    public SqsMessageHandler filter(SqsMessageHandler handler) {
+    public SqsMessagesHandler filter(SqsMessagesHandler handler) {
         return messages -> {
             try {
                 handler.handle(messages);

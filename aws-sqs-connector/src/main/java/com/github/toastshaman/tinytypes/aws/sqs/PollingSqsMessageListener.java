@@ -14,7 +14,7 @@ import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 public record PollingSqsMessageListener(
-        QueueUrl queueUrl, SqsClient sqs, Events events, Options options, SqsMessageHandler handler)
+        QueueUrl queueUrl, SqsClient sqs, Events events, Options options, SqsMessagesHandler handler)
         implements SqsMessageListener {
 
     @RecordBuilder

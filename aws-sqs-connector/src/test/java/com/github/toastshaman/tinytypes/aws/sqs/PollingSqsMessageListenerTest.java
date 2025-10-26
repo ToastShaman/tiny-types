@@ -12,7 +12,6 @@ import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -99,7 +98,7 @@ class PollingSqsMessageListenerTest {
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
                     .andThen(ChainingSqsMessageFilter(
-                            ((Function<Message, String>) Message::body).andThen(captured::add)));
+                            ((SqsMessageHandler<String>) Message::body).andThen(captured::add)));
 
             var listener = new PollingSqsMessageListener(queueUrl, client, events, new Options(5, 10), chain);
 
