@@ -12,7 +12,6 @@ public record RetryingSqsMessageFilter(RetryPolicy<Void> retryPolicy) implements
 
     @Override
     public SqsMessagesHandler filter(SqsMessagesHandler handler) {
-        Objects.requireNonNull(handler, "handler must not be null");
         return messages -> Failsafe.with(retryPolicy).run(() -> handler.handle(messages));
     }
 }
