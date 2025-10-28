@@ -10,6 +10,7 @@ dependencies {
     implementation(libs.aws.sqs)
     implementation(libs.failsafe)
 
+    testImplementation(libs.slf4j.api)
     testImplementation(libs.json)
     testImplementation(libs.datafaker)
 
