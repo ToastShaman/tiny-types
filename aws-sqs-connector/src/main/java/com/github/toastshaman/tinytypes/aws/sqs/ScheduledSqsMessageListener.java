@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class ScheduledSqsMessageListener implements AutoCloseable{
+public final class ScheduledSqsMessageListener implements AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledSqsMessageListener.class);
 
