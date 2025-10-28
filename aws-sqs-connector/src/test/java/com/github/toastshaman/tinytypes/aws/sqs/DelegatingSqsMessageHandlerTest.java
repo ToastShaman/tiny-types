@@ -30,7 +30,7 @@ class DelegatingSqsMessageHandlerTest {
 
         var chain = MeasuringSqsMessageFilter(events)
                 .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                .andThen(DelegatingSqsMessageHandler(((SqsMessageHandler<String>) Message::body)
+                .andThen(DelegatingSqsMessageHandler(SqsMessageHandler.of(Message::body)
                         .andThen(JSONObject::new)
                         .andThen(it -> it.getString("message"))
                         .andThen(captured::add)));

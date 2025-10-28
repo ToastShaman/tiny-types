@@ -98,7 +98,7 @@ class PollingSqsMessageListenerTest {
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
                     .andThen(DelegatingSqsMessageHandler(
-                            ((SqsMessageHandler<String>) Message::body).andThen(captured::add)));
+                            SqsMessageHandler.of(Message::body).andThen(captured::add)));
 
             var listener = new PollingSqsMessageListener(queueUrl, client, events, new Options(5, 10), chain);
 
