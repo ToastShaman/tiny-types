@@ -46,7 +46,7 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
                         }
                     },
                     options.delay.toMillis(),
-                    options.delay().toMillis(),
+                    options.delay.toMillis(),
                     MILLISECONDS);
             running.set(true);
         }
