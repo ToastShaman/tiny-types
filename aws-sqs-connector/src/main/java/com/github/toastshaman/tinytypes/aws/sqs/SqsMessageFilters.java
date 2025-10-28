@@ -25,7 +25,7 @@ public final class SqsMessageFilters {
         return new MeasuringSqsMessageFilter(clock, events);
     }
 
-    public static <T> ChainingSqsMessageFilter<T> ChainingSqsMessageFilter(SqsMessageHandler<T> handler) {
-        return new ChainingSqsMessageFilter<>(handler);
+    public static <T> DelegatingSqsMessageHandler<T> DelegatingSqsMessageHandler(SqsMessageHandler<T> handler) {
+        return new DelegatingSqsMessageHandler<>(handler);
     }
 }

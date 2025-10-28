@@ -1,6 +1,6 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.ChainingSqsMessageFilter;
+import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.DelegatingSqsMessageHandler;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.RetryingSqsMessageFilter;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,7 +97,7 @@ class PollingSqsMessageListenerTest {
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                    .andThen(ChainingSqsMessageFilter(
+                    .andThen(DelegatingSqsMessageHandler(
                             ((SqsMessageHandler<String>) Message::body).andThen(captured::add)));
 
             var listener = new PollingSqsMessageListener(queueUrl, client, events, new Options(5, 10), chain);

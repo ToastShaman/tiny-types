@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Objects;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-public record ChainingSqsMessageFilter<T>(SqsMessageHandler<T> handler) implements SqsMessagesHandler {
+public record DelegatingSqsMessageHandler<T>(SqsMessageHandler<T> handler) implements SqsMessagesHandler {
 
-    public ChainingSqsMessageFilter {
+    public DelegatingSqsMessageHandler {
         Objects.requireNonNull(handler, "handler must not be null");
     }
 

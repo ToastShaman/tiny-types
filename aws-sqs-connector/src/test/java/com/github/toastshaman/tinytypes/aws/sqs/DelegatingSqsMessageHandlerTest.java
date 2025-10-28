@@ -1,6 +1,6 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.ChainingSqsMessageFilter;
+import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.DelegatingSqsMessageHandler;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.RetryingSqsMessageFilter;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class ChainingSqsMessageFilterTest {
+class DelegatingSqsMessageHandlerTest {
 
     Faker faker = new Faker(new Random(578));
 
@@ -30,7 +30,7 @@ class ChainingSqsMessageFilterTest {
 
         var chain = MeasuringSqsMessageFilter(events)
                 .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                .andThen(ChainingSqsMessageFilter(((SqsMessageHandler<String>) Message::body)
+                .andThen(DelegatingSqsMessageHandler(((SqsMessageHandler<String>) Message::body)
                         .andThen(JSONObject::new)
                         .andThen(it -> it.getString("message"))
                         .andThen(captured::add)));
