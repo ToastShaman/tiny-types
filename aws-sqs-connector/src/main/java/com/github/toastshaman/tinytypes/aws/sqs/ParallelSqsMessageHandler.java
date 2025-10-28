@@ -1,11 +1,16 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 public record ParallelSqsMessageHandler<T>(SqsMessageHandler<T> handler) implements SqsMessagesHandler {
+
+    public ParallelSqsMessageHandler {
+        Objects.requireNonNull(handler, "handler must not be null");
+    }
 
     @Override
     public void handle(List<Message> messages) {
