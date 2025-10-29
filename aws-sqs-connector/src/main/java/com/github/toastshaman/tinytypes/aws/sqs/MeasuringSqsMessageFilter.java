@@ -10,11 +10,16 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public record MeasuringSqsMessageFilter(Supplier<Instant> clock, Events events) implements SqsMessagesFilter {
+@SuppressWarnings("ClassCanBeRecord")
+public final class MeasuringSqsMessageFilter implements SqsMessagesFilter {
 
-    public MeasuringSqsMessageFilter {
-        Objects.requireNonNull(clock, "clock must not be null");
-        Objects.requireNonNull(events, "events must not be null");
+    private final Supplier<Instant> clock;
+
+    private final Events events;
+
+    public MeasuringSqsMessageFilter(Supplier<Instant> clock, Events events) {
+        this.clock = Objects.requireNonNull(clock, "clock must not be null");
+        this.events = Objects.requireNonNull(events, "events must not be null");
     }
 
     @RecordBuilder

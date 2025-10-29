@@ -13,9 +13,14 @@ import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequestEntry;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
-public record PollingSqsMessageListener(
-        QueueUrl queueUrl, SqsClient sqs, Events events, Options options, SqsMessagesHandler handler)
-        implements SqsMessageListener {
+@SuppressWarnings("ClassCanBeRecord")
+public final class PollingSqsMessageListener implements SqsMessageListener {
+
+    private final QueueUrl queueUrl;
+    private final SqsClient sqs;
+    private final Events events;
+    private final Options options;
+    private final SqsMessagesHandler handler;
 
     @RecordBuilder
     @RecordBuilder.Options(addClassRetainedGenerated = true)
@@ -31,12 +36,13 @@ public record PollingSqsMessageListener(
         }
     }
 
-    public PollingSqsMessageListener {
-        Objects.requireNonNull(sqs, "sqs client must not be null");
-        Objects.requireNonNull(queueUrl, "queue url must not be null");
-        Objects.requireNonNull(events, "events must not be null");
-        Objects.requireNonNull(options, "options must not be null");
-        Objects.requireNonNull(handler, "handler must not be null");
+    public PollingSqsMessageListener(
+            QueueUrl queueUrl, SqsClient sqs, Events events, Options options, SqsMessagesHandler handler) {
+        this.queueUrl = Objects.requireNonNull(queueUrl, "queue url must not be null");
+        this.sqs = Objects.requireNonNull(sqs, "sqs client must not be null");
+        this.events = Objects.requireNonNull(events, "events must not be null");
+        this.options = Objects.requireNonNull(options, "options must not be null");
+        this.handler = Objects.requireNonNull(handler, "handler must not be null");
     }
 
     @Override

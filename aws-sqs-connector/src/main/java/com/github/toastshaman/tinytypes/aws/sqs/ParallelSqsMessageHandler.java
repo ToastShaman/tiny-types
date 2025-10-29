@@ -6,10 +6,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-public record ParallelSqsMessageHandler<T>(SqsMessageHandler<T> handler) implements SqsMessagesHandler {
+@SuppressWarnings("ClassCanBeRecord")
+public final class ParallelSqsMessageHandler<T> implements SqsMessagesHandler {
 
-    public ParallelSqsMessageHandler {
-        Objects.requireNonNull(handler, "handler must not be null");
+    private final SqsMessageHandler<T> handler;
+
+    public ParallelSqsMessageHandler(SqsMessageHandler<T> handler) {
+        this.handler = Objects.requireNonNull(handler, "handler must not be null");
     }
 
     @Override

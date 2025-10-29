@@ -4,10 +4,13 @@ import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
 import java.util.Objects;
 
-public record RetryingSqsMessageFilter(RetryPolicy<Void> retryPolicy) implements SqsMessagesFilter {
+@SuppressWarnings("ClassCanBeRecord")
+public final class RetryingSqsMessageFilter implements SqsMessagesFilter {
 
-    public RetryingSqsMessageFilter {
-        Objects.requireNonNull(retryPolicy, "retryPolicy must not be null");
+    private final RetryPolicy<Void> retryPolicy;
+
+    public RetryingSqsMessageFilter(RetryPolicy<Void> retryPolicy) {
+        this.retryPolicy = Objects.requireNonNull(retryPolicy, "retryPolicy must not be null");
     }
 
     @Override

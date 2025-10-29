@@ -1,6 +1,5 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import com.github.toastshaman.tinytypes.events.Events;
 import java.util.Objects;
 import java.util.Optional;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -9,13 +8,16 @@ import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
-public record ForwardToDeadLetterQueueOnExceptionFilter(DeadLetterQueueUrl queueUrl, SqsClient sqs, Events events)
-        implements SqsMessagesFilter {
+@SuppressWarnings("ClassCanBeRecord")
+public final class ForwardToDeadLetterQueueOnExceptionFilter implements SqsMessagesFilter {
 
-    public ForwardToDeadLetterQueueOnExceptionFilter {
-        Objects.requireNonNull(queueUrl, "queueUrl must not be null");
-        Objects.requireNonNull(sqs, "sqs client must not be null");
-        Objects.requireNonNull(events, "events must not be null");
+    private final DeadLetterQueueUrl queueUrl;
+
+    private final SqsClient sqs;
+
+    public ForwardToDeadLetterQueueOnExceptionFilter(DeadLetterQueueUrl queueUrl, SqsClient sqs) {
+        this.queueUrl = Objects.requireNonNull(queueUrl, "queueUrl must not be null");
+        this.sqs = Objects.requireNonNull(sqs, "sqs client must not be null");
     }
 
     @Override

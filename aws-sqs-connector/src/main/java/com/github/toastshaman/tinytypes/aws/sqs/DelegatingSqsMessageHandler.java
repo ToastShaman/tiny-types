@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.Objects;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-public record DelegatingSqsMessageHandler<T>(SqsMessageHandler<T> handler) implements SqsMessagesHandler {
+@SuppressWarnings("ClassCanBeRecord")
+public final class DelegatingSqsMessageHandler<T> implements SqsMessagesHandler {
 
-    public DelegatingSqsMessageHandler {
-        Objects.requireNonNull(handler, "handler must not be null");
+    private final SqsMessageHandler<T> handler;
+
+    public DelegatingSqsMessageHandler(SqsMessageHandler<T> handler) {
+        this.handler = Objects.requireNonNull(handler, "handler must not be null");
     }
 
     @Override
