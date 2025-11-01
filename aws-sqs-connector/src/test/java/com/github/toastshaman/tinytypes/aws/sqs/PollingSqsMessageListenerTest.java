@@ -4,7 +4,6 @@ import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.Delegat
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.RetryingSqsMessageFilter;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
 
 import com.github.toastshaman.tinytypes.aws.sqs.PollingSqsMessageListener.Options;
 import com.github.toastshaman.tinytypes.events.Events;
@@ -16,9 +15,9 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -39,7 +38,7 @@ class PollingSqsMessageListenerTest {
 
     @Container
     LocalStackContainer localstack =
-            new LocalStackContainer(DockerImageName.parse("localstack/localstack")).withServices(SQS);
+            new LocalStackContainer(DockerImageName.parse("localstack/localstack")).withServices("sqs");
 
     @BeforeEach
     void setUp() {

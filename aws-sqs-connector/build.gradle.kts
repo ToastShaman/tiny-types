@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.failsafe)
 
     testImplementation(libs.slf4j.api)
+    testImplementation(libs.slf4j.simple)
     testImplementation(libs.json)
     testImplementation(libs.datafaker)
 

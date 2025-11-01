@@ -27,7 +27,7 @@ dependencyResolutionManagement {
             version("okhttp", "5.2.1")
             version("aws", "2.35.10")
             version("record-builder", "49")
-            version("testcontainers", "1.21.3")
+            version("testcontainers", "2.0.1")
 
             library("json", "org.json:json:20250517")
             library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
@@ -66,9 +66,10 @@ dependencyResolutionManagement {
             library("datafaker", "net.datafaker:datafaker:2.5.2")
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
 
-            library("testcontainers-core", "org.testcontainers", "testcontainers").versionRef("testcontainers")
-            library("testcontainers-junit", "org.testcontainers", "junit-jupiter").versionRef("testcontainers")
-            library("testcontainers-localstack", "org.testcontainers", "localstack").versionRef("testcontainers")
+            library("testcontainers-junit", "org.testcontainers", "testcontainers-junit-jupiter").versionRef("testcontainers")
+            library("testcontainers-mongodb", "org.testcontainers", "testcontainers-mongodb").versionRef("testcontainers")
+            library("testcontainers-localstack", "org.testcontainers", "testcontainers-localstack").versionRef("testcontainers")
+
         }
     }
 }
