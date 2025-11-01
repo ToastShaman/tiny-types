@@ -31,11 +31,11 @@ public final class MeasuringSqsMessageFilter implements SqsMessagesFilter {
     }
 
     @Override
-    public SqsMessagesHandler filter(SqsMessagesHandler handler) {
+    public SqsMessagesHandler filter(SqsMessagesHandler next) {
         return messages -> {
             var startTime = clock.get();
             try {
-                handler.handle(messages);
+                next.handle(messages);
             } finally {
                 var endTime = clock.get();
                 events.record(SqsMessageProcessingTime(Duration.between(startTime, endTime)));

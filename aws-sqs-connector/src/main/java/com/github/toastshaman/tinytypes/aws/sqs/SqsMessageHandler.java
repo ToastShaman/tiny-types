@@ -12,11 +12,11 @@ public interface SqsMessageHandler<T> {
         return message -> next.apply(handle(message));
     }
 
-    static <T> SqsMessageHandler<T> of(Function<Message, T> function) {
+    static <T> SqsMessageHandler<T> fromFunction(Function<Message, T> function) {
         return function::apply;
     }
 
-    static <T> SqsMessageHandler<T> consume(Consumer<Message> function) {
+    static <T> SqsMessageHandler<T> fromConsumer(Consumer<Message> function) {
         return message -> {
             function.accept(message);
             return null;

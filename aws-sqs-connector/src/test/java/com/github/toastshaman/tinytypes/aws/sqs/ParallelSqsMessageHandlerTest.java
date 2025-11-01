@@ -14,7 +14,7 @@ class ParallelSqsMessageHandlerTest {
         var handledMessages = new ConcurrentLinkedDeque<String>();
 
         var handler = new ParallelSqsMessageHandler<>(
-                SqsMessageHandler.consume(message -> handledMessages.add(message.body())));
+                SqsMessageHandler.fromConsumer(message -> handledMessages.add(message.body())));
 
         var messages = List.of(
                 Message.builder().body("msg1").build(),

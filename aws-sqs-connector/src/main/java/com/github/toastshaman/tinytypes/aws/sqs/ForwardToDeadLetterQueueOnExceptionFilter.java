@@ -21,10 +21,10 @@ public final class ForwardToDeadLetterQueueOnExceptionFilter implements SqsMessa
     }
 
     @Override
-    public SqsMessagesHandler filter(SqsMessagesHandler handler) {
+    public SqsMessagesHandler filter(SqsMessagesHandler next) {
         return messages -> {
             try {
-                handler.handle(messages);
+                next.handle(messages);
             } catch (Exception e) {
                 var entries = messages.stream()
                         .map(ForwardToDeadLetterQueueOnExceptionFilter::entryFrom)

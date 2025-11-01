@@ -13,6 +13,10 @@ public final class QueueUrl extends URIValue {
         super(URI.create(value));
     }
 
+    public String asString() {
+        return value.toString();
+    }
+
     public static QueueUrl parse(String value) {
         return new QueueUrl(URI.create(value));
     }

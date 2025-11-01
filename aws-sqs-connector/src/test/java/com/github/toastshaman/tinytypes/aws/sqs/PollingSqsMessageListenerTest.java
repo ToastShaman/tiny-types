@@ -12,7 +12,6 @@ import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Stream;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +24,6 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.CreateQueueResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 @Testcontainers
@@ -33,11 +31,11 @@ class PollingSqsMessageListenerTest {
 
     String TEST_QUEUE_NAME = "test-queue";
 
-    String TEST_DLQ_QUEUE_NAME = "test-dlq-queue";
-
     Events events = new PrintStreamEventLogger();
 
     Faker faker = new Faker(new Random(83726362L));
+
+    Options options = new Options(5, 10);
 
     @Container
     LocalStackContainer localstack =
@@ -46,11 +44,11 @@ class PollingSqsMessageListenerTest {
     @BeforeEach
     void setUp() {
         try (var client = createSqsClient()) {
-            var queueUrls = getQueueUrls(client);
+            var queueUrl = createQueue(client);
             var randomNames = someMessages();
 
             for (String name : randomNames) {
-                client.sendMessage(b -> b.queueUrl(queueUrls.getFirst()).messageBody(name));
+                client.sendMessage(b -> b.queueUrl(queueUrl.asString()).messageBody(name));
             }
         }
     }
@@ -58,10 +56,8 @@ class PollingSqsMessageListenerTest {
     @AfterEach
     void tearDown() {
         try (var client = createSqsClient()) {
-            List.of(TEST_QUEUE_NAME, TEST_DLQ_QUEUE_NAME).forEach(name -> {
-                var response = client.getQueueUrl(builder -> builder.queueName(name));
-                client.deleteQueue(builder -> builder.queueUrl(response.queueUrl()));
-            });
+            var queueUrl = getQueueUrl(client);
+            client.deleteQueue(builder -> builder.queueUrl(queueUrl.asString()));
         }
     }
 
@@ -74,11 +70,14 @@ class PollingSqsMessageListenerTest {
                 .build();
     }
 
-    private List<String> getQueueUrls(SqsClient client) {
-        return Stream.of(TEST_QUEUE_NAME, TEST_DLQ_QUEUE_NAME)
-                .map(name -> client.createQueue(builder -> builder.queueName(name)))
-                .map(CreateQueueResponse::queueUrl)
-                .toList();
+    private QueueUrl getQueueUrl(SqsClient client) {
+        var response = client.getQueueUrl(builder -> builder.queueName(TEST_QUEUE_NAME));
+        return QueueUrl.parse(response.queueUrl());
+    }
+
+    private QueueUrl createQueue(SqsClient client) {
+        var response = client.createQueue(builder -> builder.queueName(TEST_QUEUE_NAME));
+        return QueueUrl.parse(response.queueUrl());
     }
 
     private List<String> someMessages() {
@@ -89,18 +88,16 @@ class PollingSqsMessageListenerTest {
     void can_poll_messages_from_sqs() {
         try (var client = createSqsClient()) {
             // given
-            var url = getQueueUrls(client).getFirst();
-
-            var queueUrl = new QueueUrl(url);
+            var queueUrl = getQueueUrl(client);
 
             var captured = new ArrayList<String>();
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
                     .andThen(DelegatingSqsMessageHandler(
-                            SqsMessageHandler.of(Message::body).andThen(captured::add)));
+                            SqsMessageHandler.fromFunction(Message::body).andThen(captured::add)));
 
-            var listener = new PollingSqsMessageListener(queueUrl, client, events, new Options(5, 10), chain);
+            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, chain);
 
             // when
             listener.poll();
