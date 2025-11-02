@@ -5,7 +5,6 @@ import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.Measuri
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.RetryingSqsMessageFilter;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.github.toastshaman.tinytypes.aws.sqs.PollingSqsMessageListener.Options;
 import com.github.toastshaman.tinytypes.events.Events;
 import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ class PollingSqsMessageListenerTest {
 
     Faker faker = new Faker(new Random(83726362L));
 
-    Options options = new Options(5, 10);
+    PollingSqsMessageListenerOptions options = new PollingSqsMessageListenerOptions(5, 10);
 
     @Container
     LocalStackContainer localstack =

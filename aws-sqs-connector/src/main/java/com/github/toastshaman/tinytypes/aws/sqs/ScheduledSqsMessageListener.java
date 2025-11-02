@@ -2,7 +2,6 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,20 +15,13 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
 
     private final SqsMessageListener listener;
 
-    private final Options options;
+    private final ScheduledSqsMessageListenerOptions options;
 
     private final ScheduledExecutorService scheduler;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public record Options(Duration delay, Duration shutdownTimeout) {
-        public Options {
-            Objects.requireNonNull(delay, "delay must not be null");
-            Objects.requireNonNull(shutdownTimeout, "shutdown timeout must not be null");
-        }
-    }
-
-    public ScheduledSqsMessageListener(SqsMessageListener listener, Options options) {
+    public ScheduledSqsMessageListener(SqsMessageListener listener, ScheduledSqsMessageListenerOptions options) {
         this.listener = Objects.requireNonNull(listener, "listener must not be null");
         this.options = Objects.requireNonNull(options, "options must not be null");
         this.scheduler = Executors.newScheduledThreadPool(1);
@@ -45,8 +37,8 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
                             log.error(e.getMessage(), e);
                         }
                     },
-                    options.delay.toMillis(),
-                    options.delay.toMillis(),
+                    options.delay().toMillis(),
+                    options.delay().toMillis(),
                     MILLISECONDS);
             running.set(true);
         }
@@ -59,7 +51,7 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
     public void stop() {
         scheduler.shutdown();
         try {
-            if (!scheduler.awaitTermination(options.shutdownTimeout.toMillis(), MILLISECONDS)) {
+            if (!scheduler.awaitTermination(options.shutdownTimeout().toMillis(), MILLISECONDS)) {
                 scheduler.shutdownNow();
             }
         } catch (InterruptedException e) {

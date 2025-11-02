@@ -14,6 +14,7 @@ dependencies {
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.json)
     testImplementation(libs.datafaker)
+    testImplementation(libs.awaitility)
 
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.localstack)

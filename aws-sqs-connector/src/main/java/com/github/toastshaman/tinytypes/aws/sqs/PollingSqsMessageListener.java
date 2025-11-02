@@ -4,7 +4,6 @@ import static com.github.toastshaman.tinytypes.aws.sqs.PollingSqsEvents.Failed;
 import static com.github.toastshaman.tinytypes.aws.sqs.PollingSqsEvents.Success;
 
 import com.github.toastshaman.tinytypes.events.Events;
-import io.soabase.recordbuilder.core.RecordBuilder;
 import java.util.List;
 import java.util.Objects;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -19,25 +18,15 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
     private final QueueUrl queueUrl;
     private final SqsClient sqs;
     private final Events events;
-    private final Options options;
+    private final PollingSqsMessageListenerOptions options;
     private final SqsMessagesHandler handler;
 
-    @RecordBuilder
-    @RecordBuilder.Options(addClassRetainedGenerated = true)
-    public record Options(int maxNumberOfMessages, int waitTimeSeconds) {
-        public Options {
-            if (maxNumberOfMessages < 1 || maxNumberOfMessages > 10) {
-                throw new IllegalArgumentException("maxNumberOfMessages must be between 1 and 10");
-            }
-
-            if (waitTimeSeconds < 0) {
-                throw new IllegalArgumentException("waitTimeSeconds must be greater than 0");
-            }
-        }
-    }
-
     public PollingSqsMessageListener(
-            QueueUrl queueUrl, SqsClient sqs, Events events, Options options, SqsMessagesHandler handler) {
+            QueueUrl queueUrl,
+            SqsClient sqs,
+            Events events,
+            PollingSqsMessageListenerOptions options,
+            SqsMessagesHandler handler) {
         this.queueUrl = Objects.requireNonNull(queueUrl, "queue url must not be null");
         this.sqs = Objects.requireNonNull(sqs, "sqs client must not be null");
         this.events = Objects.requireNonNull(events, "events must not be null");
@@ -67,8 +56,8 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
     private List<Message> receiveMessages() {
         var request = ReceiveMessageRequest.builder()
                 .queueUrl(queueUrl.toString())
-                .maxNumberOfMessages(options.maxNumberOfMessages)
-                .waitTimeSeconds(options.waitTimeSeconds)
+                .maxNumberOfMessages(options.maxNumberOfMessages())
+                .waitTimeSeconds(options.waitTimeSeconds())
                 .messageAttributeNames("All")
                 .build();
 

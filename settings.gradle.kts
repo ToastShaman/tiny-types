@@ -65,6 +65,7 @@ dependencyResolutionManagement {
 
             library("datafaker", "net.datafaker:datafaker:2.5.2")
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
+            library("awaitility", "org.awaitility:awaitility:4.3.0")
 
             library("testcontainers-junit", "org.testcontainers", "testcontainers-junit-jupiter").versionRef("testcontainers")
             library("testcontainers-mongodb", "org.testcontainers", "testcontainers-mongodb").versionRef("testcontainers")
