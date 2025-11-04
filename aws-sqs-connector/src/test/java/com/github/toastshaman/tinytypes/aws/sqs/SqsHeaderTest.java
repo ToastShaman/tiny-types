@@ -36,7 +36,7 @@ class SqsHeaderTest {
         @Test
         void can_set_header() {
             var message = Message.builder()
-                    .messageAttributes(Map.of("x-my-test-header", TEST_HEADER.reverseGet("header-value")))
+                    .messageAttributes(Map.ofEntries(TEST_HEADER.reverseGet("header-value")))
                     .build();
 
             var extractedValue = TEST_HEADER.get(message);

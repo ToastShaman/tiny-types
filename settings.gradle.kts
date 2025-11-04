@@ -52,6 +52,7 @@ dependencyResolutionManagement {
             library("failsafe", "dev.failsafe:failsafe:3.3.2")
 
             library("aws-sqs", "software.amazon.awssdk", "sqs").versionRef("aws")
+            library("aws-sns", "software.amazon.awssdk", "sns").versionRef("aws")
 
             library("record-builder-core", "io.soabase.record-builder", "record-builder-core").versionRef("record-builder")
             library("record-builder-processor", "io.soabase.record-builder", "record-builder-processor").versionRef("record-builder")

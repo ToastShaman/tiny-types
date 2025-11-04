@@ -8,7 +8,9 @@ dependencies {
     implementation(libs.record.builder.core)
 
     implementation(libs.aws.sqs)
+    implementation(libs.aws.sns)
     implementation(libs.failsafe)
+    implementation(libs.jackson.databind)
 
     testImplementation(libs.slf4j.api)
     testImplementation(libs.slf4j.simple)

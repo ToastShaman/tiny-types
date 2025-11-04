@@ -2,6 +2,7 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 
 import com.github.toastshaman.tinytypes.fp.Iso;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
@@ -17,8 +18,8 @@ public record SqsHeader<T>(String name, Iso<MessageAttributeValue, T> iso) {
         return iso.get(message.messageAttributes().get(name));
     }
 
-    public MessageAttributeValue reverseGet(T value) {
-        return iso.reverseGet(value);
+    public Map.Entry<String, MessageAttributeValue> reverseGet(T value) {
+        return Map.entry(name, iso.reverseGet(value));
     }
 
     public static SqsHeader<String> text(String name) {
