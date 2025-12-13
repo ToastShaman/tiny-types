@@ -7,4 +7,8 @@ public final class TopicArn extends NonBlankStringValue {
     public TopicArn(String value) {
         super(value);
     }
+
+    public static TopicArn of(String value) {
+        return new TopicArn(value);
+    }
 }
