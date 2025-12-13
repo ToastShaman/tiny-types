@@ -15,6 +15,7 @@ include("testing-core")
 include("testing-events")
 include("testing-fp")
 include("testing-faker")
+include("testing-http-client-okhttp-spring")
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -28,6 +29,7 @@ dependencyResolutionManagement {
             version("aws", "2.35.10")
             version("record-builder", "49")
             version("testcontainers", "2.0.1")
+            version("spring-boot", "4.0.0")
 
             library("json", "org.json:json:20250517")
             library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
@@ -38,6 +40,8 @@ dependencyResolutionManagement {
             library("jackson-datatype-json", "com.fasterxml.jackson.datatype", "jackson-datatype-json-org").versionRef("jackson")
             library("jackson-datatype-jdk8", "com.fasterxml.jackson.datatype", "jackson-datatype-jdk8").versionRef("jackson")
             library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
+
+            library("spring-boot-starter-test", "org.springframework.boot", "spring-boot-starter-test").versionRef("spring-boot")
 
             library("h2", "com.h2database:h2:2.4.240")
             library("jooq", "org.jooq:jooq:3.20.8")
@@ -71,7 +75,6 @@ dependencyResolutionManagement {
             library("testcontainers-junit", "org.testcontainers", "testcontainers-junit-jupiter").versionRef("testcontainers")
             library("testcontainers-mongodb", "org.testcontainers", "testcontainers-mongodb").versionRef("testcontainers")
             library("testcontainers-localstack", "org.testcontainers", "testcontainers-localstack").versionRef("testcontainers")
-
         }
     }
 }

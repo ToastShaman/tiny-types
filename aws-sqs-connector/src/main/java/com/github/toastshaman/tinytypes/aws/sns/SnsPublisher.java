@@ -1,9 +1,8 @@
 package com.github.toastshaman.tinytypes.aws.sns;
 
-import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
-
 import java.util.List;
 import java.util.Map;
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 
 public interface SnsPublisher<T> {
 

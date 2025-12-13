@@ -1,14 +1,13 @@
 package com.github.toastshaman.tinytypes.aws.sns;
 
 import com.github.toastshaman.tinytypes.aws.sqs.MessageSerializer;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sns.model.PublishBatchRequest;
 import software.amazon.awssdk.services.sns.model.PublishBatchRequestEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public final class SimpleSnsPublisher<T> implements SnsPublisher<T> {
 
