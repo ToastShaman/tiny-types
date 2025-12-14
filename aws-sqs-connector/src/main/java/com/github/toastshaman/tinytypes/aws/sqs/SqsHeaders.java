@@ -1,5 +1,7 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
+import java.time.Instant;
+
 public final class SqsHeaders {
 
     public static SqsHeader<String> TRACE_ID = SqsHeader.text("trace_id");
@@ -8,7 +10,7 @@ public final class SqsHeaders {
     public static SqsHeader<String> EVENT_TYPE = SqsHeader.text("event.type");
     public static SqsHeader<String> EVENT_VERSION = SqsHeader.text("event.version");
     public static SqsHeader<String> EVENT_SOURCE = SqsHeader.text("event.source");
-    public static SqsHeader<String> EVENT_TIMESTAMP = SqsHeader.text("event.timestamp");
+    public static SqsHeader<Instant> EVENT_TIMESTAMP = SqsHeader.timestamp("event.timestamp");
 
     private SqsHeaders() {}
 }

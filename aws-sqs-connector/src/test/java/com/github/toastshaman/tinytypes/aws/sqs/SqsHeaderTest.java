@@ -2,6 +2,7 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.time.Instant;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -63,5 +64,18 @@ class SqsHeaderTest {
 
             assertThat(extractedValue).isEqualTo("2024-06-01T12:34:56Z");
         }
+    }
+
+    @Test
+    void apply_sets_multiple_headers_on_message() {
+        var original = Message.builder().build();
+
+        var messageWithHeaders = SqsHeader.apply(
+                        SqsHeaders.EVENT_TIMESTAMP.with(Instant.now()),
+                        SqsHeaders.EVENT_ID.with("event-id-123"),
+                        SqsHeaders.EVENT_TYPE.with("event-type-xyz"))
+                .apply(original);
+
+        assertThat(SqsHeaders.EVENT_ID.get(messageWithHeaders)).isEqualTo("event-id-123");
     }
 }
