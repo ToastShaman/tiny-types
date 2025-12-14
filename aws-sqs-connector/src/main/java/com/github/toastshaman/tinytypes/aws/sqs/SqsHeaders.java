@@ -10,5 +10,5 @@ public final class SqsHeaders {
     public static SqsHeader<String> EVENT_SOURCE = SqsHeader.text("event.source");
     public static SqsHeader<String> EVENT_TIMESTAMP = SqsHeader.text("event.timestamp");
 
-    private  SqsHeaders() {}
+    private SqsHeaders() {}
 }
