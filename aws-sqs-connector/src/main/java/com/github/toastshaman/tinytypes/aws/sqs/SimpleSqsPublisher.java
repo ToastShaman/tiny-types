@@ -8,6 +8,7 @@ import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
+@SuppressWarnings("ClassCanBeRecord")
 public final class SimpleSqsPublisher<T> implements SqsPublisher<T> {
 
     private final SqsClient client;
@@ -23,7 +24,10 @@ public final class SimpleSqsPublisher<T> implements SqsPublisher<T> {
     }
 
     @Override
-    public void publish(T message, Map.Entry<String, MessageAttributeValue>... attributes) {
+    @SafeVarargs
+    public final void publish(T message, Map.Entry<String, MessageAttributeValue>... attributes) {
+        Objects.requireNonNull(message, "message must not be null");
+
         var messageAttributes = Map.ofEntries(attributes);
 
         client.sendMessage(builder -> builder.queueUrl(queueUrl.unwrap().toString())
@@ -34,6 +38,8 @@ public final class SimpleSqsPublisher<T> implements SqsPublisher<T> {
     @Override
     @SafeVarargs
     public final void publish(List<T> messages, Map.Entry<String, MessageAttributeValue>... attributes) {
+        Objects.requireNonNull(messages, "messages must not be null");
+
         var messageAttributes = Map.ofEntries(attributes);
 
         var entries = messages.stream()

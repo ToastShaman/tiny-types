@@ -18,6 +18,8 @@ import software.amazon.awssdk.services.sqs.model.Message;
 @Testcontainers
 class SimpleSqsPublisherTest {
 
+    SqsHeader<String> MY_HEADER = SqsHeader.text("my-header");
+
     String TEST_QUEUE_NAME = "test-queue";
 
     @Container
@@ -67,7 +69,7 @@ class SimpleSqsPublisherTest {
             var publisher = new SimpleSqsPublisher<String>(client, queueUrl, it -> it);
 
             // when
-            publisher.publish("Hello World");
+            publisher.publish("Hello World", MY_HEADER.with("HeaderValue"));
 
             // then
             var messages = client.receiveMessage(

@@ -1,11 +1,9 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
@@ -26,15 +24,8 @@ public record SqsHeader<T>(
         return get.apply(message.messageAttributes().get(name));
     }
 
-    public UnaryOperator<Message> with(T value) {
-        return message -> with(message, value);
-    }
-
-    public Message with(Message message, T value) {
-        var attributes = new HashMap<>(message.messageAttributes());
-        attributes.put(name, reverseGet.apply(value));
-
-        return message.toBuilder().messageAttributes(attributes).build();
+    public Map.Entry<String, MessageAttributeValue> with(T value) {
+        return reverseGet(value);
     }
 
     public Map.Entry<String, MessageAttributeValue> reverseGet(T value) {
@@ -54,15 +45,5 @@ public record SqsHeader<T>(
                         .dataType("String")
                         .stringValue(value.toString())
                         .build());
-    }
-
-    @SafeVarargs
-    public static UnaryOperator<Message> apply(UnaryOperator<Message>... operators) {
-        return message -> {
-            for (var operator : operators) {
-                message = operator.apply(message);
-            }
-            return message;
-        };
     }
 }

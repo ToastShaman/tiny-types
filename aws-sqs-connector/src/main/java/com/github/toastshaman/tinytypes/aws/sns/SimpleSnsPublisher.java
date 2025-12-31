@@ -9,6 +9,7 @@ import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sns.model.PublishBatchRequest;
 import software.amazon.awssdk.services.sns.model.PublishBatchRequestEntry;
 
+@SuppressWarnings("ClassCanBeRecord")
 public final class SimpleSnsPublisher<T> implements SnsPublisher<T> {
 
     private final SnsClient client;
@@ -24,7 +25,10 @@ public final class SimpleSnsPublisher<T> implements SnsPublisher<T> {
     }
 
     @Override
-    public void publish(T message, Map.Entry<String, MessageAttributeValue>... attributes) {
+    @SafeVarargs
+    public final void publish(T message, Map.Entry<String, MessageAttributeValue>... attributes) {
+        Objects.requireNonNull(message, "message must not be null");
+
         var messageAttributes = Map.ofEntries(attributes);
 
         client.publish(builder -> builder.topicArn(topicArn.unwrap())
@@ -35,6 +39,8 @@ public final class SimpleSnsPublisher<T> implements SnsPublisher<T> {
     @Override
     @SafeVarargs
     public final void publish(List<T> messages, Map.Entry<String, MessageAttributeValue>... attributes) {
+        Objects.requireNonNull(messages, "messages must not be null");
+
         var messageAttributes = Map.ofEntries(attributes);
 
         var entries = messages.stream()
