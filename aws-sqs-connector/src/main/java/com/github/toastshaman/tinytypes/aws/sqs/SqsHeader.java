@@ -1,5 +1,7 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
+import io.vavr.Function2;
+import io.vavr.Function3;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
@@ -51,5 +53,24 @@ public record SqsHeader<T>(
                         .stringValue(value.toString())
                         .build(),
                 value -> Instant.parse(value.stringValue()));
+    }
+
+    public static <T1, T2, R> Function<Message, R> zip(
+            SqsHeader<T1> h1, SqsHeader<T2> h2, Function2<T1, T2, R> mapper) {
+        return m -> {
+            var v1 = h1.from(m);
+            var v2 = h2.from(m);
+            return mapper.apply(v1, v2);
+        };
+    }
+
+    public static <T1, T2, T3, R> Function<Message, R> zip(
+            SqsHeader<T1> h1, SqsHeader<T2> h2, SqsHeader<T3> h3, Function3<T1, T2, T3, R> mapper) {
+        return m -> {
+            var v1 = h1.from(m);
+            var v2 = h2.from(m);
+            var v3 = h3.from(m);
+            return mapper.apply(v1, v2, v3);
+        };
     }
 }
