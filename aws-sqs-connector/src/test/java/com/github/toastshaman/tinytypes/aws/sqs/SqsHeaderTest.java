@@ -28,7 +28,7 @@ class SqsHeaderTest {
                                     .build()))
                     .build();
 
-            var extractedValue = TEST_HEADER.get(message);
+            var extractedValue = TEST_HEADER.from(message);
 
             assertThat(extractedValue).isEqualTo("header-value");
         }
@@ -36,10 +36,11 @@ class SqsHeaderTest {
         @Test
         void can_set_header() {
             var message = Message.builder()
-                    .messageAttributes(Map.ofEntries(TEST_HEADER.reverseGet("header-value")))
+                    .messageAttributes(Map.ofEntries(
+                            Map.entry(TEST_HEADER.name(), TEST_HEADER.encode().apply("header-value"))))
                     .build();
 
-            var extractedValue = TEST_HEADER.get(message);
+            var extractedValue = TEST_HEADER.from(message);
 
             assertThat(extractedValue).isEqualTo("header-value");
         }
@@ -59,7 +60,7 @@ class SqsHeaderTest {
                     .build();
 
             var timestampHeader = SqsHeader.timestamp("x-my-test-header");
-            var extractedValue = timestampHeader.get(message);
+            var extractedValue = timestampHeader.from(message);
 
             assertThat(extractedValue).isEqualTo("2024-06-01T12:34:56Z");
         }

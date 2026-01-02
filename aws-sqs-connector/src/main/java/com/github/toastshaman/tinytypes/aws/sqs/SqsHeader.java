@@ -8,42 +8,48 @@ import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 public record SqsHeader<T>(
-        String name, Function<MessageAttributeValue, T> get, Function<T, MessageAttributeValue> reverseGet) {
+        String name, Function<T, MessageAttributeValue> encode, Function<MessageAttributeValue, T> decode) {
 
     public SqsHeader {
         Objects.requireNonNull(name, "name must not be null");
-        Objects.requireNonNull(get, "get must not be null");
-        Objects.requireNonNull(reverseGet, "reverseGet must not be null");
+        Objects.requireNonNull(encode, "encode must not be null");
+        Objects.requireNonNull(decode, "decode must not be null");
 
         if (name.isBlank()) {
             throw new IllegalArgumentException("name must not be blank");
         }
     }
 
-    public T get(Message message) {
-        return get.apply(message.messageAttributes().get(name));
+    public T from(Message message) {
+        var messageAttributes = message.messageAttributes();
+        var value = messageAttributes.get(name);
+        if (value == null) {
+            throw new IllegalArgumentException("Message is missing expected attribute: %s".formatted(name));
+        }
+        return decode.apply(value);
     }
 
     public Map.Entry<String, MessageAttributeValue> with(T value) {
-        return reverseGet(value);
-    }
-
-    public Map.Entry<String, MessageAttributeValue> reverseGet(T value) {
-        return Map.entry(name, reverseGet.apply(value));
+        return Map.entry(name, encode.apply(value));
     }
 
     public static SqsHeader<String> text(String name) {
-        return new SqsHeader<>(name, MessageAttributeValue::stringValue, value -> MessageAttributeValue.builder()
-                .dataType("String")
-                .stringValue(value)
-                .build());
+        return new SqsHeader<>(
+                name,
+                value -> MessageAttributeValue.builder()
+                        .dataType("String")
+                        .stringValue(value)
+                        .build(),
+                MessageAttributeValue::stringValue);
     }
 
     public static SqsHeader<Instant> timestamp(String name) {
         return new SqsHeader<>(
-                name, value -> Instant.parse(value.stringValue()), value -> MessageAttributeValue.builder()
+                name,
+                value -> MessageAttributeValue.builder()
                         .dataType("String")
                         .stringValue(value.toString())
-                        .build());
+                        .build(),
+                value -> Instant.parse(value.stringValue()));
     }
 }
