@@ -24,7 +24,6 @@ dependencyResolutionManagement {
             version("jackson", "2.20.1")
             version("junit", "6.0.0")
             version("slf4j", "2.0.9")
-            version("vavr", "0.10.6")
             version("okhttp", "5.3.2")
             version("aws", "2.41.1")
             version("record-builder", "51")
@@ -33,7 +32,7 @@ dependencyResolutionManagement {
 
             library("json", "org.json:json:20251224")
             library("json-path", "com.jayway.jsonpath:json-path:2.10.0")
-            library("vavr", "io.vavr", "vavr").versionRef("vavr")
+            library("vavr", "io.vavr:vavr:0.11.0")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
             library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
