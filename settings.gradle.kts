@@ -21,18 +21,18 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("assertj", "3.27.3")
-            version("jackson", "2.20.0")
+            version("jackson", "2.20.1")
             version("junit", "6.0.0")
             version("slf4j", "2.0.9")
             version("vavr", "0.10.6")
-            version("okhttp", "5.2.1")
-            version("aws", "2.35.10")
-            version("record-builder", "49")
-            version("testcontainers", "2.0.1")
-            version("spring-boot", "4.0.0")
+            version("okhttp", "5.3.2")
+            version("aws", "2.41.1")
+            version("record-builder", "51")
+            version("testcontainers", "2.0.3")
+            version("spring-boot", "4.0.1")
 
-            library("json", "org.json:json:20250517")
-            library("json-path", "com.jayway.jsonpath:json-path:2.9.0")
+            library("json", "org.json:json:20251224")
+            library("json-path", "com.jayway.jsonpath:json-path:2.10.0")
             library("vavr", "io.vavr", "vavr").versionRef("vavr")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
@@ -44,9 +44,9 @@ dependencyResolutionManagement {
             library("spring-boot-starter-test", "org.springframework.boot", "spring-boot-starter-test").versionRef("spring-boot")
 
             library("h2", "com.h2database:h2:2.4.240")
-            library("jooq", "org.jooq:jooq:3.20.8")
-            library("spring-jdbc", "org.springframework:spring-jdbc:6.2.7")
-            library("flyway", "org.flywaydb:flyway-core:11.14.1")
+            library("jooq", "org.jooq:jooq:3.20.10")
+            library("spring-jdbc", "org.springframework:spring-jdbc:7.0.2")
+            library("flyway", "org.flywaydb:flyway-core:11.20.0")
             library("hikari", "com.zaxxer:HikariCP:7.0.2")
             library("guava", "com.google.guava:guava:33.5.0-jre")
 
@@ -64,11 +64,11 @@ dependencyResolutionManagement {
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")
             library("assertj-core", "org.assertj", "assertj-core").versionRef("assertj")
-            library("assertj-json", "net.javacrumbs.json-unit:json-unit-assertj:5.0.0")
+            library("assertj-json", "net.javacrumbs.json-unit:json-unit-assertj:5.1.0")
             library("assertj-vavr", "org.assertj:assertj-vavr:0.4.3")
             library("okeydoke", "com.oneeyedmen:okeydoke:2.0.3")
 
-            library("datafaker", "net.datafaker:datafaker:2.5.2")
+            library("datafaker", "net.datafaker:datafaker:2.5.3")
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
             library("awaitility", "org.awaitility:awaitility:4.3.0")
 
