@@ -3,16 +3,18 @@ package com.github.toastshaman.tinytypes.fp.db.mongodb;
 import io.vavr.Function0;
 import io.vavr.Function1;
 import java.util.Optional;
+import java.util.function.Consumer;
 import net.javacrumbs.shedlock.core.SimpleLock;
 
 public interface DistributedLock {
+
     <R> Optional<R> executeMaybe(Function0<R> fn);
 
     <R> Optional<R> executeMaybe(Function1<SimpleLock, R> fn);
 
-    boolean runMaybe(Runnable runnable);
+    void runMaybe(Runnable runnable);
 
-    boolean runMaybe(Function0<SimpleLock> fn);
+    void runMaybe(Consumer<SimpleLock> fn);
 
     static DistributedLock noop() {
         return new DistributedLock() {
@@ -27,15 +29,13 @@ public interface DistributedLock {
             }
 
             @Override
-            public boolean runMaybe(Runnable runnable) {
+            public void runMaybe(Runnable runnable) {
                 runnable.run();
-                return true;
             }
 
             @Override
-            public boolean runMaybe(Function0<SimpleLock> fn) {
-                fn.apply();
-                return true;
+            public void runMaybe(Consumer<SimpleLock> fn) {
+                fn.accept(null);
             }
         };
     }
