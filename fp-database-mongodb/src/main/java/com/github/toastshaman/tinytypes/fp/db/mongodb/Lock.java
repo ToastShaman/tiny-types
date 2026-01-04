@@ -3,7 +3,6 @@ package com.github.toastshaman.tinytypes.fp.db.mongodb;
 import io.vavr.Function0;
 import io.vavr.Function1;
 import java.util.Optional;
-import java.util.function.Consumer;
 import net.javacrumbs.shedlock.core.LockConfiguration;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.core.SimpleLock;
@@ -28,21 +27,19 @@ public record Lock(LockProvider p, LockConfiguration config) {
         }
     }
 
-    public void runMaybe(Runnable runnable) {
-        runMaybe(_ -> runnable.run());
+    public boolean runMaybe(Runnable runnable) {
+        return executeMaybe(_ -> {
+                    runnable.run();
+                    return true;
+                })
+                .orElse(false);
     }
 
-    public void runMaybe(Consumer<SimpleLock> fn) {
-        SimpleLock lock = p.lock(config).orElse(null);
-
-        if (lock == null) {
-            return;
-        }
-
-        try {
-            fn.accept(lock);
-        } finally {
-            lock.unlock();
-        }
+    public boolean runMaybe(Function0<SimpleLock> fn) {
+        return executeMaybe(_ -> {
+                    fn.apply();
+                    return true;
+                })
+                .orElse(false);
     }
 }
