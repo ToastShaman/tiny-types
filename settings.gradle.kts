@@ -8,6 +8,7 @@ include("events-format-jackson")
 include("events-visualiser-mermaid")
 include("fp")
 include("fp-database-jooq")
+include("fp-database-mongodb")
 include("fp-database-spring-jdbc")
 include("http-client-okhttp")
 include("time")
@@ -48,6 +49,8 @@ dependencyResolutionManagement {
             library("flyway", "org.flywaydb:flyway-core:11.20.0")
             library("hikari", "com.zaxxer:HikariCP:7.0.2")
             library("guava", "com.google.guava:guava:33.5.0-jre")
+
+            library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:5.6.2")
 
             library("okhttp", "com.squareup.okhttp3", "okhttp").versionRef("okhttp")
             library("okhttp-logging-interceptor", "com.squareup.okhttp3", "logging-interceptor").versionRef("okhttp")
