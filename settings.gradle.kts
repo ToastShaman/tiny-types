@@ -46,6 +46,7 @@ dependencyResolutionManagement {
             library("h2", "com.h2database:h2:2.4.240")
             library("jooq", "org.jooq:jooq:3.20.10")
             library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:5.6.2")
+            library("shedlock-mongodb", "net.javacrumbs.shedlock:shedlock-provider-mongo:7.5.0")
             library("spring-jdbc", "org.springframework:spring-jdbc:7.0.2")
             library("flyway", "org.flywaydb:flyway-core:11.20.0")
             library("hikari", "com.zaxxer:HikariCP:7.0.2")

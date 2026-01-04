@@ -1,5 +1,7 @@
 dependencies {
+    api(libs.vavr)
     api(libs.mongodb.driver.sync)
+    api(libs.shedlock.mongodb)
 
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.assertj.core)
