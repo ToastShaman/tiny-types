@@ -25,24 +25,24 @@ class SimpleDistributedLockTest {
     MongoDBContainer container = new MongoDBContainer("mongo").withReplicaSet();
 
     @Test
-    void can_execute_maybe() {
+    void can_execute_tryRunWithLock() {
         try (var client = MongoClients.create(container.getConnectionString())) {
             var lock = createSimpleLock(client);
 
-            var result = lock.executeMaybe(() -> 1L);
+            var result = lock.tryRunWithLock(() -> 1L);
 
             assertThat(result).isPresent().contains(1L);
         }
     }
 
     @Test
-    void can_run_maybe() {
+    void can_run_tryRunWithLock() {
         try (var client = MongoClients.create(container.getConnectionString())) {
             var lock = createSimpleLock(client);
 
             var hasRun = new AtomicBoolean(false);
 
-            lock.runMaybe(() -> hasRun.set(true));
+            lock.tryRunWithLock(() -> hasRun.set(true));
 
             assertThat(hasRun).isTrue();
         }

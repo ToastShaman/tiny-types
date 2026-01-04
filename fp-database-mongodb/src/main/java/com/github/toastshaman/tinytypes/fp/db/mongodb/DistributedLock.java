@@ -1,41 +1,41 @@
 package com.github.toastshaman.tinytypes.fp.db.mongodb;
 
-import io.vavr.Function0;
-import io.vavr.Function1;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import net.javacrumbs.shedlock.core.SimpleLock;
 
 public interface DistributedLock {
 
-    <R> Optional<R> executeMaybe(Function0<R> fn);
+    <R> Optional<R> tryRunWithLock(Supplier<R> action);
 
-    <R> Optional<R> executeMaybe(Function1<SimpleLock, R> fn);
+    <R> Optional<R> tryRunWithLock(Function<SimpleLock, R> action);
 
-    void runMaybe(Runnable runnable);
+    void tryRunWithLock(Runnable action);
 
-    void runMaybe(Consumer<SimpleLock> fn);
+    void tryRunWithLock(Consumer<SimpleLock> action);
 
     static DistributedLock noop() {
         return new DistributedLock() {
             @Override
-            public <R> Optional<R> executeMaybe(Function0<R> fn) {
-                return Optional.ofNullable(fn.apply());
+            public <R> Optional<R> tryRunWithLock(Supplier<R> action) {
+                return Optional.ofNullable(action.get());
             }
 
             @Override
-            public <R> Optional<R> executeMaybe(Function1<SimpleLock, R> fn) {
-                return Optional.ofNullable(fn.apply(null));
+            public <R> Optional<R> tryRunWithLock(Function<SimpleLock, R> action) {
+                return Optional.ofNullable(action.apply(null));
             }
 
             @Override
-            public void runMaybe(Runnable runnable) {
-                runnable.run();
+            public void tryRunWithLock(Runnable action) {
+                action.run();
             }
 
             @Override
-            public void runMaybe(Consumer<SimpleLock> fn) {
-                fn.accept(null);
+            public void tryRunWithLock(Consumer<SimpleLock> action) {
+                action.accept(null);
             }
         };
     }
