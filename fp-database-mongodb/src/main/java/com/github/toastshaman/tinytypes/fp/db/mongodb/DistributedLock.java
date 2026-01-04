@@ -2,54 +2,41 @@ package com.github.toastshaman.tinytypes.fp.db.mongodb;
 
 import io.vavr.Function0;
 import io.vavr.Function1;
-import java.util.Objects;
 import java.util.Optional;
-import net.javacrumbs.shedlock.core.LockConfiguration;
-import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.core.SimpleLock;
 
-public record DistributedLock(LockProvider provider, LockConfiguration config) implements Lockable {
+public interface DistributedLock {
+    <R> Optional<R> executeMaybe(Function0<R> fn);
 
-    public DistributedLock {
-        Objects.requireNonNull(provider, "LockProvider must not be null");
-        Objects.requireNonNull(config, "LockConfiguration must not be null");
-    }
+    <R> Optional<R> executeMaybe(Function1<SimpleLock, R> fn);
 
-    @Override
-    public <R> Optional<R> executeMaybe(Function0<R> fn) {
-        return executeMaybe(_ -> fn.apply());
-    }
+    boolean runMaybe(Runnable runnable);
 
-    @Override
-    public <R> Optional<R> executeMaybe(Function1<SimpleLock, R> fn) {
-        SimpleLock lock = provider.lock(config).orElse(null);
+    boolean runMaybe(Function0<SimpleLock> fn);
 
-        if (lock == null) {
-            return Optional.empty();
-        }
+    static DistributedLock noop() {
+        return new DistributedLock() {
+            @Override
+            public <R> Optional<R> executeMaybe(Function0<R> fn) {
+                return Optional.ofNullable(fn.apply());
+            }
 
-        try {
-            return Optional.ofNullable(fn.apply(lock));
-        } finally {
-            lock.unlock();
-        }
-    }
+            @Override
+            public <R> Optional<R> executeMaybe(Function1<SimpleLock, R> fn) {
+                return Optional.ofNullable(fn.apply(null));
+            }
 
-    @Override
-    public boolean runMaybe(Runnable runnable) {
-        return executeMaybe(_ -> {
-                    runnable.run();
-                    return true;
-                })
-                .orElse(false);
-    }
+            @Override
+            public boolean runMaybe(Runnable runnable) {
+                runnable.run();
+                return true;
+            }
 
-    @Override
-    public boolean runMaybe(Function0<SimpleLock> fn) {
-        return executeMaybe(_ -> {
-                    fn.apply();
-                    return true;
-                })
-                .orElse(false);
+            @Override
+            public boolean runMaybe(Function0<SimpleLock> fn) {
+                fn.apply();
+                return true;
+            }
+        };
     }
 }

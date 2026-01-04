@@ -19,7 +19,7 @@ import org.testcontainers.mongodb.MongoDBContainer;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Testcontainers
-class DistributedLockTest {
+class SimpleDistributedLockTest {
 
     @Container
     MongoDBContainer container = new MongoDBContainer("mongo").withReplicaSet();
@@ -48,11 +48,11 @@ class DistributedLockTest {
         }
     }
 
-    private static @NonNull DistributedLock createSimpleLock(MongoClient client) {
+    private static @NonNull SimpleDistributedLock createSimpleLock(MongoClient client) {
         var database = client.getDatabase("my-database");
         var lockProvider = new MongoLockProvider(database);
         var lockConfig =
                 new LockConfiguration(Instant.now(), "my-lock", Duration.ofSeconds(20), Duration.ofSeconds(10));
-        return new DistributedLock(lockProvider, lockConfig);
+        return new SimpleDistributedLock(lockProvider, lockConfig);
     }
 }
