@@ -8,17 +8,19 @@ import net.javacrumbs.shedlock.core.LockConfiguration;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.core.SimpleLock;
 
-public record Lock(LockProvider provider, LockConfiguration config) {
+public record DistributedLock(LockProvider provider, LockConfiguration config) implements Lockable {
 
-    public Lock {
+    public DistributedLock {
         Objects.requireNonNull(provider, "LockProvider must not be null");
         Objects.requireNonNull(config, "LockConfiguration must not be null");
     }
 
+    @Override
     public <R> Optional<R> executeMaybe(Function0<R> fn) {
         return executeMaybe(_ -> fn.apply());
     }
 
+    @Override
     public <R> Optional<R> executeMaybe(Function1<SimpleLock, R> fn) {
         SimpleLock lock = provider.lock(config).orElse(null);
 
@@ -33,6 +35,7 @@ public record Lock(LockProvider provider, LockConfiguration config) {
         }
     }
 
+    @Override
     public boolean runMaybe(Runnable runnable) {
         return executeMaybe(_ -> {
                     runnable.run();
@@ -41,6 +44,7 @@ public record Lock(LockProvider provider, LockConfiguration config) {
                 .orElse(false);
     }
 
+    @Override
     public boolean runMaybe(Function0<SimpleLock> fn) {
         return executeMaybe(_ -> {
                     fn.apply();
