@@ -29,7 +29,7 @@ class SimpleDistributedLockTest {
         try (var client = MongoClients.create(container.getConnectionString())) {
             var lock = createSimpleLock(client);
 
-            var result = lock.tryRunWithLock(() -> 1L);
+            var result = lock.tryExecuteWithLock(() -> 1L);
 
             assertThat(result).isPresent().contains(1L);
         }

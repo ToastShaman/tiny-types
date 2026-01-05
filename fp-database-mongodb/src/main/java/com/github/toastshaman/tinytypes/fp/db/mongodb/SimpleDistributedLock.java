@@ -17,18 +17,18 @@ public record SimpleDistributedLock(LockProvider provider, LockConfiguration con
     }
 
     @Override
-    public <R> Optional<R> tryRunWithLock(Supplier<R> action) {
+    public <R> Optional<R> tryExecuteWithLock(Supplier<R> action) {
         return provider.lock(config).map(_ -> action.get());
     }
 
     @Override
-    public <R> Optional<R> tryRunWithLock(Function<SimpleLock, R> action) {
+    public <R> Optional<R> tryExecuteWithLock(Function<SimpleLock, R> action) {
         return provider.lock(config).map(action);
     }
 
     @Override
     public void tryRunWithLock(Runnable action) {
-        tryRunWithLock(() -> {
+        tryExecuteWithLock(() -> {
             action.run();
             return null;
         });
@@ -36,7 +36,7 @@ public record SimpleDistributedLock(LockProvider provider, LockConfiguration con
 
     @Override
     public void tryRunWithLock(Consumer<SimpleLock> action) {
-        tryRunWithLock(lock -> {
+        tryExecuteWithLock(lock -> {
             action.accept(lock);
             return null;
         });
