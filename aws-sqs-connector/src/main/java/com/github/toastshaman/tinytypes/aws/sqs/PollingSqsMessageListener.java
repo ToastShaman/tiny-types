@@ -55,7 +55,7 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
 
     private List<Message> receiveMessages() {
         var request = ReceiveMessageRequest.builder()
-                .queueUrl(queueUrl.toString())
+                .queueUrl(queueUrl.asString())
                 .maxNumberOfMessages(options.maxNumberOfMessages())
                 .waitTimeSeconds(options.waitTimeSeconds())
                 .messageAttributeNames("All")
@@ -75,7 +75,7 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
                 .toList();
 
         sqs.deleteMessageBatch(DeleteMessageBatchRequest.builder()
-                .queueUrl(queueUrl.toString())
+                .queueUrl(queueUrl.asString())
                 .entries(entries)
                 .build());
     }
