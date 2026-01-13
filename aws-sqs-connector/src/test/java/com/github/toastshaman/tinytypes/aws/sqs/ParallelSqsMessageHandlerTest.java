@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.sqs.model.Message;
 
+@DisplayNameGeneration(ReplaceUnderscores.class)
 class ParallelSqsMessageHandlerTest {
 
     @Test

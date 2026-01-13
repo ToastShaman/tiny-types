@@ -6,6 +6,7 @@ import dev.failsafe.RetryPolicyBuilder;
 import java.time.Instant;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 public final class SqsMessageFilters {
 
@@ -27,5 +28,10 @@ public final class SqsMessageFilters {
 
     public static <T> DelegatingSqsMessageHandler<T> DelegatingSqsMessageHandler(SqsMessageHandler<T> handler) {
         return new DelegatingSqsMessageHandler<>(handler);
+    }
+
+    public static ForwardToDeadLetterQueueOnExceptionFilter ForwardToDeadLetterQueueOnExceptionFilter(
+            DeadLetterQueueUrl queueUrl, SqsClient sqs) {
+        return new ForwardToDeadLetterQueueOnExceptionFilter(queueUrl, sqs);
     }
 }

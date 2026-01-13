@@ -1,13 +1,12 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.DelegatingSqsMessageHandler;
+import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.ForwardToDeadLetterQueueOnExceptionFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
-import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.RetryingSqsMessageFilter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.toastshaman.tinytypes.events.Events;
 import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import net.datafaker.Faker;
@@ -24,13 +23,14 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.Message;
 
 @Testcontainers
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class PollingSqsMessageListenerTest {
+class ForwardToDeadLetterQueueOnExceptionFilterTest {
 
-    String TEST_QUEUE_NAME = "test-queue";
+    String QUEUE_NAME = "test-queue";
+
+    String DLQ_QUEUE_NAME = "test-queue-dlq";
 
     Events events = new PrintStreamEventLogger();
 
@@ -45,20 +45,22 @@ class PollingSqsMessageListenerTest {
     @BeforeEach
     void setUp() {
         try (var client = createSqsClient()) {
-            var queueUrl = createQueue(client);
-            var randomNames = someMessages();
+            List.of(QUEUE_NAME, DLQ_QUEUE_NAME).forEach(name -> createQueue(client, name));
 
-            for (String name : randomNames) {
-                client.sendMessage(b -> b.queueUrl(queueUrl.asString()).messageBody(name));
-            }
+            var queueUrl = getQueueUrl(client).asString();
+            var randomName = faker.cat().name();
+            client.sendMessage(it -> it.queueUrl(queueUrl).messageBody(randomName));
         }
     }
 
     @AfterEach
     void tearDown() {
         try (var client = createSqsClient()) {
-            var queueUrl = getQueueUrl(client);
-            client.deleteQueue(builder -> builder.queueUrl(queueUrl.asString()));
+            var queueUrl = getQueueUrl(client).asString();
+            client.deleteQueue(it -> it.queueUrl(queueUrl));
+
+            var dlqQueueUrl = getDlqQueueUrl(client).asString();
+            client.deleteQueue(it -> it.queueUrl(dlqQueueUrl));
         }
     }
 
@@ -72,31 +74,33 @@ class PollingSqsMessageListenerTest {
     }
 
     private QueueUrl getQueueUrl(SqsClient client) {
-        var response = client.getQueueUrl(builder -> builder.queueName(TEST_QUEUE_NAME));
+        var response = client.getQueueUrl(builder -> builder.queueName(QUEUE_NAME));
         return QueueUrl.parse(response.queueUrl());
     }
 
-    private QueueUrl createQueue(SqsClient client) {
-        var response = client.createQueue(builder -> builder.queueName(TEST_QUEUE_NAME));
-        return QueueUrl.parse(response.queueUrl());
+    private DeadLetterQueueUrl getDlqQueueUrl(SqsClient client) {
+        var response = client.getQueueUrl(builder -> builder.queueName(DLQ_QUEUE_NAME));
+        return DeadLetterQueueUrl.parse(response.queueUrl());
     }
 
-    private List<String> someMessages() {
-        return faker.collection(() -> faker.cat().name()).len(3, 5).generate();
+    private QueueUrl createQueue(SqsClient client, String queueName) {
+        var response = client.createQueue(builder -> builder.queueName(queueName));
+        return QueueUrl.parse(response.queueUrl());
     }
 
     @Test
-    void can_poll_messages_from_sqs() {
+    void forwards_messages_to_dlq() {
         try (var client = createSqsClient()) {
             // given
             var queueUrl = getQueueUrl(client);
 
-            var captured = new ArrayList<String>();
+            var dlqQueueUrl = getDlqQueueUrl(client);
 
             var chain = MeasuringSqsMessageFilter(events)
-                    .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                    .andThen(DelegatingSqsMessageHandler(
-                            SqsMessageHandler.fromFunction(Message::body).andThen(captured::add)));
+                    .andThen(ForwardToDeadLetterQueueOnExceptionFilter(dlqQueueUrl, client))
+                    .andThen(DelegatingSqsMessageHandler(SqsMessageHandler.fromConsumer(_ -> {
+                        throw new RuntimeException("Simulated processing failure");
+                    })));
 
             var listener = new PollingSqsMessageListener(queueUrl, client, events, options, chain);
 
@@ -104,7 +108,13 @@ class PollingSqsMessageListenerTest {
             listener.poll();
 
             // then
-            assertThat(captured).containsExactlyInAnyOrder("Max", "Misty", "Tator Tot", "Simba", "Angel");
+            var dlqMessages = client.receiveMessage(it -> it.queueUrl(dlqQueueUrl.asString())
+                            .maxNumberOfMessages(10)
+                            .messageAttributeNames("All"))
+                    .messages();
+
+            assertThat(dlqMessages).hasSize(1).first().satisfies(message -> assertThat(message.body())
+                    .isEqualTo("Lady Rainicorn"));
         }
     }
 }

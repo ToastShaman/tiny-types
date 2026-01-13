@@ -31,7 +31,7 @@ public final class ForwardToDeadLetterQueueOnExceptionFilter implements SqsMessa
                         .toList();
 
                 var build = SendMessageBatchRequest.builder()
-                        .queueUrl(queueUrl.unwrap().toString())
+                        .queueUrl(queueUrl.asString())
                         .entries(entries)
                         .build();
 

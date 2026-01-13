@@ -13,6 +13,10 @@ public final class DeadLetterQueueUrl extends URIValue {
         super(URI.create(value));
     }
 
+    public String asString() {
+        return value.toString();
+    }
+
     public static DeadLetterQueueUrl parse(String value) {
         return new DeadLetterQueueUrl(URI.create(value));
     }
