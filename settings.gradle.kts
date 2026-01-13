@@ -75,6 +75,8 @@ dependencyResolutionManagement {
             library("ulid", "com.github.f4b6a3:ulid-creator:5.2.3")
             library("awaitility", "org.awaitility:awaitility:4.3.0")
 
+            library("micrometer-core", "io.micrometer:micrometer-core:1.16.2")
+
             library("testcontainers-junit", "org.testcontainers", "testcontainers-junit-jupiter").versionRef("testcontainers")
             library("testcontainers-mongodb", "org.testcontainers", "testcontainers-mongodb").versionRef("testcontainers")
             library("testcontainers-localstack", "org.testcontainers", "testcontainers-localstack").versionRef("testcontainers")

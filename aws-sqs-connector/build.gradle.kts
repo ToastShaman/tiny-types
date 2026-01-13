@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.aws.sns)
     implementation(libs.failsafe)
     implementation(libs.jackson.databind)
+    implementation(libs.micrometer.core)
 
     testImplementation(libs.slf4j.api)
     testImplementation(libs.slf4j.simple)
