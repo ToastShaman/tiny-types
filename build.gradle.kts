@@ -41,7 +41,7 @@ subprojects {
 
     spotless {
         java {
-            palantirJavaFormat("2.80.0")
+            palantirJavaFormat("2.85.0")
             toggleOffOn()
         }
     }

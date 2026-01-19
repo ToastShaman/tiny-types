@@ -117,4 +117,70 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
                     .isEqualTo("Lady Rainicorn"));
         }
     }
+
+    @Test
+    void only_forward_when_the_filter_matches() {
+        try (var client = createSqsClient()) {
+            // given
+            var queueUrl = getQueueUrl(client);
+
+            var dlqQueueUrl = getDlqQueueUrl(client);
+
+            var chain = MeasuringSqsMessageFilter(events)
+                    .andThen(ForwardToDeadLetterQueueOnExceptionFilter(
+                            dlqQueueUrl, client, e -> e instanceof RetriesExceededException))
+                    .andThen(DelegatingSqsMessageHandler(SqsMessageHandler.fromConsumer(_ -> {
+                        throw new RetriesExceededException("Simulated retries exceeded");
+                    })));
+
+            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, chain);
+
+            // when
+            listener.poll();
+
+            // then
+            var dlqMessages = client.receiveMessage(it -> it.queueUrl(dlqQueueUrl.asString())
+                            .maxNumberOfMessages(10)
+                            .messageAttributeNames("All"))
+                    .messages();
+
+            assertThat(dlqMessages).hasSize(1).first().satisfies(message -> assertThat(message.body())
+                    .isEqualTo("Lady Rainicorn"));
+        }
+    }
+
+    @Test
+    void do_not_forward_if_filter_does_not_match() {
+        try (var client = createSqsClient()) {
+            // given
+            var queueUrl = getQueueUrl(client);
+
+            var dlqQueueUrl = getDlqQueueUrl(client);
+
+            var chain = MeasuringSqsMessageFilter(events)
+                    .andThen(ForwardToDeadLetterQueueOnExceptionFilter(dlqQueueUrl, client, e -> false))
+                    .andThen(DelegatingSqsMessageHandler(SqsMessageHandler.fromConsumer(_ -> {
+                        throw new IllegalArgumentException("Simulated retries exceeded");
+                    })));
+
+            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, chain);
+
+            // when
+            listener.poll();
+
+            // then
+            var dlqMessages = client.receiveMessage(it -> it.queueUrl(dlqQueueUrl.asString())
+                            .maxNumberOfMessages(10)
+                            .messageAttributeNames("All"))
+                    .messages();
+
+            assertThat(dlqMessages).hasSize(0);
+        }
+    }
+
+    static class RetriesExceededException extends RuntimeException {
+        public RetriesExceededException(String message) {
+            super(message);
+        }
+    }
 }

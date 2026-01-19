@@ -6,7 +6,7 @@ import software.amazon.awssdk.services.sqs.model.Message;
 
 public interface SqsMessageHandler<T> {
 
-    T handle(Message messages);
+    T handle(Message message);
 
     default <R> SqsMessageHandler<R> andThen(Function<T, R> next) {
         return message -> next.apply(handle(message));

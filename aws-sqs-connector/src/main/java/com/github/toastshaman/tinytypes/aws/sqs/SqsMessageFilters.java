@@ -5,6 +5,7 @@ import dev.failsafe.RetryPolicy;
 import dev.failsafe.RetryPolicyBuilder;
 import java.time.Instant;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
@@ -33,5 +34,10 @@ public final class SqsMessageFilters {
     public static ForwardToDeadLetterQueueOnExceptionFilter ForwardToDeadLetterQueueOnExceptionFilter(
             DeadLetterQueueUrl queueUrl, SqsClient sqs) {
         return new ForwardToDeadLetterQueueOnExceptionFilter(queueUrl, sqs);
+    }
+
+    public static ForwardToDeadLetterQueueOnExceptionFilter ForwardToDeadLetterQueueOnExceptionFilter(
+            DeadLetterQueueUrl queueUrl, SqsClient sqs, Predicate<Exception> filter) {
+        return new ForwardToDeadLetterQueueOnExceptionFilter(queueUrl, sqs, filter);
     }
 }

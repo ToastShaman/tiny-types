@@ -2,6 +2,7 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
@@ -15,9 +16,17 @@ public final class ForwardToDeadLetterQueueOnExceptionFilter implements SqsMessa
 
     private final SqsClient sqs;
 
+    private final Predicate<Exception> filter;
+
     public ForwardToDeadLetterQueueOnExceptionFilter(DeadLetterQueueUrl queueUrl, SqsClient sqs) {
+        this(queueUrl, sqs, e -> true);
+    }
+
+    public ForwardToDeadLetterQueueOnExceptionFilter(
+            DeadLetterQueueUrl queueUrl, SqsClient sqs, Predicate<Exception> filter) {
         this.queueUrl = Objects.requireNonNull(queueUrl, "queueUrl must not be null");
         this.sqs = Objects.requireNonNull(sqs, "sqs client must not be null");
+        this.filter = Objects.requireNonNull(filter, "filter must not be null");
     }
 
     @Override
@@ -26,6 +35,10 @@ public final class ForwardToDeadLetterQueueOnExceptionFilter implements SqsMessa
             try {
                 next.handle(messages);
             } catch (Exception e) {
+                if (!filter.test(e)) {
+                    throw e;
+                }
+
                 var entries = messages.stream()
                         .map(ForwardToDeadLetterQueueOnExceptionFilter::entryFrom)
                         .toList();
