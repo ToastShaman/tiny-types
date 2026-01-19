@@ -5,19 +5,18 @@ import static com.github.toastshaman.tinytypes.aws.sqs.MeasuringSqsMessageFilter
 import com.github.toastshaman.tinytypes.events.Event;
 import com.github.toastshaman.tinytypes.events.Events;
 import io.soabase.recordbuilder.core.RecordBuilder;
+import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 @SuppressWarnings("ClassCanBeRecord")
 public final class MeasuringSqsMessageFilter implements SqsMessagesFilter {
 
-    private final Supplier<Instant> clock;
+    private final Clock clock;
 
     private final Events events;
 
-    public MeasuringSqsMessageFilter(Supplier<Instant> clock, Events events) {
+    public MeasuringSqsMessageFilter(Clock clock, Events events) {
         this.clock = Objects.requireNonNull(clock, "clock must not be null");
         this.events = Objects.requireNonNull(events, "events must not be null");
     }
@@ -33,11 +32,11 @@ public final class MeasuringSqsMessageFilter implements SqsMessagesFilter {
     @Override
     public SqsMessagesHandler filter(SqsMessagesHandler next) {
         return messages -> {
-            var startTime = clock.get();
+            var startTime = clock.instant();
             try {
                 next.handle(messages);
             } finally {
-                var endTime = clock.get();
+                var endTime = clock.instant();
                 events.record(SqsMessageProcessingTime(Duration.between(startTime, endTime)));
             }
         };

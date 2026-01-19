@@ -3,10 +3,9 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 import com.github.toastshaman.tinytypes.events.Events;
 import dev.failsafe.RetryPolicy;
 import dev.failsafe.RetryPolicyBuilder;
-import java.time.Instant;
+import java.time.Clock;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 public final class SqsMessageFilters {
@@ -20,10 +19,10 @@ public final class SqsMessageFilters {
     }
 
     public static MeasuringSqsMessageFilter MeasuringSqsMessageFilter(Events events) {
-        return new MeasuringSqsMessageFilter(Instant::now, events);
+        return new MeasuringSqsMessageFilter(Clock.systemUTC(), events);
     }
 
-    public static MeasuringSqsMessageFilter MeasuringSqsMessageFilter(Supplier<Instant> clock, Events events) {
+    public static MeasuringSqsMessageFilter MeasuringSqsMessageFilter(Clock clock, Events events) {
         return new MeasuringSqsMessageFilter(clock, events);
     }
 
