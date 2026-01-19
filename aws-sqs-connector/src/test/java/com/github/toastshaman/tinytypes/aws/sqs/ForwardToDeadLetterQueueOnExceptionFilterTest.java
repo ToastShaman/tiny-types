@@ -1,12 +1,17 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
+import static com.github.toastshaman.tinytypes.aws.sqs.ForwardToDeadLetterQueueOnExceptionFilter.isInstanceOfOrHasCause;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.DelegatingSqsMessageHandler;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.ForwardToDeadLetterQueueOnExceptionFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.toastshaman.tinytypes.events.Events;
 import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
 import net.datafaker.Faker;
@@ -182,5 +187,43 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
         public RetriesExceededException(String message) {
             super(message);
         }
+    }
+
+    @Test
+    void test_IsInstanceOfOrHasCause() {
+        // Direct match
+        Exception directMatch = new IllegalArgumentException("test");
+        assertTrue(isInstanceOfOrHasCause(directMatch, IllegalArgumentException.class));
+
+        // Subclass match
+        assertTrue(isInstanceOfOrHasCause(directMatch, RuntimeException.class));
+        assertTrue(isInstanceOfOrHasCause(directMatch, Exception.class));
+
+        // No match
+        assertFalse(isInstanceOfOrHasCause(directMatch, IOException.class));
+
+        // Cause match
+        IOException cause = new IOException("root cause");
+        Exception withCause = new RuntimeException("wrapper", cause);
+        assertTrue(isInstanceOfOrHasCause(withCause, IOException.class));
+        assertTrue(isInstanceOfOrHasCause(withCause, RuntimeException.class));
+
+        // Deep cause chain
+        SQLException rootCause = new SQLException("database error");
+        IOException middleCause = new IOException("io error", rootCause);
+        Exception deepChain = new RuntimeException("wrapper", middleCause);
+        assertTrue(isInstanceOfOrHasCause(deepChain, SQLException.class));
+        assertTrue(isInstanceOfOrHasCause(deepChain, IOException.class));
+        assertFalse(isInstanceOfOrHasCause(deepChain, IllegalStateException.class));
+
+        // Null checks
+        assertFalse(isInstanceOfOrHasCause(null, Exception.class));
+        assertFalse(isInstanceOfOrHasCause(directMatch, null));
+        assertFalse(isInstanceOfOrHasCause(null, null));
+
+        // No cause
+        Exception noCause = new Exception("no cause");
+        assertTrue(isInstanceOfOrHasCause(noCause, Exception.class));
+        assertFalse(isInstanceOfOrHasCause(noCause, IOException.class));
     }
 }

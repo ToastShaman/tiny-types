@@ -1,39 +1,68 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("ClassCanBeRecord")
 public final class ObservableSqsMessageFilter implements SqsMessagesFilter {
 
-    private final QueueUrl queueUrl;
+    private final QueueName queueName;
 
     private final MeterRegistry meterRegistry;
 
-    public ObservableSqsMessageFilter(QueueUrl queueUrl, MeterRegistry meterRegistry) {
-        this.queueUrl = Objects.requireNonNull(queueUrl, "queue url must not be null");
+    public ObservableSqsMessageFilter(QueueName name, MeterRegistry meterRegistry) {
+        this.queueName = Objects.requireNonNull(name, "name must not be null");
         this.meterRegistry = Objects.requireNonNull(meterRegistry, "meter registry must not be null");
     }
 
     @Override
     public SqsMessagesHandler filter(SqsMessagesHandler next) {
-        var queueUrlAsString = queueUrl.asString();
-        var receivedMessages = meterRegistry.counter("sqs.messages.received", "queueUrl", queueUrlAsString);
-        var processingErrors = meterRegistry.counter("sqs.message.processing.errors", "queueUrl", queueUrlAsString);
-        var processingTimer = meterRegistry.timer("sqs.message.processing.time", "queueUrl", queueUrlAsString);
+        var name = queueName.unwrap();
+
+        var inFlightMessages =
+                meterRegistry.gauge("sqs.messages.in_flight", Tags.of("queue", name), new AtomicInteger(0));
 
         return messages -> {
-            receivedMessages.increment(messages.size());
-
             var sample = Timer.start(meterRegistry);
+
+            inFlightMessages.incrementAndGet();
+
             try {
                 next.handle(messages);
+
+                sample.stop(Timer.builder("sqs.message.processing")
+                        .tag("queue", name)
+                        .tag("status", "success")
+                        .register(meterRegistry));
+
+                meterRegistry
+                        .counter("sqs.messages.processed", "queue", name, "status", "success")
+                        .increment();
+
             } catch (Exception e) {
-                processingErrors.increment(messages.size());
+                sample.stop(Timer.builder("sqs.message.processing")
+                        .tag("queue", name)
+                        .tag("status", "failure")
+                        .tag("error", e.getClass().getSimpleName())
+                        .register(meterRegistry));
+
+                meterRegistry
+                        .counter(
+                                "sqs.messages.processed",
+                                "queue",
+                                name,
+                                "status",
+                                "failure",
+                                "error",
+                                e.getClass().getSimpleName())
+                        .increment();
+
                 throw e;
             } finally {
-                sample.stop(processingTimer);
+                inFlightMessages.decrementAndGet();
             }
         };
     }

@@ -3,113 +3,141 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.services.sqs.model.Message;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class ObservableSqsMessageFilterTest {
 
-    List<Message> messages = List.of(
-            Message.builder().messageId("1").body("a").build(),
-            Message.builder().messageId("2").body("b").build());
+    private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
 
-    Message message = Message.builder().messageId("1").body("a").build();
+    private final QueueName queueName = QueueName.of("test-queue");
 
     @Test
-    void increments_received_counter_by_message_count() {
-        // given
-        var registry = new SimpleMeterRegistry();
-        var queueUrl = new QueueUrl("https://example.com/test-queue");
-        var filter = new ObservableSqsMessageFilter(queueUrl, registry);
-        var filtered = filter.filter(_ -> {});
+    void should_record_successful_message_processing() {
+        var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
+        var handlerCalled = new AtomicBoolean(false);
 
-        // when
-        filtered.handle(messages);
+        SqsMessagesHandler handler = messages -> handlerCalled.set(true);
+        var decoratedHandler = filter.filter(handler);
 
-        // then
-        Counter counter = registry.counter("sqs.messages.received", "queueUrl", queueUrl.asString());
-        assertThat(counter.count()).isEqualTo(2.0);
+        decoratedHandler.handle(List.of());
+
+        assertThat(handlerCalled.get()).isTrue();
+        assertThat(meterRegistry
+                        .counter("sqs.messages.processed", "queue", "test-queue", "status", "success")
+                        .count())
+                .isEqualTo(1.0);
     }
 
     @Test
-    void records_processing_time() {
-        // given
-        var registry = new SimpleMeterRegistry();
-        var queueUrl = new QueueUrl("https://example.com/test-queue");
-        var filter = new ObservableSqsMessageFilter(queueUrl, registry);
-        var messages = List.of(message);
-        var filtered = filter.filter(_ -> {});
+    void should_record_failed_message_processing() {
+        var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
 
-        // when
-        filtered.handle(messages);
+        SqsMessagesHandler handler = messages -> {
+            throw new IllegalArgumentException("Processing failed");
+        };
+        var decoratedHandler = filter.filter(handler);
 
-        // then
-        Timer timer = registry.timer("sqs.message.processing.time", "queueUrl", queueUrl.asString());
+        assertThatThrownBy(() -> decoratedHandler.handle(List.of())).isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(meterRegistry
+                        .counter(
+                                "sqs.messages.processed",
+                                "queue",
+                                "test-queue",
+                                "status",
+                                "failure",
+                                "error",
+                                "IllegalArgumentException")
+                        .count())
+                .isEqualTo(1.0);
+    }
+
+    @Test
+    void should_track_in_flight_messages() {
+        var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
+        var inFlightDuringProcessing = new AtomicReference<Double>();
+
+        SqsMessagesHandler handler = messages -> {
+            var gauge = meterRegistry
+                    .find("sqs.messages.in_flight")
+                    .tag("queue", "test-queue")
+                    .gauge();
+            inFlightDuringProcessing.set(gauge.value());
+        };
+        var decoratedHandler = filter.filter(handler);
+
+        decoratedHandler.handle(List.of());
+
+        assertThat(inFlightDuringProcessing.get()).isEqualTo(1.0);
+        assertThat(meterRegistry
+                        .find("sqs.messages.in_flight")
+                        .tag("queue", "test-queue")
+                        .gauge()
+                        .value())
+                .isEqualTo(0.0);
+    }
+
+    @Test
+    void should_decrement_in_flight_counter_on_failure() {
+        var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
+
+        SqsMessagesHandler handler = messages -> {
+            throw new RuntimeException("Failed");
+        };
+        var decoratedHandler = filter.filter(handler);
+
+        assertThatThrownBy(() -> decoratedHandler.handle(List.of())).isInstanceOf(RuntimeException.class);
+
+        assertThat(meterRegistry
+                        .find("sqs.messages.in_flight")
+                        .tag("queue", "test-queue")
+                        .gauge()
+                        .value())
+                .isEqualTo(0.0);
+    }
+
+    @Test
+    void should_record_processing_timer_with_success_status() {
+        var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
+        var decoratedHandler = filter.filter(messages -> {});
+
+        decoratedHandler.handle(List.of());
+
+        var timer = meterRegistry
+                .find("sqs.message.processing")
+                .tag("queue", "test-queue")
+                .tag("status", "success")
+                .timer();
+
+        assertThat(timer).isNotNull();
         assertThat(timer.count()).isEqualTo(1);
-        assertThat(timer.totalTime(TimeUnit.NANOSECONDS)).isGreaterThanOrEqualTo(0);
     }
 
     @Test
-    void increments_error_counter_when_handler_throws() {
-        // given
-        var registry = new SimpleMeterRegistry();
-        var queueUrl = new QueueUrl("https://example.com/test-queue");
-        var filter = new ObservableSqsMessageFilter(queueUrl, registry);
-        var filtered = filter.filter(_ -> {
-            throw new RuntimeException("boom!");
+    void should_record_processing_timer_with_failure_status() {
+        var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
+        var decoratedHandler = filter.filter(messages -> {
+            throw new IllegalStateException("Error");
         });
 
-        // when + then
-        assertThatThrownBy(() -> filtered.handle(messages))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("boom!");
+        assertThatThrownBy(() -> decoratedHandler.handle(List.of())).isInstanceOf(IllegalStateException.class);
 
-        Counter counter = registry.counter("sqs.message.processing.errors", "queueUrl", queueUrl.asString());
-        assertThat(counter.count()).isEqualTo(2.0);
-    }
+        var timer = meterRegistry
+                .find("sqs.message.processing")
+                .tag("queue", "test-queue")
+                .tag("status", "failure")
+                .tag("error", "IllegalStateException")
+                .timer();
 
-    @Test
-    void still_records_timer_when_handler_throws() {
-        // given
-        var registry = new SimpleMeterRegistry();
-        var queueUrl = new QueueUrl("https://example.com/test-queue");
-        var filter = new ObservableSqsMessageFilter(queueUrl, registry);
-        var messages = List.of(Message.builder().messageId("1").body("a").build());
-        var filtered = filter.filter(_ -> {
-            throw new RuntimeException("fail");
-        });
-
-        // when + then
-        assertThatThrownBy(() -> filtered.handle(messages)).isInstanceOf(RuntimeException.class);
-
-        Timer timer = registry.timer("sqs.message.processing.time", "queueUrl", queueUrl.asString());
+        assertThat(timer).isNotNull();
         assertThat(timer.count()).isEqualTo(1);
-    }
-
-    @Test
-    void handles_empty_message_list() {
-        // given
-        var registry = new SimpleMeterRegistry();
-        var queueUrl = new QueueUrl("https://example.com/test-queue");
-        var filter = new ObservableSqsMessageFilter(queueUrl, registry);
-        var called = new AtomicBoolean(false);
-        var filtered = filter.filter(_ -> called.set(true));
-
-        // when
-        filtered.handle(List.of());
-
-        // then
-        assertThat(called).isTrue();
-
-        Counter counter = registry.counter("sqs.messages.received", "queueUrl", queueUrl.asString());
-        assertThat(counter.count()).isEqualTo(0.0);
     }
 }
