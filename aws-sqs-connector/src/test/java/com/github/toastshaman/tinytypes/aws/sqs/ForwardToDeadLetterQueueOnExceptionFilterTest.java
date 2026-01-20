@@ -193,37 +193,37 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
     void test_IsInstanceOfOrHasCause() {
         // Direct match
         Exception directMatch = new IllegalArgumentException("test");
-        assertTrue(isInstanceOfOrHasCause(directMatch, IllegalArgumentException.class));
+        assertTrue(isInstanceOfOrHasCause(IllegalArgumentException.class).test(directMatch));
 
         // Subclass match
-        assertTrue(isInstanceOfOrHasCause(directMatch, RuntimeException.class));
-        assertTrue(isInstanceOfOrHasCause(directMatch, Exception.class));
+        assertTrue(isInstanceOfOrHasCause(RuntimeException.class).test(directMatch));
+        assertTrue(isInstanceOfOrHasCause(Exception.class).test(directMatch));
 
         // No match
-        assertFalse(isInstanceOfOrHasCause(directMatch, IOException.class));
+        assertFalse(isInstanceOfOrHasCause(IOException.class).test(directMatch));
 
         // Cause match
         IOException cause = new IOException("root cause");
         Exception withCause = new RuntimeException("wrapper", cause);
-        assertTrue(isInstanceOfOrHasCause(withCause, IOException.class));
-        assertTrue(isInstanceOfOrHasCause(withCause, RuntimeException.class));
+        assertTrue(isInstanceOfOrHasCause(IOException.class).test(withCause));
+        assertTrue(isInstanceOfOrHasCause(RuntimeException.class).test(withCause));
 
         // Deep cause chain
         SQLException rootCause = new SQLException("database error");
         IOException middleCause = new IOException("io error", rootCause);
         Exception deepChain = new RuntimeException("wrapper", middleCause);
-        assertTrue(isInstanceOfOrHasCause(deepChain, SQLException.class));
-        assertTrue(isInstanceOfOrHasCause(deepChain, IOException.class));
-        assertFalse(isInstanceOfOrHasCause(deepChain, IllegalStateException.class));
+        assertTrue(isInstanceOfOrHasCause(SQLException.class).test(deepChain));
+        assertTrue(isInstanceOfOrHasCause(IOException.class).test(deepChain));
+        assertFalse(isInstanceOfOrHasCause(IllegalStateException.class).test(deepChain));
 
         // Null checks
-        assertFalse(isInstanceOfOrHasCause(null, Exception.class));
-        assertFalse(isInstanceOfOrHasCause(directMatch, null));
-        assertFalse(isInstanceOfOrHasCause(null, null));
+        assertFalse(isInstanceOfOrHasCause(Exception.class).test(null));
+        assertFalse(isInstanceOfOrHasCause(null).test(directMatch));
+        assertFalse(isInstanceOfOrHasCause(null).test(null));
 
         // No cause
         Exception noCause = new Exception("no cause");
-        assertTrue(isInstanceOfOrHasCause(noCause, Exception.class));
-        assertFalse(isInstanceOfOrHasCause(noCause, IOException.class));
+        assertTrue(isInstanceOfOrHasCause(Exception.class).test(noCause));
+        assertFalse(isInstanceOfOrHasCause(IOException.class).test(noCause));
     }
 }

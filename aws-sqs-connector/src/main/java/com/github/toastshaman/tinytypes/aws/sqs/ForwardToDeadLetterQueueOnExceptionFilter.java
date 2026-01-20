@@ -72,23 +72,25 @@ public final class ForwardToDeadLetterQueueOnExceptionFilter implements SqsMessa
         return request.build();
     }
 
-    public static boolean isInstanceOfOrHasCause(Throwable throwable, Class<? extends Throwable> targetClass) {
-        if (throwable == null || targetClass == null) {
-            return false;
-        }
+    public static Predicate<Exception> isInstanceOfOrHasCause(Class<? extends Throwable> targetClass) {
+        return throwable -> {
+            if (throwable == null || targetClass == null) {
+                return false;
+            }
 
-        if (targetClass.isInstance(throwable)) {
-            return true;
-        }
-
-        Throwable cause = throwable.getCause();
-        while (cause != null) {
-            if (targetClass.isInstance(cause)) {
+            if (targetClass.isInstance(throwable)) {
                 return true;
             }
-            cause = cause.getCause();
-        }
 
-        return false;
+            Throwable cause = throwable.getCause();
+            while (cause != null) {
+                if (targetClass.isInstance(cause)) {
+                    return true;
+                }
+                cause = cause.getCause();
+            }
+
+            return false;
+        };
     }
 }
