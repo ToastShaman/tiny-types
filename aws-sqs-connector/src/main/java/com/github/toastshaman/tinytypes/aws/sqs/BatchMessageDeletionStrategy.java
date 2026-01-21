@@ -8,7 +8,7 @@ import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequestEntry;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 @SuppressWarnings("ClassCanBeRecord")
-public non-sealed class BatchMessageDeletionStrategy implements MessageDeletionStrategy {
+public final class BatchMessageDeletionStrategy implements MessageDeletionStrategy {
 
     private final SqsClient sqs;
 
