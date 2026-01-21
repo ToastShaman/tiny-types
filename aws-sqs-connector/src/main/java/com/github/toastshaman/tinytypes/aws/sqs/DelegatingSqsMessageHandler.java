@@ -7,9 +7,9 @@ import software.amazon.awssdk.services.sqs.model.Message;
 @SuppressWarnings("ClassCanBeRecord")
 public final class DelegatingSqsMessageHandler<T> implements SqsMessagesHandler {
 
-    private final SqsMessageHandler<T> handler;
+    private final SqsMessageHandler<Message, T> handler;
 
-    public DelegatingSqsMessageHandler(SqsMessageHandler<T> handler) {
+    public DelegatingSqsMessageHandler(SqsMessageHandler<Message, T> handler) {
         this.handler = Objects.requireNonNull(handler, "handler must not be null");
     }
 

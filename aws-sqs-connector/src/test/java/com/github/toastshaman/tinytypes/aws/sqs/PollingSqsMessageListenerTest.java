@@ -96,7 +96,7 @@ class PollingSqsMessageListenerTest {
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
                     .andThen(DelegatingSqsMessageHandler(
-                            SqsMessageHandler.fromFunction(Message::body).andThen(captured::add)));
+                            SqsMessageHandler.of(Message::body).andThen(captured::add)));
 
             var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
 
@@ -121,7 +121,7 @@ class PollingSqsMessageListenerTest {
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
                     .andThen(DelegatingSqsMessageHandler(
-                            SqsMessageHandler.fromFunction(Message::body).andThen(captured::add)));
+                            SqsMessageHandler.of(Message::body).andThen(captured::add)));
 
             var deletionStrategy = MessageDeletionStrategy.batch(client, queueUrl);
 

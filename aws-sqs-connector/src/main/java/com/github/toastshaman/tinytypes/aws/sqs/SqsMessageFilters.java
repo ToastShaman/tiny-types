@@ -7,6 +7,7 @@ import java.time.Clock;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.Message;
 
 public final class SqsMessageFilters {
 
@@ -26,7 +27,8 @@ public final class SqsMessageFilters {
         return new MeasuringSqsMessageFilter(clock, events);
     }
 
-    public static <T> DelegatingSqsMessageHandler<T> DelegatingSqsMessageHandler(SqsMessageHandler<T> handler) {
+    public static <R> DelegatingSqsMessageHandler<R> DelegatingSqsMessageHandler(
+            SqsMessageHandler<Message, R> handler) {
         return new DelegatingSqsMessageHandler<>(handler);
     }
 

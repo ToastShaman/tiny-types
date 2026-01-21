@@ -1,25 +1,16 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
-import software.amazon.awssdk.services.sqs.model.Message;
 
-public interface SqsMessageHandler<T> {
+public interface SqsMessageHandler<T, R> {
 
-    T handle(Message message);
+    R handle(T t);
 
-    default <R> SqsMessageHandler<R> andThen(Function<T, R> next) {
-        return message -> next.apply(handle(message));
+    default <V> SqsMessageHandler<T, V> andThen(SqsMessageHandler<R, V> after) {
+        return t -> after.handle(handle(t));
     }
 
-    static <T> SqsMessageHandler<T> fromFunction(Function<Message, T> function) {
-        return function::apply;
-    }
-
-    static <T> SqsMessageHandler<T> fromConsumer(Consumer<Message> function) {
-        return message -> {
-            function.accept(message);
-            return null;
-        };
+    static <T, R> SqsMessageHandler<T, R> of(Function<T, R> f) {
+        return f::apply;
     }
 }

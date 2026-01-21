@@ -9,9 +9,9 @@ import software.amazon.awssdk.services.sqs.model.Message;
 @SuppressWarnings("ClassCanBeRecord")
 public final class ParallelSqsMessageHandler<T> implements SqsMessagesHandler {
 
-    private final SqsMessageHandler<T> handler;
+    private final SqsMessageHandler<Message, T> handler;
 
-    public ParallelSqsMessageHandler(SqsMessageHandler<T> handler) {
+    public ParallelSqsMessageHandler(SqsMessageHandler<Message, T> handler) {
         this.handler = Objects.requireNonNull(handler, "handler must not be null");
     }
 
