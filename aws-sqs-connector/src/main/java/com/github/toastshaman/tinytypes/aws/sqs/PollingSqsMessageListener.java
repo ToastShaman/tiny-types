@@ -7,8 +7,6 @@ import com.github.toastshaman.tinytypes.events.Events;
 import java.util.List;
 import java.util.Objects;
 import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequest;
-import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequestEntry;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
@@ -19,6 +17,7 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
     private final SqsClient sqs;
     private final Events events;
     private final PollingSqsMessageListenerOptions options;
+    private final MessageDeletionStrategy deletionStrategy;
     private final SqsMessagesHandler handler;
 
     public PollingSqsMessageListener(
@@ -26,11 +25,13 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
             SqsClient sqs,
             Events events,
             PollingSqsMessageListenerOptions options,
+            MessageDeletionStrategy deletionStrategy,
             SqsMessagesHandler handler) {
         this.queueUrl = Objects.requireNonNull(queueUrl, "queue url must not be null");
         this.sqs = Objects.requireNonNull(sqs, "sqs client must not be null");
         this.events = Objects.requireNonNull(events, "events must not be null");
         this.options = Objects.requireNonNull(options, "options must not be null");
+        this.deletionStrategy = Objects.requireNonNull(deletionStrategy, "deletion strategy must not be null");
         this.handler = Objects.requireNonNull(handler, "handler must not be null");
     }
 
@@ -43,9 +44,18 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
                 return;
             }
 
-            handler.handle(messages);
-
-            deleteMessages(messages);
+            switch (deletionStrategy) {
+                case BatchMessageDeletionStrategy strategy -> {
+                    handler.handle(messages);
+                    strategy.delete(messages);
+                }
+                case IndividualMessageDeletionStrategy strategy -> {
+                    for (var message : messages) {
+                        handler.handle(List.of(message));
+                        strategy.delete(message);
+                    }
+                }
+            }
 
             events.record(Success(queueUrl, messages));
         } catch (Exception exception) {
@@ -64,19 +74,5 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
         var response = sqs.receiveMessage(request);
 
         return response.messages();
-    }
-
-    private void deleteMessages(List<Message> messages) {
-        var entries = messages.stream()
-                .map(message -> DeleteMessageBatchRequestEntry.builder()
-                        .id(message.messageId())
-                        .receiptHandle(message.receiptHandle())
-                        .build())
-                .toList();
-
-        sqs.deleteMessageBatch(DeleteMessageBatchRequest.builder()
-                .queueUrl(queueUrl.asString())
-                .entries(entries)
-                .build());
     }
 }

@@ -86,7 +86,7 @@ class PollingSqsMessageListenerTest {
     }
 
     @Test
-    void can_poll_messages_from_sqs() {
+    void can_poll_messages_from_sqs_with_individual_deletion_strategy() {
         try (var client = createSqsClient()) {
             // given
             var queueUrl = getQueueUrl(client);
@@ -98,7 +98,34 @@ class PollingSqsMessageListenerTest {
                     .andThen(DelegatingSqsMessageHandler(
                             SqsMessageHandler.fromFunction(Message::body).andThen(captured::add)));
 
-            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, chain);
+            var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
+
+            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, deletionStrategy, chain);
+
+            // when
+            listener.poll();
+
+            // then
+            assertThat(captured).containsExactlyInAnyOrder("Max", "Misty", "Tator Tot", "Simba", "Angel");
+        }
+    }
+
+    @Test
+    void can_poll_messages_from_sqs_with_batch_deletion_strategy() {
+        try (var client = createSqsClient()) {
+            // given
+            var queueUrl = getQueueUrl(client);
+
+            var captured = new ArrayList<String>();
+
+            var chain = MeasuringSqsMessageFilter(events)
+                    .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
+                    .andThen(DelegatingSqsMessageHandler(
+                            SqsMessageHandler.fromFunction(Message::body).andThen(captured::add)));
+
+            var deletionStrategy = MessageDeletionStrategy.batch(client, queueUrl);
+
+            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, deletionStrategy, chain);
 
             // when
             listener.poll();

@@ -107,7 +107,9 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
                         throw new RuntimeException("Simulated processing failure");
                     })));
 
-            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, chain);
+            var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
+
+            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, deletionStrategy, chain);
 
             // when
             listener.poll();
@@ -138,7 +140,9 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
                         throw new RetriesExceededException("Simulated retries exceeded");
                     })));
 
-            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, chain);
+            var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
+
+            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, deletionStrategy, chain);
 
             // when
             listener.poll();
@@ -168,7 +172,9 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
                         throw new IllegalArgumentException("Simulated retries exceeded");
                     })));
 
-            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, chain);
+            var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
+
+            var listener = new PollingSqsMessageListener(queueUrl, client, events, options, deletionStrategy, chain);
 
             // when
             listener.poll();
