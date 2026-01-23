@@ -1,7 +1,6 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
 import static com.github.toastshaman.tinytypes.aws.sqs.ForwardToDeadLetterQueueOnExceptionFilter.isInstanceOfOrHasCause;
-import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.DelegatingSqsMessageHandler;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.ForwardToDeadLetterQueueOnExceptionFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,9 +102,9 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(ForwardToDeadLetterQueueOnExceptionFilter(dlqQueueUrl, client))
-                    .andThen(DelegatingSqsMessageHandler(SqsMessageHandler.of(_ -> {
+                    .andThen(DelegatingSqsMessageHandler.from(_ -> {
                         throw new RuntimeException("Simulated processing failure");
-                    })));
+                    }));
 
             var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
 
@@ -136,9 +135,9 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(ForwardToDeadLetterQueueOnExceptionFilter(
                             dlqQueueUrl, client, e -> e instanceof RetriesExceededException))
-                    .andThen(DelegatingSqsMessageHandler(SqsMessageHandler.of(_ -> {
+                    .andThen(DelegatingSqsMessageHandler.from(_ -> {
                         throw new RetriesExceededException("Simulated retries exceeded");
-                    })));
+                    }));
 
             var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
 
@@ -168,9 +167,9 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(ForwardToDeadLetterQueueOnExceptionFilter(dlqQueueUrl, client, e -> false))
-                    .andThen(DelegatingSqsMessageHandler(SqsMessageHandler.of(_ -> {
+                    .andThen(DelegatingSqsMessageHandler.from(_ -> {
                         throw new IllegalArgumentException("Simulated retries exceeded");
-                    })));
+                    }));
 
             var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
 

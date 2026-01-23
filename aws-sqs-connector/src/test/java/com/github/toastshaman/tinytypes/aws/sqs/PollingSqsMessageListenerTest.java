@@ -10,6 +10,7 @@ import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,7 +97,7 @@ class PollingSqsMessageListenerTest {
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
                     .andThen(DelegatingSqsMessageHandler(
-                            SqsMessageHandler.of(Message::body).andThen(captured::add)));
+                            ((Function<Message, String>) Message::body).andThen(captured::add)));
 
             var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
 
@@ -121,7 +122,7 @@ class PollingSqsMessageListenerTest {
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
                     .andThen(DelegatingSqsMessageHandler(
-                            SqsMessageHandler.of(Message::body).andThen(captured::add)));
+                            ((Function<Message, String>) Message::body).andThen(captured::add)));
 
             var deletionStrategy = MessageDeletionStrategy.batch(client, queueUrl);
 

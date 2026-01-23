@@ -1,6 +1,5 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.DelegatingSqsMessageHandler;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.RetryingSqsMessageFilter;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -10,6 +9,7 @@ import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 import net.datafaker.Faker;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -30,7 +30,7 @@ class DelegatingSqsMessageHandlerTest {
 
         var chain = MeasuringSqsMessageFilter(events)
                 .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                .andThen(DelegatingSqsMessageHandler(SqsMessageHandler.of(Message::body)
+                .andThen(DelegatingSqsMessageHandler.of(((Function<Message, String>) Message::body)
                         .andThen(JSONObject::new)
                         .andThen(it -> it.getString("message"))
                         .andThen(captured::add)));
