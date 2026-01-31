@@ -12,9 +12,10 @@ dependencies {
     implementation(libs.failsafe)
     implementation(libs.jackson.databind)
     implementation(libs.micrometer.core)
+    implementation(libs.ulid)
+    implementation(libs.slf4j.api)
 
-    testImplementation(libs.slf4j.api)
-    testImplementation(libs.slf4j.simple)
+    testImplementation(libs.slf4j.jdk14)
     testImplementation(libs.json)
     testImplementation(libs.datafaker)
     testImplementation(libs.awaitility)

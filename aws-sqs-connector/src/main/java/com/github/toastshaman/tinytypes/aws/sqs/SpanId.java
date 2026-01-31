@@ -1,0 +1,26 @@
+package com.github.toastshaman.tinytypes.aws.sqs;
+
+import com.github.f4b6a3.ulid.UlidCreator;
+import com.github.toastshaman.tinytypes.values.NonBlankStringValue;
+import java.util.Optional;
+
+public final class SpanId extends NonBlankStringValue {
+
+    public static final ScopedValue<SpanId> SPAN_ID = ScopedValue.newInstance();
+
+    public SpanId(String value) {
+        super(value);
+    }
+
+    public static SpanId of(String value) {
+        return new SpanId(value);
+    }
+
+    public static SpanId random() {
+        return new SpanId(UlidCreator.getMonotonicUlid().toLowerCase());
+    }
+
+    public static Optional<SpanId> getCurrent() {
+        return Optional.ofNullable(SPAN_ID.isBound() ? SPAN_ID.get() : null);
+    }
+}
