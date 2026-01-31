@@ -1,7 +1,5 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import static com.github.toastshaman.tinytypes.aws.sqs.TracingMdcSqsMessageHandler.RestoringMdcScope.putClosable;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -35,20 +33,23 @@ public final class TracingMdcSqsMessageHandler<T> implements SqsMessagesHandler 
             var traceId = scopedTraceId.orElseThrow(() -> new IllegalStateException("trace id must not be null"));
             var spanId = scopedSpanId.orElseThrow(() -> new IllegalStateException("span id must not be null"));
 
-            try (var ignored1 = putClosable(MDC_TRACE_ID, traceId.unwrap())) {
-                try (var ignored2 = putClosable(MDC_SPAN_ID, spanId.unwrap())) {
+            try (var ignored1 = MdcScope.with(MDC_TRACE_ID, traceId.unwrap())) {
+                try (var ignored2 = MdcScope.with(MDC_SPAN_ID, spanId.unwrap())) {
                     handler.apply(message);
                 }
             }
         }
     }
 
-    public static class RestoringMdcScope implements AutoCloseable {
+    public static class MdcScope implements AutoCloseable {
         private final String key;
         private final String previous;
 
-        public RestoringMdcScope(String key, String value) {
-            this.key = Objects.requireNonNull(key, "key must not be null");
+        public MdcScope(String key, String value) {
+            if (key == null || key.isBlank()) {
+                throw new IllegalArgumentException("key must not be null or blank");
+            }
+            this.key = key;
             this.previous = MDC.get(key);
 
             MDC.put(key, value);
@@ -63,8 +64,8 @@ public final class TracingMdcSqsMessageHandler<T> implements SqsMessagesHandler 
             }
         }
 
-        public static RestoringMdcScope putClosable(String key, String value) {
-            return new RestoringMdcScope(key, value);
+        public static MdcScope with(String key, String value) {
+            return new MdcScope(key, value);
         }
     }
 }
