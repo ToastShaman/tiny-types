@@ -17,7 +17,7 @@ public final class ParallelSqsMessageHandler<T> implements SqsMessagesHandler {
     }
 
     @Override
-    public void handle(List<Message> messages) {
+    public void accept(List<Message> messages) {
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             var futures = messages.stream()
                     .map(message -> CompletableFuture.runAsync(() -> handler.apply(message), executor))

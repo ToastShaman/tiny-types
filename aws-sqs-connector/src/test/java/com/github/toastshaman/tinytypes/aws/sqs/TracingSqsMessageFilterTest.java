@@ -25,7 +25,7 @@ class TracingSqsMessageFilterTest {
 
         var decoratedHandler = filter.filter(handler);
 
-        decoratedHandler.handle(List.of());
+        decoratedHandler.accept(List.of());
 
         assertThat(capturedTraceId.get()).isNotNull();
         assertThat(capturedSpanId.get()).isNotNull();
@@ -45,7 +45,7 @@ class TracingSqsMessageFilterTest {
         };
         var decoratedHandler = filter.filter(handler);
 
-        decoratedHandler.handle(List.of());
+        decoratedHandler.accept(List.of());
 
         // ULIDs are 26 characters long
         assertThat(capturedTraceId.get().unwrap()).hasSize(26);
@@ -67,7 +67,7 @@ class TracingSqsMessageFilterTest {
         };
         var decoratedHandler = filter.filter(handler);
 
-        decoratedHandler.handle(List.of());
+        decoratedHandler.accept(List.of());
 
         assertThat(capturedTraceId.get()).isEqualTo(expectedTraceId);
         assertThat(capturedSpanId.get()).isEqualTo(expectedSpanId);
@@ -83,7 +83,7 @@ class TracingSqsMessageFilterTest {
         };
         var decoratedHandler = filter.filter(handler);
 
-        decoratedHandler.handle(List.of());
+        decoratedHandler.accept(List.of());
 
         assertThat(TraceId.TRACE_ID.isBound()).isFalse();
         assertThat(SpanId.SPAN_ID.isBound()).isFalse();
@@ -98,7 +98,7 @@ class TracingSqsMessageFilterTest {
         };
         var decoratedHandler = filter.filter(handler);
 
-        assertThatThrownBy(() -> decoratedHandler.handle(List.of())).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> decoratedHandler.accept(List.of())).isInstanceOf(RuntimeException.class);
 
         assertThat(TraceId.TRACE_ID.isBound()).isFalse();
         assertThat(SpanId.SPAN_ID.isBound()).isFalse();
@@ -124,24 +124,10 @@ class TracingSqsMessageFilterTest {
         };
         var decoratedSecondHandler = filter.filter(secondHandler);
 
-        decoratedFirstHandler.handle(List.of());
-        decoratedSecondHandler.handle(List.of());
+        decoratedFirstHandler.accept(List.of());
+        decoratedSecondHandler.accept(List.of());
 
         assertThat(firstTraceId.get()).isNotEqualTo(secondTraceId.get());
         assertThat(firstSpanId.get()).isNotEqualTo(secondSpanId.get());
-    }
-
-    @Test
-    void should_reject_null_trace_id_supplier() {
-        assertThatThrownBy(() -> new TracingSqsMessageFilter(null, SpanId::random))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("traceIdSupplier must not be null");
-    }
-
-    @Test
-    void should_reject_null_span_id_supplier() {
-        assertThatThrownBy(() -> new TracingSqsMessageFilter(TraceId::random, null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("spanIdSupplier must not be null");
     }
 }

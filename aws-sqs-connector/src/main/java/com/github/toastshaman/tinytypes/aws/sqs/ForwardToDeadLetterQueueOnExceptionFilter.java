@@ -33,7 +33,7 @@ public final class ForwardToDeadLetterQueueOnExceptionFilter implements SqsMessa
     public SqsMessagesHandler filter(SqsMessagesHandler next) {
         return messages -> {
             try {
-                next.handle(messages);
+                next.accept(messages);
             } catch (Exception e) {
                 if (!filter.test(e)) {
                     throw e;

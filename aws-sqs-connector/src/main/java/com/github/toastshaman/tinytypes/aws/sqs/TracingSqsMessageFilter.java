@@ -1,24 +1,33 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import static com.github.toastshaman.tinytypes.aws.sqs.SpanId.SPAN_ID;
-import static com.github.toastshaman.tinytypes.aws.sqs.TraceId.TRACE_ID;
-
 import java.util.Objects;
 import java.util.function.Supplier;
 
 @SuppressWarnings("ClassCanBeRecord")
 public final class TracingSqsMessageFilter implements SqsMessagesFilter {
 
+    private final ScopedValue<TraceId> scopedTraceId;
     private final Supplier<TraceId> traceIdSupplier;
 
+    private final ScopedValue<SpanId> scopedSpanId;
     private final Supplier<SpanId> spanIdSupplier;
 
     public TracingSqsMessageFilter() {
-        this(TraceId::random, SpanId::random);
+        this(TraceId.TRACE_ID, TraceId::random, SpanId.SPAN_ID, SpanId::random);
     }
 
     public TracingSqsMessageFilter(Supplier<TraceId> traceIdSupplier, Supplier<SpanId> spanIdSupplier) {
+        this(TraceId.TRACE_ID, traceIdSupplier, SpanId.SPAN_ID, spanIdSupplier);
+    }
+
+    public TracingSqsMessageFilter(
+            ScopedValue<TraceId> scopedTraceId,
+            Supplier<TraceId> traceIdSupplier,
+            ScopedValue<SpanId> scopedSpanId,
+            Supplier<SpanId> spanIdSupplier) {
+        this.scopedTraceId = Objects.requireNonNull(scopedTraceId, "scopedTraceId must not be null");
         this.traceIdSupplier = Objects.requireNonNull(traceIdSupplier, "traceIdSupplier must not be null");
+        this.scopedSpanId = Objects.requireNonNull(scopedSpanId, "scopedSpanId must not be null");
         this.spanIdSupplier = Objects.requireNonNull(spanIdSupplier, "spanIdSupplier must not be null");
     }
 
@@ -28,7 +37,9 @@ public final class TracingSqsMessageFilter implements SqsMessagesFilter {
             var traceId = traceIdSupplier.get();
             var spanId = spanIdSupplier.get();
 
-            ScopedValue.where(TRACE_ID, traceId).where(SPAN_ID, spanId).run(() -> next.handle(messages));
+            ScopedValue.where(scopedTraceId, traceId)
+                    .where(scopedSpanId, spanId)
+                    .run(() -> next.accept(messages));
         };
     }
 }

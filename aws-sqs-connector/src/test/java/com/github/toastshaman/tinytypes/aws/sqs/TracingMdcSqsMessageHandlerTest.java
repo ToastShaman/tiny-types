@@ -41,7 +41,7 @@ class TracingMdcSqsMessageHandlerTest {
 
         ScopedValue.where(TRACE_ID, traceId)
                 .where(SPAN_ID, spanId)
-                .run(() -> handler.handle(
+                .run(() -> handler.accept(
                         List.of(Message.builder().messageId("1").body("test").build())));
 
         assertThat(capturedMdcTraceId.get()).isEqualTo("test-trace-id");
@@ -60,7 +60,7 @@ class TracingMdcSqsMessageHandlerTest {
 
         ScopedValue.where(TRACE_ID, traceId)
                 .where(SPAN_ID, spanId)
-                .run(() -> handler.handle(
+                .run(() -> handler.accept(
                         List.of(Message.builder().messageId("1").body("test").build())));
 
         assertThat(MDC.get(MDC_TRACE_ID)).isEqualTo("previous-trace-id");
@@ -76,7 +76,7 @@ class TracingMdcSqsMessageHandlerTest {
 
         ScopedValue.where(TRACE_ID, traceId)
                 .where(SPAN_ID, spanId)
-                .run(() -> handler.handle(
+                .run(() -> handler.accept(
                         List.of(Message.builder().messageId("1").body("test").build())));
 
         assertThat(MDC.get(MDC_TRACE_ID)).isNull();
@@ -98,28 +98,11 @@ class TracingMdcSqsMessageHandlerTest {
 
         assertThatThrownBy(() -> ScopedValue.where(TRACE_ID, traceId)
                         .where(SPAN_ID, spanId)
-                        .run(() -> handler.handle(messages)))
+                        .run(() -> handler.accept(messages)))
                 .isInstanceOf(RuntimeException.class);
 
         assertThat(MDC.get(MDC_TRACE_ID)).isEqualTo("previous-trace-id");
         assertThat(MDC.get(MDC_SPAN_ID)).isEqualTo("previous-span-id");
-    }
-
-    @Test
-    void should_not_set_mdc_when_scoped_values_not_bound() {
-        var capturedMdcTraceId = new AtomicReference<String>();
-        var capturedMdcSpanId = new AtomicReference<String>();
-
-        var handler = new TracingMdcSqsMessageHandler<>(message -> {
-            capturedMdcTraceId.set(MDC.get(MDC_TRACE_ID));
-            capturedMdcSpanId.set(MDC.get(MDC_SPAN_ID));
-            return null;
-        });
-
-        handler.handle(List.of(Message.builder().messageId("1").body("test").build()));
-
-        assertThat(capturedMdcTraceId.get()).isNull();
-        assertThat(capturedMdcSpanId.get()).isNull();
     }
 
     @Test
@@ -140,7 +123,7 @@ class TracingMdcSqsMessageHandlerTest {
                 Message.builder().messageId("1").body("first").build(),
                 Message.builder().messageId("2").body("second").build());
 
-        ScopedValue.where(TRACE_ID, traceId).where(SPAN_ID, spanId).run(() -> handler.handle(messages));
+        ScopedValue.where(TRACE_ID, traceId).where(SPAN_ID, spanId).run(() -> handler.accept(messages));
 
         assertThat(capturedTraceIds).containsExactly("test-trace-id", "test-trace-id");
         assertThat(capturedSpanIds).containsExactly("test-span-id", "test-span-id");

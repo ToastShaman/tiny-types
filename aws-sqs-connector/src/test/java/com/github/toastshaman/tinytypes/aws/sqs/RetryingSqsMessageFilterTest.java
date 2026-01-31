@@ -42,7 +42,7 @@ class RetryingSqsMessageFilterTest {
 
         var messages = List.of(aMessage(), aMessage(), aMessage());
 
-        chain.handle(messages);
+        chain.accept(messages);
 
         assertThat(attempt.get())
                 .describedAs("should have failed 2 times and processed 3")

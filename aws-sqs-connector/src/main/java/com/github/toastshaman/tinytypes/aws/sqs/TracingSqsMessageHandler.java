@@ -30,7 +30,7 @@ public final class TracingSqsMessageHandler<T> implements SqsMessagesHandler {
     }
 
     @Override
-    public void handle(List<Message> messages) {
+    public void accept(List<Message> messages) {
         for (Message message : messages) {
             var traceId = traceIdSupplier.get();
             var spanId = spanIdSupplier.get();

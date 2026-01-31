@@ -34,7 +34,7 @@ public final class MeasuringSqsMessageFilter implements SqsMessagesFilter {
         return messages -> {
             var startTime = clock.instant();
             try {
-                next.handle(messages);
+                next.accept(messages);
             } finally {
                 var endTime = clock.instant();
                 events.record(SqsMessageProcessingTime(Duration.between(startTime, endTime)));

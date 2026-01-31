@@ -15,22 +15,18 @@ public final class DelegatingSqsMessageHandler<T> implements SqsMessagesHandler 
         this.handler = Objects.requireNonNull(handler, "handler must not be null");
     }
 
-    public DelegatingSqsMessageHandler(Consumer<Message> handler) {
-        this(message -> {
-            handler.accept(message);
-            return null;
-        });
-    }
-
     @Override
-    public void handle(List<Message> messages) {
+    public void accept(List<Message> messages) {
         for (Message message : messages) {
             handler.apply(message);
         }
     }
 
     public static DelegatingSqsMessageHandler<Message> from(Consumer<Message> handler) {
-        return new DelegatingSqsMessageHandler<>(handler);
+        return new DelegatingSqsMessageHandler<>(message -> {
+            handler.accept(message);
+            return message;
+        });
     }
 
     public static <T> DelegatingSqsMessageHandler<T> of(Function<Message, T> handler) {

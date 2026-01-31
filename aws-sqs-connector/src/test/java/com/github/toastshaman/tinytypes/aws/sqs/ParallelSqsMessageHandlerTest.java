@@ -23,7 +23,7 @@ class ParallelSqsMessageHandlerTest {
                 Message.builder().body("msg2").build(),
                 Message.builder().body("msg3").build());
 
-        handler.handle(messages);
+        handler.accept(messages);
 
         assertThat(handledMessages).containsExactlyInAnyOrder("msg1", "msg2", "msg3");
     }

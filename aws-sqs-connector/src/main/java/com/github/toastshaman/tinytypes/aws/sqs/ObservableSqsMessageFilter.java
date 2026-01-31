@@ -31,7 +31,7 @@ public final class ObservableSqsMessageFilter implements SqsMessagesFilter {
             inFlightMessages.incrementAndGet();
 
             try {
-                next.handle(messages);
+                next.accept(messages);
 
                 sample.stop(Timer.builder("sqs.message.processing")
                         .tag("queue", name)

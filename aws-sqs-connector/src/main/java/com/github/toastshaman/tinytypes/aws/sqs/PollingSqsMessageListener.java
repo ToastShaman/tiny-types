@@ -46,12 +46,12 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
 
             switch (deletionStrategy) {
                 case BatchMessageDeletionStrategy strategy -> {
-                    handler.handle(messages);
+                    handler.accept(messages);
                     strategy.delete(messages);
                 }
                 case IndividualMessageDeletionStrategy strategy -> {
                     for (var message : messages) {
-                        handler.handle(List.of(message));
+                        handler.accept(List.of(message));
                         strategy.delete(message);
                     }
                 }

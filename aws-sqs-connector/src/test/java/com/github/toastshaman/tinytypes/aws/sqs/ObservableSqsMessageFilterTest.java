@@ -27,7 +27,7 @@ class ObservableSqsMessageFilterTest {
         SqsMessagesHandler handler = messages -> handlerCalled.set(true);
         var decoratedHandler = filter.filter(handler);
 
-        decoratedHandler.handle(List.of());
+        decoratedHandler.accept(List.of());
 
         assertThat(handlerCalled.get()).isTrue();
         assertThat(meterRegistry
@@ -45,7 +45,7 @@ class ObservableSqsMessageFilterTest {
         };
         var decoratedHandler = filter.filter(handler);
 
-        assertThatThrownBy(() -> decoratedHandler.handle(List.of())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> decoratedHandler.accept(List.of())).isInstanceOf(IllegalArgumentException.class);
 
         assertThat(meterRegistry
                         .counter(
@@ -74,7 +74,7 @@ class ObservableSqsMessageFilterTest {
         };
         var decoratedHandler = filter.filter(handler);
 
-        decoratedHandler.handle(List.of());
+        decoratedHandler.accept(List.of());
 
         assertThat(inFlightDuringProcessing.get()).isEqualTo(1.0);
         assertThat(meterRegistry
@@ -94,7 +94,7 @@ class ObservableSqsMessageFilterTest {
         };
         var decoratedHandler = filter.filter(handler);
 
-        assertThatThrownBy(() -> decoratedHandler.handle(List.of())).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> decoratedHandler.accept(List.of())).isInstanceOf(RuntimeException.class);
 
         assertThat(meterRegistry
                         .find("sqs.messages.in_flight")
@@ -109,7 +109,7 @@ class ObservableSqsMessageFilterTest {
         var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
         var decoratedHandler = filter.filter(messages -> {});
 
-        decoratedHandler.handle(List.of());
+        decoratedHandler.accept(List.of());
 
         var timer = meterRegistry
                 .find("sqs.message.processing")
@@ -128,7 +128,7 @@ class ObservableSqsMessageFilterTest {
             throw new IllegalStateException("Error");
         });
 
-        assertThatThrownBy(() -> decoratedHandler.handle(List.of())).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> decoratedHandler.accept(List.of())).isInstanceOf(IllegalStateException.class);
 
         var timer = meterRegistry
                 .find("sqs.message.processing")

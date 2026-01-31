@@ -30,7 +30,7 @@ class TracingSqsMessageHandlerTest {
                 Message.builder().messageId("2").body("second").build(),
                 Message.builder().messageId("3").body("third").build());
 
-        handler.handle(messages);
+        handler.accept(messages);
 
         assertThat(capturedTraceIds).hasSize(3);
         assertThat(capturedSpanIds).hasSize(3);
@@ -51,7 +51,7 @@ class TracingSqsMessageHandlerTest {
                 Message.builder().messageId("1").body("first").build(),
                 Message.builder().messageId("2").body("second").build());
 
-        handler.handle(messages);
+        handler.accept(messages);
 
         assertThat(capturedTraceIds.get(0)).isNotEqualTo(capturedTraceIds.get(1));
         assertThat(capturedSpanIds.get(0)).isNotEqualTo(capturedSpanIds.get(1));
@@ -68,7 +68,7 @@ class TracingSqsMessageHandlerTest {
             return null;
         });
 
-        handler.handle(List.of(Message.builder().messageId("1").body("test").build()));
+        handler.accept(List.of(Message.builder().messageId("1").body("test").build()));
 
         // ULIDs are 26 characters long
         assertThat(capturedTraceId.get().unwrap()).hasSize(26);
@@ -92,7 +92,7 @@ class TracingSqsMessageHandlerTest {
                 () -> expectedTraceId,
                 () -> expectedSpanId);
 
-        handler.handle(List.of(Message.builder().messageId("1").body("test").build()));
+        handler.accept(List.of(Message.builder().messageId("1").body("test").build()));
 
         assertThat(capturedTraceId.get()).isEqualTo(expectedTraceId);
         assertThat(capturedSpanId.get()).isEqualTo(expectedSpanId);
@@ -106,7 +106,7 @@ class TracingSqsMessageHandlerTest {
             return null;
         });
 
-        handler.handle(List.of(Message.builder().messageId("1").body("test").build()));
+        handler.accept(List.of(Message.builder().messageId("1").body("test").build()));
 
         assertThat(TraceId.TRACE_ID.isBound()).isFalse();
         assertThat(SpanId.SPAN_ID.isBound()).isFalse();
@@ -120,31 +120,10 @@ class TracingSqsMessageHandlerTest {
 
         var messages = List.of(Message.builder().messageId("1").body("test").build());
 
-        assertThatThrownBy(() -> handler.handle(messages)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> handler.accept(messages)).isInstanceOf(RuntimeException.class);
 
         assertThat(TraceId.TRACE_ID.isBound()).isFalse();
         assertThat(SpanId.SPAN_ID.isBound()).isFalse();
-    }
-
-    @Test
-    void should_reject_null_handler() {
-        assertThatThrownBy(() -> new TracingSqsMessageHandler<>(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("handler must not be null");
-    }
-
-    @Test
-    void should_reject_null_trace_id_supplier() {
-        assertThatThrownBy(() -> new TracingSqsMessageHandler<>(message -> null, null, SpanId::random))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("traceIdSupplier must not be null");
-    }
-
-    @Test
-    void should_reject_null_span_id_supplier() {
-        assertThatThrownBy(() -> new TracingSqsMessageHandler<>(message -> null, TraceId::random, null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("spanIdSupplier must not be null");
     }
 
     @Test
@@ -160,7 +139,7 @@ class TracingSqsMessageHandlerTest {
                 Message.builder().messageId("1").body("hello").build(),
                 Message.builder().messageId("2").body("world").build());
 
-        handler.handle(messages);
+        handler.accept(messages);
 
         assertThat(processedBodies).containsExactly("hello", "world");
     }

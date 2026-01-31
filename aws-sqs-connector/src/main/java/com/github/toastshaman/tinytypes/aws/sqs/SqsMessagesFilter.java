@@ -9,6 +9,6 @@ public interface SqsMessagesFilter {
     }
 
     default SqsMessagesHandler andThen(SqsMessagesHandler next) {
-        return messages -> filter(next).handle(messages);
+        return messages -> filter(next).accept(messages);
     }
 }

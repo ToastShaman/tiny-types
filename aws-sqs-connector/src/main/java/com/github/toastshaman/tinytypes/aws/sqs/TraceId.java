@@ -17,9 +17,7 @@ public final class TraceId extends NonBlankStringValue {
     }
 
     public static TraceId random() {
-        return TRACE_ID.isBound()
-                ? TRACE_ID.get()
-                : new TraceId(UlidCreator.getMonotonicUlid().toLowerCase());
+        return TRACE_ID.orElse(new TraceId(UlidCreator.getMonotonicUlid().toLowerCase()));
     }
 
     public static Optional<TraceId> getCurrent() {

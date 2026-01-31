@@ -15,6 +15,6 @@ public final class RetryingSqsMessageFilter implements SqsMessagesFilter {
 
     @Override
     public SqsMessagesHandler filter(SqsMessagesHandler next) {
-        return messages -> Failsafe.with(retryPolicy).run(() -> next.handle(messages));
+        return messages -> Failsafe.with(retryPolicy).run(() -> next.accept(messages));
     }
 }

@@ -37,7 +37,7 @@ class DelegatingSqsMessageHandlerTest {
 
         var messages = someMessages();
 
-        chain.handle(messages);
+        chain.accept(messages);
 
         assertThat(captured).containsExactly("Molly", "Max", "Daisy");
     }
