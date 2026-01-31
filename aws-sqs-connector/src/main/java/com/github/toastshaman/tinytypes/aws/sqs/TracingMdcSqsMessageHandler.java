@@ -1,5 +1,7 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
+import static com.github.toastshaman.tinytypes.aws.sqs.TracingMdcSqsMessageHandler.RestoringMdcScope.putClosable;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -33,31 +35,36 @@ public final class TracingMdcSqsMessageHandler<T> implements SqsMessagesHandler 
             var traceId = scopedTraceId.orElseThrow(() -> new IllegalStateException("trace id must not be null"));
             var spanId = scopedSpanId.orElseThrow(() -> new IllegalStateException("span id must not be null"));
 
-            try (var ignored1 = new MdcScope(MDC_TRACE_ID, traceId.unwrap())) {
-                try (var ignored2 = new MdcScope(MDC_SPAN_ID, spanId.unwrap())) {
+            try (var ignored1 = putClosable(MDC_TRACE_ID, traceId.unwrap())) {
+                try (var ignored2 = putClosable(MDC_SPAN_ID, spanId.unwrap())) {
                     handler.apply(message);
                 }
             }
         }
     }
 
-    private static class MdcScope implements AutoCloseable {
+    public static class RestoringMdcScope implements AutoCloseable {
         private final String key;
         private final String previous;
 
-        public MdcScope(String key, String value) {
-            this.key = key;
+        public RestoringMdcScope(String key, String value) {
+            this.key = Objects.requireNonNull(key, "key must not be null");
             this.previous = MDC.get(key);
+
             MDC.put(key, value);
         }
 
         @Override
         public void close() {
-            if (previous != null) {
-                MDC.put(key, previous);
-            } else {
+            if (previous == null) {
                 MDC.remove(key);
+            } else {
+                MDC.put(key, previous);
             }
+        }
+
+        public static RestoringMdcScope putClosable(String key, String value) {
+            return new RestoringMdcScope(key, value);
         }
     }
 }
