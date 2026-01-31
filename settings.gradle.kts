@@ -22,12 +22,12 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("assertj", "3.27.3")
-            version("jackson", "2.20.1")
+            version("jackson", "2.21.0")
             version("junit", "6.0.0")
             version("slf4j", "2.0.9")
             version("okhttp", "5.3.2")
-            version("aws", "2.41.1")
-            version("record-builder", "51")
+            version("aws", "2.41.19")
+            version("record-builder", "52")
             version("testcontainers", "2.0.3")
             version("spring-boot", "4.0.1")
 
@@ -45,11 +45,11 @@ dependencyResolutionManagement {
             library("spring-boot-starter-test", "org.springframework.boot", "spring-boot-starter-test").versionRef("spring-boot")
 
             library("h2", "com.h2database:h2:2.4.240")
-            library("jooq", "org.jooq:jooq:3.20.10")
+            library("jooq", "org.jooq:jooq:3.20.11")
             library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:5.6.2")
-            library("shedlock-mongodb", "net.javacrumbs.shedlock:shedlock-provider-mongo:7.5.0")
-            library("spring-jdbc", "org.springframework:spring-jdbc:7.0.2")
-            library("flyway", "org.flywaydb:flyway-core:11.20.0")
+            library("shedlock-mongodb", "net.javacrumbs.shedlock:shedlock-provider-mongo:7.6.0")
+            library("spring-jdbc", "org.springframework:spring-jdbc:7.0.3")
+            library("flyway", "org.flywaydb:flyway-core:12.00.0")
             library("hikari", "com.zaxxer:HikariCP:7.0.2")
             library("guava", "com.google.guava:guava:33.5.0-jre")
             library("jspecify", "org.jspecify:jspecify:1.0.0")
