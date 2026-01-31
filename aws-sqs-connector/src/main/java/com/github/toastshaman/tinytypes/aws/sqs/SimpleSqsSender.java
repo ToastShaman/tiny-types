@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
 @SuppressWarnings("ClassCanBeRecord")
-public final class SimpleSqsPublisher<T> implements SqsPublisher<T> {
+public final class SimpleSqsSender<T> implements SqsSender<T> {
 
     private final SqsClient client;
 
@@ -17,7 +17,7 @@ public final class SimpleSqsPublisher<T> implements SqsPublisher<T> {
 
     private final MessageSerializer<T> serializer;
 
-    public SimpleSqsPublisher(SqsClient client, QueueUrl queueUrl, MessageSerializer<T> serializer) {
+    public SimpleSqsSender(SqsClient client, QueueUrl queueUrl, MessageSerializer<T> serializer) {
         this.client = Objects.requireNonNull(client, "client must not be null");
         this.queueUrl = Objects.requireNonNull(queueUrl, "queueUrl must not be null");
         this.serializer = Objects.requireNonNull(serializer, "serializer must not be null");
@@ -25,7 +25,7 @@ public final class SimpleSqsPublisher<T> implements SqsPublisher<T> {
 
     @Override
     @SafeVarargs
-    public final void publish(T message, Map.Entry<String, MessageAttributeValue>... attributes) {
+    public final void send(T message, Map.Entry<String, MessageAttributeValue>... attributes) {
         Objects.requireNonNull(message, "message must not be null");
 
         var messageAttributes = Map.ofEntries(attributes);
@@ -37,7 +37,7 @@ public final class SimpleSqsPublisher<T> implements SqsPublisher<T> {
 
     @Override
     @SafeVarargs
-    public final void publish(List<T> messages, Map.Entry<String, MessageAttributeValue>... attributes) {
+    public final void send(List<T> messages, Map.Entry<String, MessageAttributeValue>... attributes) {
         Objects.requireNonNull(messages, "messages must not be null");
 
         var messageAttributes = Map.ofEntries(attributes);

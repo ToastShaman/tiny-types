@@ -19,7 +19,7 @@ import software.amazon.awssdk.services.sqs.model.Message;
 
 @Testcontainers
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class SimpleSqsPublisherTest {
+class SimpleSqsSenderTest {
 
     SqsHeader<String> MY_HEADER = SqsHeader.text("my-header");
 
@@ -64,15 +64,15 @@ class SimpleSqsPublisherTest {
     }
 
     @Test
-    void can_publish_messages_to_sqs() {
+    void can_send_messages_to_sqs() {
         try (var client = createSqsClient()) {
             // given
             var queueUrl = getQueueUrl(client);
 
-            var publisher = new SimpleSqsPublisher<String>(client, queueUrl, it -> it);
+            var publisher = new SimpleSqsSender<String>(client, queueUrl, it -> it);
 
             // when
-            publisher.publish("Hello World", MY_HEADER.with("HeaderValue"));
+            publisher.send("Hello World", MY_HEADER.with("HeaderValue"));
 
             // then
             var messages = client.receiveMessage(
