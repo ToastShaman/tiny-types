@@ -48,8 +48,8 @@ class TracingSqsMessageFilterTest {
         decoratedHandler.accept(List.of());
 
         // ULIDs are 26 characters long
-        assertThat(capturedTraceId.get().unwrap()).hasSize(26);
-        assertThat(capturedSpanId.get().unwrap()).hasSize(26);
+        assertThat(capturedTraceId.get().unwrap()).hasSize(16);
+        assertThat(capturedSpanId.get().unwrap()).hasSize(16);
     }
 
     @Test

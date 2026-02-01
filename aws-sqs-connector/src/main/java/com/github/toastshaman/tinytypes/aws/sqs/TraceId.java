@@ -1,7 +1,7 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import com.github.f4b6a3.ulid.UlidCreator;
 import com.github.toastshaman.tinytypes.values.NonBlankStringValue;
+import io.opentelemetry.sdk.trace.IdGenerator;
 import java.util.Optional;
 
 public final class TraceId extends NonBlankStringValue {
@@ -17,7 +17,7 @@ public final class TraceId extends NonBlankStringValue {
     }
 
     public static TraceId random() {
-        return TRACE_ID.orElse(new TraceId(UlidCreator.getMonotonicUlid().toLowerCase()));
+        return TRACE_ID.orElse(new TraceId(IdGenerator.random().generateSpanId()));
     }
 
     public static Optional<TraceId> getCurrent() {

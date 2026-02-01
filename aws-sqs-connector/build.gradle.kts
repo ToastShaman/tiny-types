@@ -12,13 +12,16 @@ dependencies {
     implementation(libs.failsafe)
     implementation(libs.jackson.databind)
     implementation(libs.micrometer.core)
-    implementation(libs.ulid)
+    implementation(libs.micrometer.tracing)
+    implementation(libs.opentelemetry.sdk)
     implementation(libs.slf4j.api)
 
     testImplementation(libs.slf4j.jdk14)
     testImplementation(libs.json)
     testImplementation(libs.datafaker)
     testImplementation(libs.awaitility)
+
+    testImplementation(libs.micrometer.tracing.testing)
 
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.localstack)

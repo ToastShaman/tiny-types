@@ -49,7 +49,7 @@ dependencyResolutionManagement {
             library("mongodb-driver-sync", "org.mongodb:mongodb-driver-sync:5.6.2")
             library("shedlock-mongodb", "net.javacrumbs.shedlock:shedlock-provider-mongo:7.6.0")
             library("spring-jdbc", "org.springframework:spring-jdbc:7.0.3")
-            library("flyway", "org.flywaydb:flyway-core:12.00.0")
+            library("flyway", "org.flywaydb:flyway-core:12.0.0")
             library("hikari", "com.zaxxer:HikariCP:7.0.2")
             library("guava", "com.google.guava:guava:33.5.0-jre")
             library("jspecify", "org.jspecify:jspecify:1.0.0")
@@ -61,6 +61,8 @@ dependencyResolutionManagement {
 
             library("aws-sqs", "software.amazon.awssdk", "sqs").versionRef("aws")
             library("aws-sns", "software.amazon.awssdk", "sns").versionRef("aws")
+
+            library("opentelemetry-sdk", "io.opentelemetry:opentelemetry-sdk:1.58.0")
 
             library("record-builder-core", "io.soabase.record-builder", "record-builder-core").versionRef("record-builder")
             library("record-builder-processor", "io.soabase.record-builder", "record-builder-processor").versionRef("record-builder")
@@ -77,6 +79,8 @@ dependencyResolutionManagement {
             library("awaitility", "org.awaitility:awaitility:4.3.0")
 
             library("micrometer-core", "io.micrometer:micrometer-core:1.16.2")
+            library("micrometer-tracing", "io.micrometer:micrometer-tracing:1.6.2")
+            library("micrometer-tracing-testing", "io.micrometer:micrometer-tracing-test:1.6.2")
 
             library("testcontainers-junit", "org.testcontainers", "testcontainers-junit-jupiter").versionRef("testcontainers")
             library("testcontainers-mongodb", "org.testcontainers", "testcontainers-mongodb").versionRef("testcontainers")

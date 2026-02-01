@@ -22,8 +22,8 @@ class SpanIdTest {
     void should_generate_random_ulid_span_id() {
         var spanId = SpanId.random();
 
-        assertThat(spanId.unwrap()).hasSize(26);
-        assertThat(spanId.unwrap()).matches("^[0-9a-z]{26}$");
+        assertThat(spanId.unwrap()).hasSize(16);
+        assertThat(spanId.unwrap()).matches("^[0-9a-z]{16}$");
     }
 
     @Test

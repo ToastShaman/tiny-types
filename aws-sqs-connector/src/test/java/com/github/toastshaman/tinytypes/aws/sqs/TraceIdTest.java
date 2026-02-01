@@ -22,8 +22,8 @@ class TraceIdTest {
     void should_generate_random_ulid_trace_id() {
         var traceId = TraceId.random();
 
-        assertThat(traceId.unwrap()).hasSize(26);
-        assertThat(traceId.unwrap()).matches("^[0-9a-z]{26}$");
+        assertThat(traceId.unwrap()).hasSize(16);
+        assertThat(traceId.unwrap()).matches("^[0-9a-z]{16}$");
     }
 
     @Test
