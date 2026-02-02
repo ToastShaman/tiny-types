@@ -6,7 +6,6 @@ import io.micrometer.core.instrument.Timer;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class ObservableSqsMessageFilter implements SqsMessagesFilter {
 
     private final QueueName queueName;

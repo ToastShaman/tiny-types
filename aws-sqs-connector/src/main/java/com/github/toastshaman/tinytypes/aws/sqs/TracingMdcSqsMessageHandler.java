@@ -6,7 +6,6 @@ import java.util.function.Function;
 import org.slf4j.MDC;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class TracingMdcSqsMessageHandler<T> implements SqsMessagesHandler {
 
     public static final String MDC_TRACE_ID = "traceId";

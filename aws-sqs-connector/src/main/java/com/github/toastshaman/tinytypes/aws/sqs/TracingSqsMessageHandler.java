@@ -9,7 +9,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class TracingSqsMessageHandler<T> implements SqsMessagesHandler {
 
     private final Function<Message, T> handler;

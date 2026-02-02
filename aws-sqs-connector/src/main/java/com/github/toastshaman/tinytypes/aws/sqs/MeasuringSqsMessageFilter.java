@@ -9,7 +9,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.Objects;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class MeasuringSqsMessageFilter implements SqsMessagesFilter {
 
     private final Clock clock;

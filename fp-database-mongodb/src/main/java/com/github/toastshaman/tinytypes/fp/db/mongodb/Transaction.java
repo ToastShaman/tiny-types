@@ -4,7 +4,6 @@ import com.mongodb.client.MongoClient;
 import java.util.Objects;
 import java.util.function.Function;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class Transaction<R> {
 
     private final Function<MongoClient, R> fn;

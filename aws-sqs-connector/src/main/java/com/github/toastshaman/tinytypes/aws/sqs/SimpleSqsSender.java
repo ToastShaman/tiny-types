@@ -8,7 +8,6 @@ import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class SimpleSqsSender<T> implements SqsSender<T> {
 
     private final SqsClient client;

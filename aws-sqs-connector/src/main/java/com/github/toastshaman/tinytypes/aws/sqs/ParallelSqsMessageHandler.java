@@ -7,7 +7,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class ParallelSqsMessageHandler<T> implements SqsMessagesHandler {
 
     private final Function<Message, T> handler;

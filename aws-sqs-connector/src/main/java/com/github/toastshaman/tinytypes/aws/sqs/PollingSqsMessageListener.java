@@ -10,7 +10,6 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class PollingSqsMessageListener implements SqsMessageListener {
 
     private final QueueUrl queueUrl;

@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class DelegatingSqsMessageHandler<T> implements SqsMessagesHandler {
 
     private final Function<Message, T> handler;

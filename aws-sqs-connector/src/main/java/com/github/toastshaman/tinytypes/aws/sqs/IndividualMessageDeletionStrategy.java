@@ -4,7 +4,6 @@ import java.util.Objects;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class IndividualMessageDeletionStrategy implements MessageDeletionStrategy {
 
     private final SqsClient sqs;

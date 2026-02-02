@@ -17,7 +17,7 @@ public final class TraceId extends NonBlankStringValue {
     }
 
     public static TraceId random() {
-        return TRACE_ID.orElse(new TraceId(IdGenerator.random().generateSpanId()));
+        return getCurrent().orElse(new TraceId(IdGenerator.random().generateTraceId()));
     }
 
     public static Optional<TraceId> getCurrent() {

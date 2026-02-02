@@ -9,7 +9,6 @@ import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sns.model.PublishBatchRequest;
 import software.amazon.awssdk.services.sns.model.PublishBatchRequestEntry;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class SimpleSnsPublisher<T> implements SnsPublisher<T> {
 
     private final SnsClient client;

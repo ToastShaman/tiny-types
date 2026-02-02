@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class MicrometerTracingSqsMessageHandler<T> implements SqsMessagesHandler {
 
     private final Tracer tracer;

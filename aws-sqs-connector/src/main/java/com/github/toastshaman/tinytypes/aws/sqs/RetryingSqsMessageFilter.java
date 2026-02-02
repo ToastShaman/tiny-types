@@ -4,7 +4,6 @@ import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
 import java.util.Objects;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class RetryingSqsMessageFilter implements SqsMessagesFilter {
 
     private final RetryPolicy<Void> retryPolicy;

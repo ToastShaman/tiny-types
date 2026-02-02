@@ -58,7 +58,7 @@ class TracingSqsMessageHandlerTest {
     }
 
     @Test
-    void should_generate_ulid_format_ids() {
+    void should_generate_trace_format_ids() {
         var capturedTraceId = new AtomicReference<TraceId>();
         var capturedSpanId = new AtomicReference<SpanId>();
 
@@ -70,8 +70,7 @@ class TracingSqsMessageHandlerTest {
 
         handler.accept(List.of(Message.builder().messageId("1").body("test").build()));
 
-        // ULIDs are 26 characters long
-        assertThat(capturedTraceId.get().unwrap()).hasSize(16);
+        assertThat(capturedTraceId.get().unwrap()).hasSize(32);
         assertThat(capturedSpanId.get().unwrap()).hasSize(16);
     }
 

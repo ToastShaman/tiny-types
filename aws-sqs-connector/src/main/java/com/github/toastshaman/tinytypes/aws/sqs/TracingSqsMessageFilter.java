@@ -3,7 +3,6 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-@SuppressWarnings("ClassCanBeRecord")
 public final class TracingSqsMessageFilter implements SqsMessagesFilter {
 
     private final ScopedValue<TraceId> scopedTraceId;
