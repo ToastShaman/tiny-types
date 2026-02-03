@@ -3,7 +3,10 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -11,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.services.sqs.model.Message;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class ObservableSqsMessageFilterTest {
@@ -21,115 +25,127 @@ class ObservableSqsMessageFilterTest {
 
     @Test
     void should_record_successful_message_processing() {
-        var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
+        // given
         var handlerCalled = new AtomicBoolean(false);
+        var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
+        var chain = filter.filter(messages -> handlerCalled.set(true));
 
-        SqsMessagesHandler handler = messages -> handlerCalled.set(true);
-        var decoratedHandler = filter.filter(handler);
+        // when
+        chain.accept(List.of(aRadomMessage(), aRadomMessage()));
 
-        decoratedHandler.accept(List.of());
+        // then
+        assertThat(handlerCalled).isTrue();
 
-        assertThat(handlerCalled.get()).isTrue();
-        assertThat(meterRegistry
-                        .counter("sqs.messages.processed", "queue", "test-queue", "status", "success")
-                        .count())
-                .isEqualTo(1.0);
+        var counter = meterRegistry
+                .find("sqs.messages.processed")
+                .tag("queue", "test-queue")
+                .tag("status", "success")
+                .counter();
+
+        assertThat(counter).isNotNull().extracting(Counter::count).isEqualTo(2.0);
     }
 
     @Test
     void should_record_failed_message_processing() {
+        // given
         var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
 
-        SqsMessagesHandler handler = messages -> {
+        var chain = filter.filter(messages -> {
             throw new IllegalArgumentException("Processing failed");
-        };
-        var decoratedHandler = filter.filter(handler);
+        });
 
-        assertThatThrownBy(() -> decoratedHandler.accept(List.of())).isInstanceOf(IllegalArgumentException.class);
+        // when
+        assertThatThrownBy(() -> chain.accept(List.of(aRadomMessage(), aRadomMessage())))
+                .isInstanceOf(IllegalArgumentException.class);
 
-        assertThat(meterRegistry
-                        .counter(
-                                "sqs.messages.processed",
-                                "queue",
-                                "test-queue",
-                                "status",
-                                "failure",
-                                "error",
-                                "IllegalArgumentException")
-                        .count())
-                .isEqualTo(1.0);
+        // then
+        var counter = meterRegistry
+                .find("sqs.messages.processed")
+                .tag("queue", "test-queue")
+                .tag("status", "failure")
+                .tag("error", "IllegalArgumentException")
+                .counter();
+
+        assertThat(counter).isNotNull().extracting(Counter::count).isEqualTo(2.0);
     }
 
     @Test
     void should_track_in_flight_messages() {
+        // given
         var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
-        var inFlightDuringProcessing = new AtomicReference<Double>();
+        var captured = new AtomicReference<Double>();
 
-        SqsMessagesHandler handler = messages -> {
-            var gauge = meterRegistry
-                    .find("sqs.messages.in_flight")
-                    .tag("queue", "test-queue")
-                    .gauge();
-            inFlightDuringProcessing.set(gauge.value());
-        };
-        var decoratedHandler = filter.filter(handler);
+        var gauge = meterRegistry
+                .find("sqs.messages.in_flight")
+                .tag("queue", "test-queue")
+                .gauge();
 
-        decoratedHandler.accept(List.of());
+        assertThat(gauge).isNotNull();
 
-        assertThat(inFlightDuringProcessing.get()).isEqualTo(1.0);
-        assertThat(meterRegistry
-                        .find("sqs.messages.in_flight")
-                        .tag("queue", "test-queue")
-                        .gauge()
-                        .value())
-                .isEqualTo(0.0);
+        var chain = filter.filter(messages -> captured.set(gauge.value()));
+
+        // when
+        chain.accept(List.of(aRadomMessage(), aRadomMessage()));
+
+        // then
+        assertThat(captured).hasValue(2.0);
+        assertThat(gauge).isNotNull().extracting(Gauge::value).isEqualTo(0.0);
     }
 
     @Test
     void should_decrement_in_flight_counter_on_failure() {
+        // given
         var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
 
-        SqsMessagesHandler handler = messages -> {
+        var chain = filter.filter(messages -> {
             throw new RuntimeException("Failed");
-        };
-        var decoratedHandler = filter.filter(handler);
+        });
 
-        assertThatThrownBy(() -> decoratedHandler.accept(List.of())).isInstanceOf(RuntimeException.class);
+        // when
+        assertThatThrownBy(() -> chain.accept(List.of())).isInstanceOf(RuntimeException.class);
 
-        assertThat(meterRegistry
-                        .find("sqs.messages.in_flight")
-                        .tag("queue", "test-queue")
-                        .gauge()
-                        .value())
-                .isEqualTo(0.0);
+        // then
+        var gauge = meterRegistry
+                .find("sqs.messages.in_flight")
+                .tag("queue", "test-queue")
+                .gauge();
+
+        assertThat(gauge).isNotNull().extracting(Gauge::value).isEqualTo(0.0);
     }
 
     @Test
     void should_record_processing_timer_with_success_status() {
+        // given
         var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
-        var decoratedHandler = filter.filter(messages -> {});
+        var chain = filter.filter(messages -> {});
 
-        decoratedHandler.accept(List.of());
+        // when
+        chain.accept(List.of(aRadomMessage(), aRadomMessage()));
 
+        // then
         var timer = meterRegistry
                 .find("sqs.message.processing")
                 .tag("queue", "test-queue")
                 .tag("status", "success")
                 .timer();
 
-        assertThat(timer).isNotNull();
-        assertThat(timer.count()).isEqualTo(1);
+        assertThat(timer).isNotNull().extracting(Timer::count).isEqualTo(1L);
     }
 
     @Test
     void should_record_processing_timer_with_failure_status() {
+        // given
         var filter = new ObservableSqsMessageFilter(queueName, meterRegistry);
-        var decoratedHandler = filter.filter(messages -> {
+
+        var chain = filter.filter(messages -> {
             throw new IllegalStateException("Error");
         });
 
-        assertThatThrownBy(() -> decoratedHandler.accept(List.of())).isInstanceOf(IllegalStateException.class);
+        // when
+        assertThatThrownBy(() -> chain.accept(List.of(aRadomMessage(), aRadomMessage())))
+                .isInstanceOf(IllegalStateException.class);
 
+        // then
         var timer = meterRegistry
                 .find("sqs.message.processing")
                 .tag("queue", "test-queue")
@@ -137,7 +153,14 @@ class ObservableSqsMessageFilterTest {
                 .tag("error", "IllegalStateException")
                 .timer();
 
-        assertThat(timer).isNotNull();
-        assertThat(timer.count()).isEqualTo(1);
+        assertThat(timer).isNotNull().extracting(Timer::count).isEqualTo(1L);
+    }
+
+    Message aRadomMessage() {
+        return Message.builder()
+                .messageId("msg-" + Math.random())
+                .body("This is a test message")
+                .receiptHandle("handle-" + Math.random())
+                .build();
     }
 }
