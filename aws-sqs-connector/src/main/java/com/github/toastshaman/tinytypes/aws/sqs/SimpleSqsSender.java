@@ -23,29 +23,25 @@ public final class SimpleSqsSender<T> implements SqsSender<T> {
     }
 
     @Override
-    @SafeVarargs
-    public final void send(T message, Map.Entry<String, MessageAttributeValue>... attributes) {
+    public void send(T message, Map<String, MessageAttributeValue> attributes) {
         Objects.requireNonNull(message, "message must not be null");
-
-        var messageAttributes = Map.ofEntries(attributes);
+        Objects.requireNonNull(attributes, "attributes must not be null");
 
         client.sendMessage(builder -> builder.queueUrl(queueUrl.unwrap().toString())
                 .messageBody(serializer.serialize(message))
-                .messageAttributes(messageAttributes));
+                .messageAttributes(attributes));
     }
 
     @Override
-    @SafeVarargs
-    public final void send(List<T> messages, Map.Entry<String, MessageAttributeValue>... attributes) {
+    public void send(List<T> messages, Map<String, MessageAttributeValue> attributes) {
         Objects.requireNonNull(messages, "messages must not be null");
-
-        var messageAttributes = Map.ofEntries(attributes);
+        Objects.requireNonNull(attributes, "attributes must not be null");
 
         var entries = messages.stream()
                 .map(serializer::serialize)
                 .map(it -> SendMessageBatchRequestEntry.builder()
                         .messageBody(it)
-                        .messageAttributes(messageAttributes)
+                        .messageAttributes(attributes)
                         .build())
                 .toList();
 

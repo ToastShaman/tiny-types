@@ -2,6 +2,7 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -72,7 +73,9 @@ class SimpleSqsSenderTest {
             var publisher = new SimpleSqsSender<String>(client, queueUrl, it -> it);
 
             // when
-            publisher.send("Hello World", MY_HEADER.with("HeaderValue"));
+            var attributes = Map.ofEntries(MY_HEADER.with("HeaderValue"));
+
+            publisher.send("Hello World", attributes);
 
             // then
             var messages = client.receiveMessage(

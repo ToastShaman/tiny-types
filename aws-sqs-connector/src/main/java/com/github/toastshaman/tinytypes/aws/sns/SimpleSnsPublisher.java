@@ -24,29 +24,25 @@ public final class SimpleSnsPublisher<T> implements SnsPublisher<T> {
     }
 
     @Override
-    @SafeVarargs
-    public final void publish(T message, Map.Entry<String, MessageAttributeValue>... attributes) {
+    public void publish(T message, Map<String, MessageAttributeValue> attributes) {
         Objects.requireNonNull(message, "message must not be null");
-
-        var messageAttributes = Map.ofEntries(attributes);
+        Objects.requireNonNull(attributes, "attributes must not be null");
 
         client.publish(builder -> builder.topicArn(topicArn.unwrap())
                 .message(serializer.serialize(message))
-                .messageAttributes(messageAttributes));
+                .messageAttributes(attributes));
     }
 
     @Override
-    @SafeVarargs
-    public final void publish(List<T> messages, Map.Entry<String, MessageAttributeValue>... attributes) {
+    public void publish(List<T> messages, Map<String, MessageAttributeValue> attributes) {
         Objects.requireNonNull(messages, "messages must not be null");
-
-        var messageAttributes = Map.ofEntries(attributes);
+        Objects.requireNonNull(attributes, "attributes must not be null");
 
         var entries = messages.stream()
                 .map(serializer::serialize)
                 .map(it -> PublishBatchRequestEntry.builder()
                         .message(it)
-                        .messageAttributes(messageAttributes)
+                        .messageAttributes(attributes)
                         .build())
                 .toList();
 

@@ -6,7 +6,15 @@ import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 
 public interface SnsPublisher<T> {
 
-    void publish(T message, Map.Entry<String, MessageAttributeValue>... attributes);
+    void publish(T message, Map<String, MessageAttributeValue> attributes);
 
-    void publish(List<T> messages, Map.Entry<String, MessageAttributeValue>... attributes);
+    default void publish(T message) {
+        publish(message, Map.of());
+    }
+
+    void publish(List<T> messages, Map<String, MessageAttributeValue> attributes);
+
+    default void publish(List<T> messages) {
+        publish(messages, Map.of());
+    }
 }

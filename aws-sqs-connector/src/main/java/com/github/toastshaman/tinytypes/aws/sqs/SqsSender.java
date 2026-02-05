@@ -6,7 +6,15 @@ import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 public interface SqsSender<T> {
 
-    void send(T message, Map.Entry<String, MessageAttributeValue>... attributes);
+    void send(T message, Map<String, MessageAttributeValue> attributes);
 
-    void send(List<T> messages, Map.Entry<String, MessageAttributeValue>... attributes);
+    default void send(T message) {
+        send(message, Map.of());
+    }
+
+    void send(List<T> messages, Map<String, MessageAttributeValue> attributes);
+
+    default void send(List<T> messages) {
+        send(messages, Map.of());
+    }
 }
