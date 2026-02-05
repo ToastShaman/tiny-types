@@ -10,11 +10,11 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class TracingSqsMessageFilterTest {
+class SimpleTracingSqsMessageFilterTest {
 
     @Test
     void should_bind_trace_id_and_span_id_during_message_processing() {
-        var filter = new TracingSqsMessageFilter();
+        var filter = new SimpleTracingSqsMessageFilter();
         var capturedTraceId = new AtomicReference<TraceId>();
         var capturedSpanId = new AtomicReference<SpanId>();
 
@@ -35,7 +35,7 @@ class TracingSqsMessageFilterTest {
 
     @Test
     void should_generate_trace_format_ids() {
-        var filter = new TracingSqsMessageFilter();
+        var filter = new SimpleTracingSqsMessageFilter();
         var capturedTraceId = new AtomicReference<TraceId>();
         var capturedSpanId = new AtomicReference<SpanId>();
 
@@ -56,7 +56,7 @@ class TracingSqsMessageFilterTest {
         var expectedTraceId = TraceId.of("custom-trace-id");
         var expectedSpanId = SpanId.of("custom-span-id");
 
-        var filter = new TracingSqsMessageFilter(() -> expectedTraceId, () -> expectedSpanId);
+        var filter = new SimpleTracingSqsMessageFilter(() -> expectedTraceId, () -> expectedSpanId);
         var capturedTraceId = new AtomicReference<TraceId>();
         var capturedSpanId = new AtomicReference<SpanId>();
 
@@ -74,7 +74,7 @@ class TracingSqsMessageFilterTest {
 
     @Test
     void should_unbind_trace_context_after_processing_completes() {
-        var filter = new TracingSqsMessageFilter();
+        var filter = new SimpleTracingSqsMessageFilter();
 
         SqsMessagesHandler handler = messages -> {
             assertThat(TraceId.TRACE_ID.isBound()).isTrue();
@@ -90,7 +90,7 @@ class TracingSqsMessageFilterTest {
 
     @Test
     void should_unbind_trace_context_even_when_handler_throws() {
-        var filter = new TracingSqsMessageFilter();
+        var filter = new SimpleTracingSqsMessageFilter();
 
         SqsMessagesHandler handler = messages -> {
             throw new RuntimeException("Processing failed");
@@ -105,7 +105,7 @@ class TracingSqsMessageFilterTest {
 
     @Test
     void should_generate_different_ids_for_each_invocation() {
-        var filter = new TracingSqsMessageFilter();
+        var filter = new SimpleTracingSqsMessageFilter();
         var firstTraceId = new AtomicReference<TraceId>();
         var firstSpanId = new AtomicReference<SpanId>();
         var secondTraceId = new AtomicReference<TraceId>();

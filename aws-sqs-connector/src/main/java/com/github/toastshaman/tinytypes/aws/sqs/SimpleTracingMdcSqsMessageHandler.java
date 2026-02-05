@@ -6,7 +6,7 @@ import java.util.function.Function;
 import org.slf4j.MDC;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-public final class TracingMdcSqsMessageHandler<T> implements SqsMessagesHandler {
+public final class SimpleTracingMdcSqsMessageHandler<T> implements SqsMessagesHandler {
 
     public static final String MDC_TRACE_ID = "traceId";
     public static final String MDC_SPAN_ID = "spanId";
@@ -15,11 +15,11 @@ public final class TracingMdcSqsMessageHandler<T> implements SqsMessagesHandler 
     private final ScopedValue<SpanId> scopedSpanId;
     private final Function<Message, T> handler;
 
-    public TracingMdcSqsMessageHandler(Function<Message, T> handler) {
+    public SimpleTracingMdcSqsMessageHandler(Function<Message, T> handler) {
         this(TraceId.TRACE_ID, SpanId.SPAN_ID, handler);
     }
 
-    public TracingMdcSqsMessageHandler(
+    public SimpleTracingMdcSqsMessageHandler(
             ScopedValue<TraceId> scopedTraceId, ScopedValue<SpanId> scopedSpanId, Function<Message, T> handler) {
         this.scopedTraceId = Objects.requireNonNull(scopedTraceId, "traceId must not be null");
         this.scopedSpanId = Objects.requireNonNull(scopedSpanId, "spanId must not be null");

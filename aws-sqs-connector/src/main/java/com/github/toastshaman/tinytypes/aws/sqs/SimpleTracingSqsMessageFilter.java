@@ -3,7 +3,7 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public final class TracingSqsMessageFilter implements SqsMessagesFilter {
+public final class SimpleTracingSqsMessageFilter implements SqsMessagesFilter {
 
     private final ScopedValue<TraceId> scopedTraceId;
     private final Supplier<TraceId> traceIdSupplier;
@@ -11,15 +11,15 @@ public final class TracingSqsMessageFilter implements SqsMessagesFilter {
     private final ScopedValue<SpanId> scopedSpanId;
     private final Supplier<SpanId> spanIdSupplier;
 
-    public TracingSqsMessageFilter() {
+    public SimpleTracingSqsMessageFilter() {
         this(TraceId.TRACE_ID, TraceId::random, SpanId.SPAN_ID, SpanId::random);
     }
 
-    public TracingSqsMessageFilter(Supplier<TraceId> traceIdSupplier, Supplier<SpanId> spanIdSupplier) {
+    public SimpleTracingSqsMessageFilter(Supplier<TraceId> traceIdSupplier, Supplier<SpanId> spanIdSupplier) {
         this(TraceId.TRACE_ID, traceIdSupplier, SpanId.SPAN_ID, spanIdSupplier);
     }
 
-    public TracingSqsMessageFilter(
+    public SimpleTracingSqsMessageFilter(
             ScopedValue<TraceId> scopedTraceId,
             Supplier<TraceId> traceIdSupplier,
             ScopedValue<SpanId> scopedSpanId,

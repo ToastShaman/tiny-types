@@ -7,16 +7,15 @@ import java.util.Map;
 import java.util.Objects;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
-public class MicrometerTracingQueueSender<T> implements SqsSender<T> {
+public class TracingSqsSender<T> implements SqsSender<T> {
 
     private final SqsSender<T> delegate;
 
     private final Tracer tracer;
 
-    private final MicrometerSqsTracingPropagator propagator;
+    private final TracingSqsHeaderPropagator propagator;
 
-    public MicrometerTracingQueueSender(
-            SqsSender<T> delegate, Tracer tracer, MicrometerSqsTracingPropagator propagator) {
+    public TracingSqsSender(SqsSender<T> delegate, Tracer tracer, TracingSqsHeaderPropagator propagator) {
         this.delegate = Objects.requireNonNull(delegate, "delegate must not be null");
         this.tracer = Objects.requireNonNull(tracer, "tracer must not be null");
         this.propagator = Objects.requireNonNull(propagator, "propagator must not be null");

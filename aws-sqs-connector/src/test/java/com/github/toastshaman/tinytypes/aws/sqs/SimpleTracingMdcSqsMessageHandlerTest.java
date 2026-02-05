@@ -1,9 +1,9 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
+import static com.github.toastshaman.tinytypes.aws.sqs.SimpleTracingMdcSqsMessageHandler.MDC_SPAN_ID;
+import static com.github.toastshaman.tinytypes.aws.sqs.SimpleTracingMdcSqsMessageHandler.MDC_TRACE_ID;
 import static com.github.toastshaman.tinytypes.aws.sqs.SpanId.SPAN_ID;
 import static com.github.toastshaman.tinytypes.aws.sqs.TraceId.TRACE_ID;
-import static com.github.toastshaman.tinytypes.aws.sqs.TracingMdcSqsMessageHandler.MDC_SPAN_ID;
-import static com.github.toastshaman.tinytypes.aws.sqs.TracingMdcSqsMessageHandler.MDC_TRACE_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -18,7 +18,7 @@ import org.slf4j.MDC;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class TracingMdcSqsMessageHandlerTest {
+class SimpleTracingMdcSqsMessageHandlerTest {
 
     @AfterEach
     void tearDown() {
@@ -30,7 +30,7 @@ class TracingMdcSqsMessageHandlerTest {
         var capturedMdcTraceId = new AtomicReference<String>();
         var capturedMdcSpanId = new AtomicReference<String>();
 
-        var handler = new TracingMdcSqsMessageHandler<>(message -> {
+        var handler = new SimpleTracingMdcSqsMessageHandler<>(message -> {
             capturedMdcTraceId.set(MDC.get(MDC_TRACE_ID));
             capturedMdcSpanId.set(MDC.get(MDC_SPAN_ID));
             return null;
@@ -53,7 +53,7 @@ class TracingMdcSqsMessageHandlerTest {
         MDC.put(MDC_TRACE_ID, "previous-trace-id");
         MDC.put(MDC_SPAN_ID, "previous-span-id");
 
-        var handler = new TracingMdcSqsMessageHandler<>(message -> null);
+        var handler = new SimpleTracingMdcSqsMessageHandler<>(message -> null);
 
         var traceId = TraceId.of("new-trace-id");
         var spanId = SpanId.of("new-span-id");
@@ -69,7 +69,7 @@ class TracingMdcSqsMessageHandlerTest {
 
     @Test
     void should_clear_mdc_when_no_previous_values_existed() {
-        var handler = new TracingMdcSqsMessageHandler<>(message -> null);
+        var handler = new SimpleTracingMdcSqsMessageHandler<>(message -> null);
 
         var traceId = TraceId.of("test-trace-id");
         var spanId = SpanId.of("test-span-id");
@@ -88,7 +88,7 @@ class TracingMdcSqsMessageHandlerTest {
         MDC.put(MDC_TRACE_ID, "previous-trace-id");
         MDC.put(MDC_SPAN_ID, "previous-span-id");
 
-        var handler = new TracingMdcSqsMessageHandler<>(message -> {
+        var handler = new SimpleTracingMdcSqsMessageHandler<>(message -> {
             throw new RuntimeException("Processing failed");
         });
 
@@ -110,7 +110,7 @@ class TracingMdcSqsMessageHandlerTest {
         var capturedTraceIds = new ArrayList<String>();
         var capturedSpanIds = new ArrayList<String>();
 
-        var handler = new TracingMdcSqsMessageHandler<>(message -> {
+        var handler = new SimpleTracingMdcSqsMessageHandler<>(message -> {
             capturedTraceIds.add(MDC.get(MDC_TRACE_ID));
             capturedSpanIds.add(MDC.get(MDC_SPAN_ID));
             return null;
@@ -131,7 +131,7 @@ class TracingMdcSqsMessageHandlerTest {
 
     @Test
     void should_reject_null_handler() {
-        assertThatThrownBy(() -> new TracingMdcSqsMessageHandler<>(null))
+        assertThatThrownBy(() -> new SimpleTracingMdcSqsMessageHandler<>(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("handler must not be null");
     }

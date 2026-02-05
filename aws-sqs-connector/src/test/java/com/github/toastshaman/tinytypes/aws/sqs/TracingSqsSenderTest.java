@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.propagation.Propagator;
+import io.micrometer.tracing.test.simple.SimpleSpanBuilder;
+import io.micrometer.tracing.test.simple.SimpleTraceContext;
 import io.micrometer.tracing.test.simple.SimpleTracer;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +17,11 @@ import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class MicrometerTracingQueueSenderTest {
+class TracingSqsSenderTest {
 
-    private final SimpleTracer tracer = new SimpleTracer();
+    SimpleTracer tracer = new SimpleTracer();
 
-    private final Propagator testPropagator = new Propagator() {
+    Propagator testPropagator = new Propagator() {
         @Override
         public List<String> fields() {
             return List.of("traceId", "spanId");
@@ -33,16 +35,26 @@ class MicrometerTracingQueueSenderTest {
 
         @Override
         public <C> Span.Builder extract(C carrier, Getter<C> getter) {
+            String traceId = getter.get(carrier, "traceId");
+            String spanId = getter.get(carrier, "spanId");
+
+            if (traceId != null && spanId != null) {
+                SimpleTraceContext context = new SimpleTraceContext();
+                context.setTraceId(traceId);
+                context.setSpanId(spanId);
+                return new SimpleSpanBuilder(tracer).setParent(context);
+            }
+
             return tracer.spanBuilder();
         }
     };
 
-    private final MicrometerSqsTracingPropagator propagator = MicrometerSqsTracingPropagator.sqs(testPropagator);
+    TracingSqsHeaderPropagator propagator = TracingSqsHeaderPropagator.with(testPropagator);
 
     @Test
     void adds_tracing_attributes_when_sending_single_message() {
         var capturingDelegate = new CapturingSqsSender<String>();
-        var sender = new MicrometerTracingQueueSender<>(capturingDelegate, tracer, propagator);
+        var sender = new TracingSqsSender<>(capturingDelegate, tracer, propagator);
 
         var span = tracer.nextSpan().name("test-span").start();
         try (var ignored = tracer.withSpan(span)) {
@@ -68,7 +80,7 @@ class MicrometerTracingQueueSenderTest {
     @Test
     void preserves_existing_attributes_when_sending_single_message() {
         var capturingDelegate = new CapturingSqsSender<String>();
-        var sender = new MicrometerTracingQueueSender<>(capturingDelegate, tracer, propagator);
+        var sender = new TracingSqsSender<>(capturingDelegate, tracer, propagator);
 
         var existingAttribute = MessageAttributeValue.builder()
                 .dataType("String")
@@ -93,7 +105,7 @@ class MicrometerTracingQueueSenderTest {
     @Test
     void adds_tracing_attributes_when_sending_batch() {
         var capturingDelegate = new CapturingSqsSender<String>();
-        var sender = new MicrometerTracingQueueSender<>(capturingDelegate, tracer, propagator);
+        var sender = new TracingSqsSender<>(capturingDelegate, tracer, propagator);
 
         var span = tracer.nextSpan().name("test-span").start();
         try (var ignored = tracer.withSpan(span)) {
@@ -115,7 +127,7 @@ class MicrometerTracingQueueSenderTest {
     @Test
     void preserves_existing_attributes_when_sending_batch() {
         var capturingDelegate = new CapturingSqsSender<String>();
-        var sender = new MicrometerTracingQueueSender<>(capturingDelegate, tracer, propagator);
+        var sender = new TracingSqsSender<>(capturingDelegate, tracer, propagator);
 
         var existingAttribute = MessageAttributeValue.builder()
                 .dataType("String")
