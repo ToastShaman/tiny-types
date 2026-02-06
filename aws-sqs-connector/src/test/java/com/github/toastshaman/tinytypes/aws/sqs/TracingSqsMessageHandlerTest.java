@@ -30,10 +30,10 @@ class TracingSqsMessageHandlerTest {
                 .andThen(new TracingSqsMessageHandler<Void>(tracer, propagator, msg -> {
                     hasBeenCalled.set(true);
 
-                    var context = tracer.currentTraceContext().context();
-
-                    assertThat(context.traceId()).isNotBlank();
-                    assertThat(context.spanId()).isNotBlank();
+                    var span = tracer.currentSpan();
+                    assertThat(span).isNotNull();
+                    assertThat(span.context().traceId()).isNotBlank();
+                    assertThat(span.context().spanId()).isNotBlank();
 
                     return null;
                 }));
@@ -50,10 +50,10 @@ class TracingSqsMessageHandlerTest {
         var handler = new TracingSqsMessageHandler<Void>(tracer, propagator, msg -> {
             hasBeenCalled.set(true);
 
-            var context = tracer.currentTraceContext().context();
-
-            assertThat(context.traceId()).isNotBlank();
-            assertThat(context.spanId()).isNotBlank();
+            var span = tracer.currentSpan();
+            assertThat(span).isNotNull();
+            assertThat(span.context().traceId()).isEqualTo("test-trace-id");
+            assertThat(span.context().spanId()).isNotBlank();
 
             return null;
         });

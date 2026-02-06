@@ -1,32 +1,32 @@
-package com.github.toastshaman.tinytypes.aws.sqs;
+package com.github.toastshaman.tinytypes.aws.sns;
 
 import io.micrometer.tracing.Tracer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 
-public class TracingSqsSender<T> implements SqsSender<T> {
+public class TracingSnsPublisher<T> implements SnsPublisher<T> {
 
-    private final SqsSender<T> delegate;
+    private final SnsPublisher<T> delegate;
 
     private final Tracer tracer;
 
-    private final TracingSqsHeaderPropagator propagator;
+    private final TracingSnsHeaderPropagator propagator;
 
-    public TracingSqsSender(SqsSender<T> delegate, Tracer tracer, TracingSqsHeaderPropagator propagator) {
+    public TracingSnsPublisher(SnsPublisher<T> delegate, Tracer tracer, TracingSnsHeaderPropagator propagator) {
         this.delegate = Objects.requireNonNull(delegate, "delegate must not be null");
         this.tracer = Objects.requireNonNull(tracer, "tracer must not be null");
         this.propagator = Objects.requireNonNull(propagator, "propagator must not be null");
     }
 
     @Override
-    public void send(T message, Map<String, MessageAttributeValue> attributes) {
+    public void publish(T message, Map<String, MessageAttributeValue> attributes) {
         var span = tracer.currentSpan();
 
         if (span == null) {
-            delegate.send(message, attributes);
+            delegate.publish(message, attributes);
             return;
         }
 
@@ -36,15 +36,15 @@ public class TracingSqsSender<T> implements SqsSender<T> {
         combined.putAll(attributes);
         combined.putAll(tracingAttributes);
 
-        delegate.send(message, combined);
+        delegate.publish(message, combined);
     }
 
     @Override
-    public void send(List<T> messages, Map<String, MessageAttributeValue> attributes) {
+    public void publish(List<T> messages, Map<String, MessageAttributeValue> attributes) {
         var span = tracer.currentSpan();
 
         if (span == null) {
-            delegate.send(messages, attributes);
+            delegate.publish(messages, attributes);
             return;
         }
 
@@ -54,6 +54,6 @@ public class TracingSqsSender<T> implements SqsSender<T> {
         combined.putAll(attributes);
         combined.putAll(tracingAttributes);
 
-        delegate.send(messages, combined);
+        delegate.publish(messages, combined);
     }
 }

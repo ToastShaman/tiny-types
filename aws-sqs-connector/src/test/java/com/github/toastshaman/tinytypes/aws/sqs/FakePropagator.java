@@ -40,8 +40,12 @@ public class FakePropagator implements Propagator {
             return new SimpleSpanBuilder(tracer).setParent(context);
         }
 
-        var context = Objects.requireNonNull(tracer.currentTraceContext().context());
+        var span = tracer.currentSpan();
 
-        return tracer.spanBuilder().setParent(context);
+        if (span != null) {
+            return tracer.spanBuilder().setParent(span.context());
+        }
+
+        return tracer.spanBuilder();
     }
 }
