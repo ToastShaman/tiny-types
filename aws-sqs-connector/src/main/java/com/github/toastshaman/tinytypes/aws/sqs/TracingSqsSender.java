@@ -1,6 +1,7 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
 import io.micrometer.tracing.Tracer;
+import io.micrometer.tracing.propagation.Propagator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +14,9 @@ public class TracingSqsSender<T> implements SqsSender<T> {
 
     private final Tracer tracer;
 
-    private final TracingHeaderPropagator<MessageAttributeValue> propagator;
+    private final Propagator propagator;
 
-    public TracingSqsSender(
-            SqsSender<T> delegate, Tracer tracer, TracingHeaderPropagator<MessageAttributeValue> propagator) {
+    public TracingSqsSender(SqsSender<T> delegate, Tracer tracer, Propagator propagator) {
         this.delegate = Objects.requireNonNull(delegate, "delegate must not be null");
         this.tracer = Objects.requireNonNull(tracer, "tracer must not be null");
         this.propagator = Objects.requireNonNull(propagator, "propagator must not be null");
@@ -39,8 +39,18 @@ public class TracingSqsSender<T> implements SqsSender<T> {
             return attributes;
         }
 
-        var combined = new HashMap<>(attributes);
-        combined.putAll(propagator.inject(span.context()));
-        return combined;
+        var carrier = new HashMap<>(attributes);
+
+        propagator.inject(span.context(), carrier, (c, key, value) -> {
+            Objects.requireNonNull(c)
+                    .put(
+                            key,
+                            MessageAttributeValue.builder()
+                                    .stringValue(value)
+                                    .dataType("String")
+                                    .build());
+        });
+
+        return Map.copyOf(carrier);
     }
 }

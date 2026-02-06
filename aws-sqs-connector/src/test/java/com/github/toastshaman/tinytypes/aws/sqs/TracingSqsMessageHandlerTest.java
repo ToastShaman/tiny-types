@@ -18,9 +18,7 @@ class TracingSqsMessageHandlerTest {
 
     SimpleTracer tracer = new SimpleTracer();
 
-    Propagator testPropagator = new FakePropagator(tracer);
-
-    TracingHeaderPropagator propagator = TracingHeaderPropagator.sqs(testPropagator);
+    Propagator propagator = new FakePropagator(tracer);
 
     @Test
     void creates_a_span_when_processing_messages() {
