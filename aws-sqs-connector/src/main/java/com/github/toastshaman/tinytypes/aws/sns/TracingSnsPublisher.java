@@ -23,37 +23,22 @@ public class TracingSnsPublisher<T> implements SnsPublisher<T> {
 
     @Override
     public void publish(T message, Map<String, MessageAttributeValue> attributes) {
-        var span = tracer.currentSpan();
-
-        if (span == null) {
-            delegate.publish(message, attributes);
-            return;
-        }
-
-        var tracingAttributes = propagator.inject(span.context());
-
-        Map<String, MessageAttributeValue> combined = new HashMap<>();
-        combined.putAll(attributes);
-        combined.putAll(tracingAttributes);
-
-        delegate.publish(message, combined);
+        delegate.publish(message, withTracingHeaders(attributes));
     }
 
     @Override
     public void publish(List<T> messages, Map<String, MessageAttributeValue> attributes) {
-        var span = tracer.currentSpan();
+        delegate.publish(messages, withTracingHeaders(attributes));
+    }
 
+    private Map<String, MessageAttributeValue> withTracingHeaders(Map<String, MessageAttributeValue> attributes) {
+        var span = tracer.currentSpan();
         if (span == null) {
-            delegate.publish(messages, attributes);
-            return;
+            return attributes;
         }
 
-        var tracingAttributes = propagator.inject(span.context());
-
-        Map<String, MessageAttributeValue> combined = new HashMap<>();
-        combined.putAll(attributes);
-        combined.putAll(tracingAttributes);
-
-        delegate.publish(messages, combined);
+        var combined = new HashMap<>(attributes);
+        combined.putAll(propagator.inject(span.context()));
+        return combined;
     }
 }

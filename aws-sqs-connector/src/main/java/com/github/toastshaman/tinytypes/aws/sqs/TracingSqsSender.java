@@ -23,37 +23,23 @@ public class TracingSqsSender<T> implements SqsSender<T> {
 
     @Override
     public void send(T message, Map<String, MessageAttributeValue> attributes) {
-        var span = tracer.currentSpan();
-
-        if (span == null) {
-            delegate.send(message, attributes);
-            return;
-        }
-
-        var tracingAttributes = propagator.inject(span.context());
-
-        Map<String, MessageAttributeValue> combined = new HashMap<>();
-        combined.putAll(attributes);
-        combined.putAll(tracingAttributes);
-
-        delegate.send(message, combined);
+        delegate.send(message, withTracingHeaders(attributes));
     }
 
     @Override
     public void send(List<T> messages, Map<String, MessageAttributeValue> attributes) {
+        delegate.send(messages, withTracingHeaders(attributes));
+    }
+
+    private Map<String, MessageAttributeValue> withTracingHeaders(Map<String, MessageAttributeValue> attributes) {
         var span = tracer.currentSpan();
 
         if (span == null) {
-            delegate.send(messages, attributes);
-            return;
+            return attributes;
         }
 
-        var tracingAttributes = propagator.inject(span.context());
-
-        Map<String, MessageAttributeValue> combined = new HashMap<>();
-        combined.putAll(attributes);
-        combined.putAll(tracingAttributes);
-
-        delegate.send(messages, combined);
+        var combined = new HashMap<>(attributes);
+        combined.putAll(propagator.inject(span.context()));
+        return combined;
     }
 }

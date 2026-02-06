@@ -14,7 +14,8 @@ public class TracingSqsMessageFilter implements SqsMessagesFilter {
     @Override
     public SqsMessagesHandler filter(SqsMessagesHandler next) {
         return messages -> {
-            var span = tracer.nextSpan().start();
+            var span = tracer.nextSpan().name("processing-sqs-messages").start();
+
             try (var ws = tracer.withSpan(span)) {
                 next.accept(messages);
             } catch (Exception e) {

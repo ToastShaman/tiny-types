@@ -25,7 +25,11 @@ public final class TracingSqsMessageHandler<T> implements SqsMessagesHandler {
     public void accept(List<Message> messages) {
         for (Message message : messages) {
             var attributes = message.messageAttributes();
-            var span = propagator.extract(attributes).start();
+
+            var span = propagator
+                    .extract(attributes)
+                    .name("processing-sqs-message")
+                    .start();
 
             try (var ws = tracer.withSpan(span)) {
                 handler.apply(message);
