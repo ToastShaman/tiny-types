@@ -39,10 +39,10 @@ public class TracingSnsPublisher<T> implements SnsPublisher<T> {
             return attributes;
         }
 
-        var carrier = new HashMap<>(attributes);
+        var allAttributes = new HashMap<>(attributes);
 
-        propagator.inject(span.context(), carrier, (c, key, value) -> {
-            Objects.requireNonNull(c)
+        propagator.inject(span.context(), allAttributes, (carrier, key, value) -> {
+            Objects.requireNonNull(carrier)
                     .put(
                             key,
                             MessageAttributeValue.builder()
@@ -51,6 +51,6 @@ public class TracingSnsPublisher<T> implements SnsPublisher<T> {
                                     .build());
         });
 
-        return Map.copyOf(carrier);
+        return Map.copyOf(allAttributes);
     }
 }
