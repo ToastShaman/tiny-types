@@ -17,6 +17,9 @@ public class TracingSqsMessageFilter implements SqsMessagesFilter {
             var span = tracer.nextSpan().start();
             try (var ws = tracer.withSpan(span)) {
                 next.accept(messages);
+            } catch (Exception e) {
+                span.error(e);
+                throw e;
             } finally {
                 span.end();
             }

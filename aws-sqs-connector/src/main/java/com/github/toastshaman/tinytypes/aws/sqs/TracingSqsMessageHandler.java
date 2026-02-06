@@ -29,6 +29,9 @@ public final class TracingSqsMessageHandler<T> implements SqsMessagesHandler {
 
             try (var ws = tracer.withSpan(span)) {
                 handler.apply(message);
+            } catch (Exception e) {
+                span.error(e);
+                throw e;
             } finally {
                 span.end();
             }
