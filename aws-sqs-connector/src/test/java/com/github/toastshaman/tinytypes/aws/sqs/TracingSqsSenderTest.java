@@ -19,7 +19,7 @@ class TracingSqsSenderTest {
 
     Propagator testPropagator = new FakePropagator(tracer);
 
-    TracingSqsHeaderPropagator propagator = TracingSqsHeaderPropagator.with(testPropagator);
+    TracingHeaderPropagator propagator = TracingHeaderPropagator.sqs(testPropagator);
 
     @Test
     void adds_tracing_attributes_when_sending_single_message() {

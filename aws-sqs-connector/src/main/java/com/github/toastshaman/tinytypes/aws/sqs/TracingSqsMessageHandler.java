@@ -10,12 +10,11 @@ public final class TracingSqsMessageHandler<T> implements SqsMessagesHandler {
 
     private final Tracer tracer;
 
-    private final TracingSqsHeaderPropagator propagator;
+    private final TracingHeaderPropagator propagator;
 
     private final Function<Message, T> handler;
 
-    public TracingSqsMessageHandler(
-            Tracer tracer, TracingSqsHeaderPropagator propagator, Function<Message, T> handler) {
+    public TracingSqsMessageHandler(Tracer tracer, TracingHeaderPropagator propagator, Function<Message, T> handler) {
         this.tracer = Objects.requireNonNull(tracer, "tracer must not be null");
         this.propagator = Objects.requireNonNull(propagator, "propagator must not be null");
         this.handler = Objects.requireNonNull(handler, "handler must not be null");

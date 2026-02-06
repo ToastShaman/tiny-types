@@ -1,7 +1,6 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.TraceContext;
@@ -18,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class TracingSqsHeaderPropagatorTest {
+class TracingHeaderPropagatorTest {
 
     private final SimpleTracer tracer = new SimpleTracer();
 
@@ -54,36 +53,8 @@ class TracingSqsHeaderPropagatorTest {
     };
 
     @Test
-    void inject_returns_empty_map() {
-        var propagator = TracingSqsHeaderPropagator.noop();
-
-        var span = tracer.nextSpan().name("test-span").start();
-        var context = span.context();
-
-        var attributes = propagator.inject(context);
-
-        assertThat(attributes).isEmpty();
-    }
-
-    @Test
-    void extract_returns_noop_span_builder() {
-        var propagator = TracingSqsHeaderPropagator.noop();
-
-        var spanBuilder = propagator.extract(Map.of());
-
-        assertThat(spanBuilder).isNotNull();
-    }
-
-    @Test
-    void throws_when_propagator_is_null() {
-        assertThatNullPointerException()
-                .isThrownBy(() -> TracingSqsHeaderPropagator.with(null))
-                .withMessage("propagator must not be null");
-    }
-
-    @Test
     void inject_adds_tracing_headers_to_message_attributes() {
-        var propagator = TracingSqsHeaderPropagator.with(testPropagator);
+        var propagator = TracingHeaderPropagator.sqs(testPropagator);
 
         var span = tracer.nextSpan().name("test-span").start();
         var context = span.context();
@@ -105,7 +76,7 @@ class TracingSqsHeaderPropagatorTest {
 
     @Test
     void extract_creates_span_builder_from_message_attributes() {
-        var propagator = TracingSqsHeaderPropagator.with(testPropagator);
+        var propagator = TracingHeaderPropagator.sqs(testPropagator);
 
         var originalSpan = tracer.nextSpan().name("original-span").start();
         var originalContext = originalSpan.context();
@@ -134,7 +105,7 @@ class TracingSqsHeaderPropagatorTest {
 
     @Test
     void extract_handles_missing_attributes_gracefully() {
-        var propagator = TracingSqsHeaderPropagator.with(testPropagator);
+        var propagator = TracingHeaderPropagator.sqs(testPropagator);
 
         Map<String, MessageAttributeValue> emptyAttributes = new HashMap<>();
 
@@ -149,7 +120,7 @@ class TracingSqsHeaderPropagatorTest {
 
     @Test
     void roundtrip_preserves_trace_context() {
-        var propagator = TracingSqsHeaderPropagator.with(testPropagator);
+        var propagator = TracingHeaderPropagator.sqs(testPropagator);
 
         // Create an original span
         var originalSpan = tracer.nextSpan().name("producer-span").start();

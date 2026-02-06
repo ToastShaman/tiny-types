@@ -13,9 +13,10 @@ public class TracingSqsSender<T> implements SqsSender<T> {
 
     private final Tracer tracer;
 
-    private final TracingSqsHeaderPropagator propagator;
+    private final TracingHeaderPropagator<MessageAttributeValue> propagator;
 
-    public TracingSqsSender(SqsSender<T> delegate, Tracer tracer, TracingSqsHeaderPropagator propagator) {
+    public TracingSqsSender(
+            SqsSender<T> delegate, Tracer tracer, TracingHeaderPropagator<MessageAttributeValue> propagator) {
         this.delegate = Objects.requireNonNull(delegate, "delegate must not be null");
         this.tracer = Objects.requireNonNull(tracer, "tracer must not be null");
         this.propagator = Objects.requireNonNull(propagator, "propagator must not be null");

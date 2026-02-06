@@ -1,5 +1,6 @@
 package com.github.toastshaman.tinytypes.aws.sns;
 
+import com.github.toastshaman.tinytypes.aws.sqs.TracingHeaderPropagator;
 import io.micrometer.tracing.Tracer;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +14,10 @@ public class TracingSnsPublisher<T> implements SnsPublisher<T> {
 
     private final Tracer tracer;
 
-    private final TracingSnsHeaderPropagator propagator;
+    private final TracingHeaderPropagator<MessageAttributeValue> propagator;
 
-    public TracingSnsPublisher(SnsPublisher<T> delegate, Tracer tracer, TracingSnsHeaderPropagator propagator) {
+    public TracingSnsPublisher(
+            SnsPublisher<T> delegate, Tracer tracer, TracingHeaderPropagator<MessageAttributeValue> propagator) {
         this.delegate = Objects.requireNonNull(delegate, "delegate must not be null");
         this.tracer = Objects.requireNonNull(tracer, "tracer must not be null");
         this.propagator = Objects.requireNonNull(propagator, "propagator must not be null");

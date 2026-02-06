@@ -20,7 +20,7 @@ class TracingSqsMessageHandlerTest {
 
     Propagator testPropagator = new FakePropagator(tracer);
 
-    TracingSqsHeaderPropagator propagator = TracingSqsHeaderPropagator.with(testPropagator);
+    TracingHeaderPropagator propagator = TracingHeaderPropagator.sqs(testPropagator);
 
     @Test
     void creates_a_span_when_processing_messages() {
@@ -53,7 +53,7 @@ class TracingSqsMessageHandlerTest {
             var span = tracer.currentSpan();
             assertThat(span).isNotNull();
             assertThat(span.context().traceId()).isEqualTo("test-trace-id");
-            assertThat(span.context().spanId()).isNotBlank();
+            assertThat(span.context().spanId()).isNotEqualTo("test-span-id");
 
             return null;
         });
