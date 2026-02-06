@@ -2,11 +2,7 @@ package com.github.toastshaman.tinytypes.aws.sqs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.micrometer.tracing.Span;
-import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.propagation.Propagator;
-import io.micrometer.tracing.test.simple.SimpleSpanBuilder;
-import io.micrometer.tracing.test.simple.SimpleTraceContext;
 import io.micrometer.tracing.test.simple.SimpleTracer;
 import java.util.List;
 import java.util.Map;
@@ -22,33 +18,7 @@ class TracingSqsMessageHandlerTest {
 
     SimpleTracer tracer = new SimpleTracer();
 
-    Propagator testPropagator = new Propagator() {
-        @Override
-        public List<String> fields() {
-            return List.of("traceId", "spanId");
-        }
-
-        @Override
-        public <C> void inject(TraceContext context, C carrier, Setter<C> setter) {
-            setter.set(carrier, "traceId", context.traceId());
-            setter.set(carrier, "spanId", context.spanId());
-        }
-
-        @Override
-        public <C> Span.Builder extract(C carrier, Getter<C> getter) {
-            String traceId = getter.get(carrier, "traceId");
-            String spanId = getter.get(carrier, "spanId");
-
-            if (traceId != null && spanId != null) {
-                SimpleTraceContext context = new SimpleTraceContext();
-                context.setTraceId(traceId);
-                context.setSpanId(spanId);
-                return new SimpleSpanBuilder(tracer).setParent(context);
-            }
-
-            return tracer.spanBuilder();
-        }
-    };
+    Propagator testPropagator = new FakePropagator(tracer);
 
     TracingSqsHeaderPropagator propagator = TracingSqsHeaderPropagator.with(testPropagator);
 
@@ -56,18 +26,19 @@ class TracingSqsMessageHandlerTest {
     void creates_a_span_when_processing_messages() {
         var hasBeenCalled = new AtomicBoolean(false);
 
-        var handler = new TracingSqsMessageHandler<Void>(tracer, propagator, msg -> {
-            hasBeenCalled.set(true);
+        var chain = new TracingSqsMessageFilter(tracer)
+                .andThen(new TracingSqsMessageHandler<Void>(tracer, propagator, msg -> {
+                    hasBeenCalled.set(true);
 
-            var context = tracer.currentTraceContext().context();
+                    var context = tracer.currentTraceContext().context();
 
-            assertThat(context.traceId()).isNotBlank();
-            assertThat(context.spanId()).isNotBlank();
+                    assertThat(context.traceId()).isNotBlank();
+                    assertThat(context.spanId()).isNotBlank();
 
-            return null;
-        });
+                    return null;
+                }));
 
-        handler.accept(List.of(Message.builder().body("hello").build()));
+        chain.accept(List.of(Message.builder().body("hello").build()));
 
         assertThat(hasBeenCalled).isTrue();
     }

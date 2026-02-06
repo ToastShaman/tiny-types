@@ -25,10 +25,7 @@ public final class TracingSqsMessageHandler<T> implements SqsMessagesHandler {
     public void accept(List<Message> messages) {
         for (Message message : messages) {
             var attributes = message.messageAttributes();
-            var hasPropagationHeaders = propagator.fields().stream().allMatch(attributes::containsKey);
-            var span = hasPropagationHeaders
-                    ? propagator.extract(attributes).start()
-                    : tracer.nextSpan().start();
+            var span = propagator.extract(attributes).start();
 
             try (var ws = tracer.withSpan(span)) {
                 handler.apply(message);

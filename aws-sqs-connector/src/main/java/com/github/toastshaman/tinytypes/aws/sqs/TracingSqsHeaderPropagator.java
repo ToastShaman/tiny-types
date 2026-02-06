@@ -4,14 +4,11 @@ import io.micrometer.tracing.Span;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.propagation.Propagator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 public interface TracingSqsHeaderPropagator {
-
-    List<String> fields();
 
     Map<String, MessageAttributeValue> inject(TraceContext context);
 
@@ -25,11 +22,6 @@ public interface TracingSqsHeaderPropagator {
         Objects.requireNonNull(propagator, "propagator must not be null");
 
         return new TracingSqsHeaderPropagator() {
-            @Override
-            public List<String> fields() {
-                return propagator.fields();
-            }
-
             @Override
             public Map<String, MessageAttributeValue> inject(TraceContext context) {
                 Map<String, MessageAttributeValue> attributes = new HashMap<>();
