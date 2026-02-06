@@ -51,6 +51,7 @@ class TracingSqsMessageHandlerTest {
             var span = tracer.currentSpan();
             assertThat(span).isNotNull();
             assertThat(span.context().traceId()).isEqualTo("test-trace-id");
+            assertThat(span.context().parentId()).isEqualTo("test-span-id");
             assertThat(span.context().spanId()).isNotEqualTo("test-span-id");
 
             return null;
