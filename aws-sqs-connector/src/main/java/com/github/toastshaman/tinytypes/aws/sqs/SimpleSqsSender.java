@@ -28,7 +28,7 @@ public final class SimpleSqsSender<T> implements SqsSender<T> {
         Objects.requireNonNull(attributes, "attributes must not be null");
 
         client.sendMessage(builder -> builder.queueUrl(queueUrl.unwrap().toString())
-                .messageBody(serializer.serialize(message))
+                .messageBody(serializer.apply(message))
                 .messageAttributes(attributes));
     }
 
@@ -38,7 +38,7 @@ public final class SimpleSqsSender<T> implements SqsSender<T> {
         Objects.requireNonNull(attributes, "attributes must not be null");
 
         var entries = messages.stream()
-                .map(serializer::serialize)
+                .map(serializer)
                 .map(it -> SendMessageBatchRequestEntry.builder()
                         .messageBody(it)
                         .messageAttributes(attributes)

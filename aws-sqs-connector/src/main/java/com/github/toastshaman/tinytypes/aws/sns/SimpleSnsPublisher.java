@@ -29,7 +29,7 @@ public final class SimpleSnsPublisher<T> implements SnsPublisher<T> {
         Objects.requireNonNull(attributes, "attributes must not be null");
 
         client.publish(builder -> builder.topicArn(topicArn.unwrap())
-                .message(serializer.serialize(message))
+                .message(serializer.apply(message))
                 .messageAttributes(attributes));
     }
 
@@ -39,7 +39,7 @@ public final class SimpleSnsPublisher<T> implements SnsPublisher<T> {
         Objects.requireNonNull(attributes, "attributes must not be null");
 
         var entries = messages.stream()
-                .map(serializer::serialize)
+                .map(serializer)
                 .map(it -> PublishBatchRequestEntry.builder()
                         .message(it)
                         .messageAttributes(attributes)
