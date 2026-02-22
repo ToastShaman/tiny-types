@@ -1,6 +1,5 @@
 package com.github.toastshaman.tinytypes.aws.sqs;
 
-import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.DelegatingSqsMessageHandler;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.MeasuringSqsMessageFilter;
 import static com.github.toastshaman.tinytypes.aws.sqs.SqsMessageFilters.RetryingSqsMessageFilter;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,7 +95,7 @@ class PollingSqsMessageListenerTest {
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                    .andThen(DelegatingSqsMessageHandler(
+                    .andThen(SqsMessagesHandler.forEach(
                             ((Function<Message, String>) Message::body).andThen(captured::add)));
 
             var deletionStrategy = MessageDeletionStrategy.individual(client, queueUrl);
@@ -121,7 +120,7 @@ class PollingSqsMessageListenerTest {
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(RetryingSqsMessageFilter(builder -> builder.withMaxRetries(3)))
-                    .andThen(DelegatingSqsMessageHandler(
+                    .andThen(SqsMessagesHandler.forEach(
                             ((Function<Message, String>) Message::body).andThen(captured::add)));
 
             var deletionStrategy = MessageDeletionStrategy.batch(client, queueUrl);

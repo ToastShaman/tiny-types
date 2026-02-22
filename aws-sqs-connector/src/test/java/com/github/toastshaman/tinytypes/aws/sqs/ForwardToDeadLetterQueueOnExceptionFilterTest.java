@@ -102,7 +102,7 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(ForwardToDeadLetterQueueOnExceptionFilter(dlqQueueUrl, client))
-                    .andThen(DelegatingSqsMessageHandler.from(_ -> {
+                    .andThen(SqsMessagesHandler.forEach(_ -> {
                         throw new RuntimeException("Simulated processing failure");
                     }));
 
@@ -135,7 +135,7 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(ForwardToDeadLetterQueueOnExceptionFilter(
                             dlqQueueUrl, client, e -> e instanceof RetriesExceededException))
-                    .andThen(DelegatingSqsMessageHandler.from(_ -> {
+                    .andThen(SqsMessagesHandler.forEach(_ -> {
                         throw new RetriesExceededException("Simulated retries exceeded");
                     }));
 
@@ -167,7 +167,7 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
 
             var chain = MeasuringSqsMessageFilter(events)
                     .andThen(ForwardToDeadLetterQueueOnExceptionFilter(dlqQueueUrl, client, e -> false))
-                    .andThen(DelegatingSqsMessageHandler.from(_ -> {
+                    .andThen(SqsMessagesHandler.forEach(_ -> {
                         throw new IllegalArgumentException("Simulated retries exceeded");
                     }));
 

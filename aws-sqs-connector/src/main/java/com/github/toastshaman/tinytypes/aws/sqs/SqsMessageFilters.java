@@ -5,10 +5,8 @@ import dev.failsafe.RetryPolicy;
 import dev.failsafe.RetryPolicyBuilder;
 import java.time.Clock;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.Message;
 
 public final class SqsMessageFilters {
 
@@ -26,10 +24,6 @@ public final class SqsMessageFilters {
 
     public static MeasuringSqsMessageFilter MeasuringSqsMessageFilter(Clock clock, Events events) {
         return new MeasuringSqsMessageFilter(clock, events);
-    }
-
-    public static <R> DelegatingSqsMessageHandler<R> DelegatingSqsMessageHandler(Function<Message, R> handler) {
-        return new DelegatingSqsMessageHandler<>(handler);
     }
 
     public static ForwardToDeadLetterQueueOnExceptionFilter ForwardToDeadLetterQueueOnExceptionFilter(
