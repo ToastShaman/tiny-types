@@ -55,6 +55,17 @@ public record SqsHeader<T>(
                 value -> Instant.parse(value.stringValue()));
     }
 
+    public static <E extends Enum<E>> SqsHeader<E> enumOf(String name, Class<E> enumClass) {
+        Objects.requireNonNull(enumClass, "enumClass must not be null");
+        return new SqsHeader<>(
+                name,
+                value -> MessageAttributeValue.builder()
+                        .dataType("String")
+                        .stringValue(value.name())
+                        .build(),
+                attr -> Enum.valueOf(enumClass, attr.stringValue()));
+    }
+
     public static <T1, T2, R> Function<Message, R> zip(
             SqsHeader<T1> h1, SqsHeader<T2> h2, Function2<T1, T2, R> mapper) {
         return m -> {

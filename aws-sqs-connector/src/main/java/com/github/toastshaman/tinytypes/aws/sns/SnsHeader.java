@@ -43,4 +43,15 @@ public record SnsHeader<T>(
                         .build(),
                 software.amazon.awssdk.services.sqs.model.MessageAttributeValue::stringValue);
     }
+
+    public static <E extends Enum<E>> SnsHeader<E> enumOf(String name, Class<E> enumClass) {
+        Objects.requireNonNull(enumClass, "enumClass must not be null");
+        return new SnsHeader<>(
+                name,
+                value -> MessageAttributeValue.builder()
+                        .dataType("String")
+                        .stringValue(value.name())
+                        .build(),
+                attr -> Enum.valueOf(enumClass, attr.stringValue()));
+    }
 }

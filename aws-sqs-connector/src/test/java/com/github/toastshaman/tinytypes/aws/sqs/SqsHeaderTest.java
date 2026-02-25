@@ -65,4 +65,34 @@ class SqsHeaderTest {
             assertThat(extractedValue).isEqualTo("2024-06-01T12:34:56Z");
         }
     }
+
+    @Test
+    void returns_the_encoded__enum_value() {
+        enum X {
+            A,
+            B,
+            C
+        }
+
+        var header = SqsHeader.enumOf("x-enum-header", X.class);
+
+        var entry = header.with(X.B);
+
+        assertThat(entry.getKey()).isEqualTo("x-enum-header");
+        assertThat(entry.getValue().stringValue()).isEqualTo("B");
+        assertThat(entry.getValue().dataType()).isEqualTo("String");
+
+        var message = Message.builder()
+                .messageAttributes(Map.ofEntries(Map.entry(
+                        header.name(),
+                        MessageAttributeValue.builder()
+                                .dataType("String")
+                                .stringValue("C")
+                                .build())))
+                .build();
+
+        var extractedValue = header.from(message);
+
+        assertThat(extractedValue).isEqualTo(X.C);
+    }
 }

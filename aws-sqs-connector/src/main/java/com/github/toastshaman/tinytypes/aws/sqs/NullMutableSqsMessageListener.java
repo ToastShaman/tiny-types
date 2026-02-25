@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-
 import software.amazon.awssdk.services.sqs.model.Message;
 
 public class NullMutableSqsMessageListener implements SqsMessageListener {

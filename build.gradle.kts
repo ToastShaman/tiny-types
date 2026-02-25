@@ -1,6 +1,7 @@
 plugins {
     java
     `java-library`
+    `java-test-fixtures`
     `maven-publish`
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.github.ben-manes.versions") version "0.53.0"
@@ -10,6 +11,7 @@ plugins {
 subprojects {
     apply(plugin = "java")
     apply(plugin = "java-library")
+    apply(plugin = "java-test-fixtures")
     apply(plugin = "maven-publish")
     apply(plugin = "com.adarshr.test-logger")
     apply(plugin = "com.github.ben-manes.versions")
