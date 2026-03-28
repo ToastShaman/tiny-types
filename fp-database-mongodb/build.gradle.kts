@@ -2,6 +2,10 @@ dependencies {
     api(libs.vavr)
     api(libs.mongodb.driver.sync)
     api(libs.shedlock.mongodb)
+    api(libs.record.builder.core)
+
+    annotationProcessor(libs.record.builder.processor)
+    testAnnotationProcessor(libs.record.builder.processor)
 
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.assertj.core)
