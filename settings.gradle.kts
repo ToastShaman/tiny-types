@@ -84,7 +84,6 @@ dependencyResolutionManagement {
 
             library("testcontainers-junit", "org.testcontainers", "testcontainers-junit-jupiter").versionRef("testcontainers")
             library("testcontainers-mongodb", "org.testcontainers", "testcontainers-mongodb").versionRef("testcontainers")
-            library("testcontainers-localstack", "org.testcontainers", "testcontainers-localstack").versionRef("testcontainers")
         }
     }
 }

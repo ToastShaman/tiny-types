@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.github.toastshaman.tinytypes.aws.MiniStackContainer;
 import com.github.toastshaman.tinytypes.events.Events;
 import com.github.toastshaman.tinytypes.events.PrintStreamEventLogger;
 import java.io.IOException;
@@ -21,8 +22,6 @@ import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.localstack.LocalStackContainer;
-import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -43,8 +42,7 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
     PollingSqsMessageListenerOptions options = new PollingSqsMessageListenerOptions(5, 10);
 
     @Container
-    LocalStackContainer localstack =
-            new LocalStackContainer(DockerImageName.parse("localstack/localstack")).withServices("sqs");
+    static MiniStackContainer ministack = new MiniStackContainer();
 
     @BeforeEach
     void setUp() {
@@ -70,10 +68,10 @@ class ForwardToDeadLetterQueueOnExceptionFilterTest {
 
     private SqsClient createSqsClient() {
         return SqsClient.builder()
-                .endpointOverride(localstack.getEndpoint())
+                .endpointOverride(ministack.getEndpoint())
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(localstack.getAccessKey(), localstack.getSecretKey())))
-                .region(Region.of(localstack.getRegion()))
+                        AwsBasicCredentials.create(ministack.getAccessKey(), ministack.getSecretKey())))
+                .region(Region.of(ministack.getRegion()))
                 .build();
     }
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static software.amazon.awssdk.services.sqs.model.QueueAttributeName.QUEUE_ARN;
 
+import com.github.toastshaman.tinytypes.aws.MiniStackContainer;
 import com.github.toastshaman.tinytypes.aws.sqs.QueueArn;
 import com.github.toastshaman.tinytypes.aws.sqs.QueueUrl;
 import java.util.Map;
@@ -14,8 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.localstack.LocalStackContainer;
-import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -31,8 +30,7 @@ class SimpleSnsPublisherTest {
     String TEST_QUEUE_NAME = "test-queue";
 
     @Container
-    LocalStackContainer localstack =
-            new LocalStackContainer(DockerImageName.parse("localstack/localstack")).withServices("sns", "sqs");
+    static MiniStackContainer ministack = new MiniStackContainer();
 
     private TopicArn topicArn;
 
@@ -59,19 +57,19 @@ class SimpleSnsPublisherTest {
 
     private SnsClient createSnsClient() {
         return SnsClient.builder()
-                .endpointOverride(localstack.getEndpoint())
+                .endpointOverride(ministack.getEndpoint())
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(localstack.getAccessKey(), localstack.getSecretKey())))
-                .region(Region.of(localstack.getRegion()))
+                        AwsBasicCredentials.create(ministack.getAccessKey(), ministack.getSecretKey())))
+                .region(Region.of(ministack.getRegion()))
                 .build();
     }
 
     private SqsClient createSqsClient() {
         return SqsClient.builder()
-                .endpointOverride(localstack.getEndpoint())
+                .endpointOverride(ministack.getEndpoint())
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(localstack.getAccessKey(), localstack.getSecretKey())))
-                .region(Region.of(localstack.getRegion()))
+                        AwsBasicCredentials.create(ministack.getAccessKey(), ministack.getSecretKey())))
+                .region(Region.of(ministack.getRegion()))
                 .build();
     }
 

@@ -24,7 +24,6 @@ dependencies {
     testImplementation(libs.micrometer.tracing.testing)
 
     testImplementation(libs.testcontainers.junit)
-    testImplementation(libs.testcontainers.localstack)
 
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)
