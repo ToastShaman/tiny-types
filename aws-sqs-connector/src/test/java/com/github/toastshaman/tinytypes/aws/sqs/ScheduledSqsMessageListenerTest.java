@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class ScheduledSqsMessageListenerTest {
 
-    private static class TestSqsMessageListener implements MessageCountingSqsMessageListener {
+    private static class TestSqsMessageListener implements SqsMessageListener {
         final AtomicInteger pollCount = new AtomicInteger();
         final boolean throwException;
         final int messagesPerPoll;
@@ -27,7 +27,7 @@ class ScheduledSqsMessageListenerTest {
         }
 
         @Override
-        public int pollAndCountMessages() {
+        public int poll() {
             pollCount.incrementAndGet();
             if (throwException) {
                 throw new RuntimeException("Test exception");

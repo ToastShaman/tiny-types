@@ -57,22 +57,12 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
         }
 
         try {
-            var handledMessages = pollAndCountMessages();
+            var handledMessages = listener.poll();
             scheduleNextPoll(handledMessages == 0 ? options.delay().toMillis() : 0);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             scheduleNextPoll(options.delay().toMillis());
         }
-    }
-
-    private int pollAndCountMessages() {
-        if (listener instanceof MessageCountingSqsMessageListener countingListener) {
-            return countingListener.pollAndCountMessages();
-        }
-
-        listener.poll();
-
-        return 0;
     }
 
     private void awaitTermination(ScheduledExecutorService scheduler) {

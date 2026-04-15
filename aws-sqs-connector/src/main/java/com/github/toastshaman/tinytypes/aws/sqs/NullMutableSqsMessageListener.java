@@ -22,7 +22,7 @@ public class NullMutableSqsMessageListener implements SqsMessageListener {
     }
 
     @Override
-    public void poll() {
+    public int poll() {
         lock.lock();
 
         try {
@@ -31,10 +31,12 @@ public class NullMutableSqsMessageListener implements SqsMessageListener {
             var message = q.poll();
 
             if (message == null) {
-                return;
+                return 0;
             }
 
             handler.accept(List.of(message));
+
+            return 1;
         } finally {
             lock.unlock();
         }
