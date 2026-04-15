@@ -12,20 +12,28 @@ import org.junit.jupiter.api.Test;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class ScheduledSqsMessageListenerTest {
 
-    private static class TestSqsMessageListener implements SqsMessageListener {
+    private static class TestSqsMessageListener implements MessageCountingSqsMessageListener {
         final AtomicInteger pollCount = new AtomicInteger();
         final boolean throwException;
+        final int messagesPerPoll;
 
         TestSqsMessageListener(boolean throwException) {
+            this(throwException, 0);
+        }
+
+        TestSqsMessageListener(boolean throwException, int messagesPerPoll) {
             this.throwException = throwException;
+            this.messagesPerPoll = messagesPerPoll;
         }
 
         @Override
-        public void poll() {
+        public int pollAndCountMessages() {
             pollCount.incrementAndGet();
             if (throwException) {
                 throw new RuntimeException("Test exception");
             }
+
+            return messagesPerPoll;
         }
     }
 
@@ -88,6 +96,22 @@ class ScheduledSqsMessageListenerTest {
             scheduledListener.start();
             scheduledListener.close();
             assertFalse(scheduledListener.isRunning());
+        }
+    }
+
+    @Test
+    void should_poll_again_immediately_when_messages_were_processed() throws InterruptedException {
+        var listener = new TestSqsMessageListener(false, 1);
+
+        var slowOptions = ScheduledSqsMessageListenerOptions.builder()
+                .delay(Duration.ofSeconds(1))
+                .shutdownTimeout(Duration.ofMillis(100))
+                .build();
+
+        try (var scheduledListener = new ScheduledSqsMessageListener(listener, slowOptions)) {
+            scheduledListener.start();
+
+            await().atMost(Duration.ofMillis(250)).untilAsserted(() -> assertTrue(listener.pollCount.get() >= 2));
         }
     }
 }

@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
-public final class PollingSqsMessageListener implements SqsMessageListener {
+public final class PollingSqsMessageListener implements MessageCountingSqsMessageListener {
 
     private final QueueUrl queueUrl;
     private final SqsClient sqs;
@@ -35,12 +35,12 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
     }
 
     @Override
-    public void poll() {
+    public int pollAndCountMessages() {
         try {
             var messages = receiveMessages();
 
             if (messages.isEmpty()) {
-                return;
+                return 0;
             }
 
             switch (deletionStrategy) {
@@ -57,8 +57,10 @@ public final class PollingSqsMessageListener implements SqsMessageListener {
             }
 
             events.record(Success(queueUrl, messages));
+            return messages.size();
         } catch (Exception exception) {
             events.record(Failed(queueUrl, exception));
+            return 0;
         }
     }
 

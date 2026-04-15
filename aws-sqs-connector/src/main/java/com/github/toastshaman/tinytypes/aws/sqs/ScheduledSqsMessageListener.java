@@ -24,23 +24,12 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
     public ScheduledSqsMessageListener(SqsMessageListener listener, ScheduledSqsMessageListenerOptions options) {
         this.listener = Objects.requireNonNull(listener, "listener must not be null");
         this.options = Objects.requireNonNull(options, "options must not be null");
-        this.scheduler = Executors.newScheduledThreadPool(1);
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     public void start() {
         if (running.compareAndSet(false, true)) {
-            scheduler.scheduleWithFixedDelay(
-                    () -> {
-                        try {
-                            listener.poll();
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-                    },
-                    options.delay().toMillis(),
-                    options.delay().toMillis(),
-                    MILLISECONDS);
-            running.set(true);
+            scheduleNextPoll(0);
         }
     }
 
@@ -49,7 +38,44 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
     }
 
     public void stop() {
+        running.set(false);
         scheduler.shutdown();
+        awaitTermination(scheduler);
+    }
+
+    private void scheduleNextPoll(long delayMillis) {
+        if (!running.get()) {
+            return;
+        }
+
+        scheduler.schedule(this::runPoll, delayMillis, MILLISECONDS);
+    }
+
+    private void runPoll() {
+        if (!running.get()) {
+            return;
+        }
+
+        try {
+            var handledMessages = pollAndCountMessages();
+            scheduleNextPoll(handledMessages == 0 ? options.delay().toMillis() : 0);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            scheduleNextPoll(options.delay().toMillis());
+        }
+    }
+
+    private int pollAndCountMessages() {
+        if (listener instanceof MessageCountingSqsMessageListener countingListener) {
+            return countingListener.pollAndCountMessages();
+        }
+
+        listener.poll();
+
+        return 0;
+    }
+
+    private void awaitTermination(ScheduledExecutorService scheduler) {
         try {
             if (!scheduler.awaitTermination(options.shutdownTimeout().toMillis(), MILLISECONDS)) {
                 scheduler.shutdownNow();
