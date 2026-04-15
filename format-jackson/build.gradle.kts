@@ -1,10 +1,7 @@
 dependencies {
     api(project(":core"))
     api(libs.jackson.databind)
-    api(libs.jackson.datatype.jdk8)
-    api(libs.jackson.datatype.jsr310)
     api(libs.jackson.datatype.json)
-    api(libs.json.path)
 
     testImplementation(libs.assertj.core)
     testImplementation(libs.assertj.json)

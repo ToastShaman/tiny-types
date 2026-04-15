@@ -41,32 +41,6 @@ class JsonTest {
                     }""";
 
     @Test
-    void parse_returns_success() {
-        var title = Json.standard()
-                .decoder()
-                .parse(json)
-                .readString("glossary.GlossDiv.title")
-                .getOrNull();
-
-        assertThat(title).isEqualTo("S");
-
-        var id = Json.standard()
-                .decoder()
-                .parse(json)
-                .read("glossary.id", Long.class)
-                .getOrNull();
-
-        assertThat(id).isEqualTo(5L);
-    }
-
-    @Test
-    void parse_returns_failure() {
-        var result = Json.standard().decoder().parse(json).readString("glossary.foobar.title");
-
-        assertThat(result).isFailure();
-    }
-
-    @Test
     void can_read_as_json_object() {
         var result = Json.standard().decoder().readJSONObject(json);
 

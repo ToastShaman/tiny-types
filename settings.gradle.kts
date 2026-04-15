@@ -22,7 +22,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("assertj", "3.27.3")
-            version("jackson", "2.21.0")
+            version("jackson", "3.1.2")
             version("junit", "6.0.0")
             version("slf4j", "2.0.9")
             version("okhttp", "5.3.2")
@@ -32,15 +32,12 @@ dependencyResolutionManagement {
             version("spring-boot", "4.0.1")
 
             library("json", "org.json:json:20251224")
-            library("json-path", "com.jayway.jsonpath:json-path:2.10.0")
             library("vavr", "io.vavr:vavr:0.11.0")
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef("slf4j")
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
             library("slf4j-jdk14", "org.slf4j", "slf4j-jdk14").versionRef("slf4j")
-            library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
-            library("jackson-datatype-json", "com.fasterxml.jackson.datatype", "jackson-datatype-json-org").versionRef("jackson")
-            library("jackson-datatype-jdk8", "com.fasterxml.jackson.datatype", "jackson-datatype-jdk8").versionRef("jackson")
-            library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
+            library("jackson-databind", "tools.jackson.core", "jackson-databind").versionRef("jackson")
+            library("jackson-datatype-json", "tools.jackson.datatype", "jackson-datatype-json-org").versionRef("jackson")
 
             library("spring-boot-starter-test", "org.springframework.boot", "spring-boot-starter-test").versionRef("spring-boot")
 
