@@ -100,6 +100,27 @@ class ScheduledSqsMessageListenerTest {
     }
 
     @Test
+    void close_should_be_safe_before_start() {
+        var listener = new TestSqsMessageListener(false);
+
+        var scheduledListener = new ScheduledSqsMessageListener(listener, options);
+        scheduledListener.close();
+
+        assertFalse(scheduledListener.isRunning());
+    }
+
+    @Test
+    void start_should_throw_when_called_after_stop() {
+        var listener = new TestSqsMessageListener(false);
+
+        var scheduledListener = new ScheduledSqsMessageListener(listener, options);
+        scheduledListener.stop();
+
+        var exception = assertThrows(IllegalStateException.class, scheduledListener::start);
+        assertEquals("listener has been stopped and cannot be restarted", exception.getMessage());
+    }
+
+    @Test
     void should_poll_again_immediately_when_messages_were_processed() throws InterruptedException {
         var listener = new TestSqsMessageListener(false, 1);
 

@@ -28,7 +28,11 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
     }
 
     public void start() {
-        if (running.compareAndSet(false, true)) {
+        if (scheduler.isShutdown()) {
+            throw new IllegalStateException("listener has been stopped and cannot be restarted");
+        }
+
+        if (tryMarkRunning()) {
             scheduleNextPoll(0);
         }
     }
@@ -38,13 +42,13 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
     }
 
     public void stop() {
-        running.set(false);
+        markStopped();
         scheduler.shutdown();
         awaitTermination(scheduler);
     }
 
     private void scheduleNextPoll(long delayMillis) {
-        if (!running.get()) {
+        if (!isRunning()) {
             return;
         }
 
@@ -52,7 +56,7 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
     }
 
     private void runPoll() {
-        if (!running.get()) {
+        if (!isRunning()) {
             return;
         }
 
@@ -76,6 +80,14 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
         } finally {
             running.set(false);
         }
+    }
+
+    private boolean tryMarkRunning() {
+        return running.compareAndSet(false, true);
+    }
+
+    private void markStopped() {
+        running.set(false);
     }
 
     @Override
