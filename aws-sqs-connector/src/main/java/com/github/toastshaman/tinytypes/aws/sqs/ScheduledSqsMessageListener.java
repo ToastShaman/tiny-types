@@ -27,7 +27,7 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
-    public void start() {
+    public ScheduledSqsMessageListener start() {
         if (scheduler.isShutdown()) {
             throw new IllegalStateException("listener has been stopped and cannot be restarted");
         }
@@ -35,6 +35,8 @@ public final class ScheduledSqsMessageListener implements AutoCloseable {
         if (tryMarkRunning()) {
             scheduleNextPoll(0);
         }
+
+        return this;
     }
 
     public boolean isRunning() {

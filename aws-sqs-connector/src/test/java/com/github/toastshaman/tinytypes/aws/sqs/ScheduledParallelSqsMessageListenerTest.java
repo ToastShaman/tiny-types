@@ -39,17 +39,16 @@ class ScheduledParallelSqsMessageListenerTest {
                 .shutdownTimeout(Duration.ofMillis(200))
                 .build();
 
-        try (var scheduled = new ScheduledSqsMessageListener(parallel, scheduledOptions)) {
-            scheduled.start();
+        var scheduled = new ScheduledSqsMessageListener(parallel, scheduledOptions).start();
 
+        try (scheduled) {
             // Wait until the parallel listener has fired enough times that, given `threads` polls per
             // tick, we have observed multiple ticks worth of delegate invocations.
             await().atMost(Duration.ofSeconds(3))
                     .untilAsserted(() -> assertThat(pollInvocations.get()).isGreaterThanOrEqualTo(threads * 2));
-
-            scheduled.stop();
-            assertThat(scheduled.isRunning()).isFalse();
         }
+
+        assertThat(scheduled.isRunning()).isFalse();
 
         // Each tick must have invoked the delegate once per configured thread, so the total must be a
         // multiple of `threads`.
