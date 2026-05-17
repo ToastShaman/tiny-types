@@ -17,6 +17,7 @@ include("testing-events")
 include("testing-fp")
 include("testing-faker")
 include("testing-http-client-okhttp-spring")
+include("testing-approvals")
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -66,6 +67,7 @@ dependencyResolutionManagement {
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").versionRef("junit")
+            library("opentest4j", "org.opentest4j:opentest4j:1.3.0")
             library("assertj-core", "org.assertj", "assertj-core").versionRef("assertj")
             library("assertj-json", "net.javacrumbs.json-unit:json-unit-assertj:5.1.0")
             library("assertj-vavr", "org.assertj:assertj-vavr:0.4.3")
